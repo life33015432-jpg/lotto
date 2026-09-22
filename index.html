@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Aipluslotto.com</title>
+  <style>
+    :root {
+      --bg-color: #0b111e;
+      --card-bg: #162032;
+      --card-inner: #1e2c44;
+      --primary-accent: #f59e0b;
+      --secondary-accent: #3b82f6;
+      --success-accent: #10b981;
+      --danger-accent: #ef4444;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --border-color: #26354d;
+      --ball-size: 32px;
+      --ball-size-sm: 21px; /* 추출 결과 및 보관함 전용 축소 규격 */
+      --ball-y: #f59e0b;  /* 1~10 */
+      --ball-b: #3b82f6;  /* 11~20 */
+      --ball-r: #ef4444;  /* 21~30 */
+      --ball-g: #64748b;  /* 31~40 */
+      --ball-gr: #10b981; /* 41~45 */
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--bg-color); color: var(--text-main); display: flex; justify-content: center; min-height: 100vh; padding: 12px 8px 40px; }
+    
+    .app-container { width: 100%; max-width: 530px; display: flex; flex-direction: column; gap: 14px; margin: 0 auto; }
+    .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px; position: relative; }
+    .title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .title-row h3 { font-size: 0.95rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 6px; }
+    
+    .ball {
+      width: var(--ball-size);
+      height: var(--ball-size);
+      min-width: var(--ball-size);
+      min-height: var(--ball-size);
+      max-width: var(--ball-size);
+      max-height: var(--ball-size);
+      border-radius: 50%;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #fff;
+      box-shadow: inset -2px -2px 4px rgba(0,0,0,0.35), 1px 2px 4px rgba(0,0,0,0.25);
+      cursor: pointer;
+      user-select: none;
+      flex-shrink: 0;
+      transition: transform 0.1s ease;
+    }
+    .ball:active { transform: scale(0.92); }
+
+    .ball-sm {
+      width: var(--ball-size-sm) !important;
+      height: var(--ball-size-sm) !important;
+      min-width: var(--ball-size-sm) !important;
+      min-height: var(--ball-size-sm) !important;
+      max-width: var(--ball-size-sm) !important;
+      max-height: var(--ball-size-sm) !important;
+      font-size: 0.62rem !important;
+      box-shadow: inset -1px -1px 2px rgba(0,0,0,0.35), 1px 1px 2px rgba(0,0,0,0.25) !important;
+      cursor: default;
+    }
+
+    .ball-y { background: var(--ball-y); color: #2d1800; }
+    .ball-b { background: var(--ball-b); }
+    .ball-r { background: var(--ball-r); }
+    .ball-g { background: var(--ball-g); }
+    .ball-gr { background: var(--ball-gr); }
+    .ball-unselected { background: #1e293b; color: #64748b; box-shadow: none; border: 1px solid #334155; }
+    .ball.selected-ring { outline: 2.5px solid #fff; outline-offset: 1px; }
+
+    /* 헤더 패널 */
+    .header-panel { text-align: center; padding: 6px 0; }
+    .brand-title { font-size: 1.4rem; font-weight: 900; letter-spacing: -0.5px; color: var(--primary-accent); }
+    .stat-badge-row { display: flex; justify-content: center; gap: 10px; margin-top: 6px; font-size: 0.8rem; color: var(--text-sub); }
+    .stat-badge { background: var(--card-inner); padding: 3px 12px; border-radius: 20px; border: 1px solid var(--border-color); }
+    .stat-badge b { color: var(--secondary-accent); font-weight: 700; }
+
+    /* 최근 당첨 번호 통계 */
+    .stat-grid { display: flex; flex-direction: column; gap: 8px; font-size: 0.82rem; }
+    .stat-item { background: var(--card-inner); border-radius: 10px; padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; }
+    .stat-header { display: flex; justify-content: space-between; color: var(--text-sub); font-size: 0.75rem; }
+    .stat-ball-list { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
+
+    /* 2대 번호 추천 엔진 탭 */
+    .engine-toggle-group { display: flex; gap: 6px; background: #0e1726; padding: 4px; border-radius: 10px; margin-bottom: 10px; }
+    .engine-tab-btn { flex: 1; padding: 8px 0; background: transparent; border: none; border-radius: 7px; color: var(--text-sub); font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
+    .engine-tab-btn.active.engine-ai { background: var(--secondary-accent); color: #fff; box-shadow: 0 2px 6px rgba(59,130,246,0.35); }
+    .engine-tab-btn.active.engine-score { background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: #fff; box-shadow: 0 2px 6px rgba(139,92,246,0.35); }
+    
+    .ai-ball-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; justify-items: center; margin: 4px 0 10px; }
+
+    /* 사주 운세 & 꿈해몽 */
+    .fixed-scroll-panel { max-height: 220px; overflow-y: auto; background: var(--card-inner); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; font-size: 0.78rem; line-height: 1.45; }
+    .fixed-scroll-panel::-webkit-scrollbar,
+    .list-scroll-5items::-webkit-scrollbar { width: 5px; }
+    .fixed-scroll-panel::-webkit-scrollbar-thumb,
+    .list-scroll-5items::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    
+    .fortune-controls { display: grid; grid-template-columns: 1.2fr 0.9fr 1.1fr; gap: 6px; margin-bottom: 8px; }
+    .select-input, .text-input { width: 100%; background: #0f172a; border: 1px solid var(--border-color); border-radius: 6px; color: #fff; padding: 6px; font-size: 0.78rem; outline: none; }
+    .text-input::placeholder { color: #64748b; }
+    .couple-container { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; padding: 8px; background: #131d2e; border-radius: 8px; border: 1px solid #23334d; }
+    .couple-title { font-size: 0.75rem; font-weight: 700; color: var(--primary-accent); margin-bottom: 4px; }
+    .fortune-score-badge { display: inline-block; background: rgba(16,185,129,0.2); color: #10b981; padding: 2px 8px; border-radius: 10px; font-weight: 700; margin-bottom: 6px; }
+
+    /* 번호 선택 패드 */
+    .pad-container { min-height: 380px; display: flex; flex-direction: column; justify-content: space-between; }
+    .number-pad { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; justify-items: center; align-content: center; }
+    .pad-info-bar { display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: var(--text-sub); margin-top: 10px; padding: 4px 2px; }
+    
+    .max-combo-badge {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--primary-accent);
+      background: var(--card-inner);
+      padding: 3px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+    }
+
+    .quick-qty-group { display: flex; gap: 6px; margin-top: 8px; }
+    .btn-qty { flex: 1; padding: 6px 0; background: var(--card-inner); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-sub); font-size: 0.76rem; font-weight: 700; cursor: pointer; }
+    .btn-qty.active { background: var(--primary-accent); color: #1e1100; border-color: var(--primary-accent); }
+    .range-control { display: flex; align-items: center; gap: 8px; margin: 8px 0 6px; }
+    .range-slider { flex: 1; accent-color: var(--primary-accent); }
+    .btn-extract { width: 100%; padding: 13px; background: linear-gradient(135deg, #10b981, #059669); border: none; border-radius: 10px; color: #fff; font-size: 1rem; font-weight: 800; cursor: pointer; box-shadow: 0 3px 10px rgba(16,185,129,0.3); }
+
+    /* 5개 항목 높이 제한 스크롤 컨테이너 */
+    .list-scroll-5items {
+      max-height: 250px;
+      overflow-y: auto;
+      padding-right: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    /* 단일 라인 공통 레이아웃 (추출 결과 & 보관함) */
+    .single-line-result {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--card-inner);
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      gap: 6px;
+      min-height: 44px;
+    }
+    .result-left-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .result-game-label { font-size: 0.82rem; font-weight: 800; color: var(--primary-accent); min-width: 20px; text-align: center; }
+    .result-balls-group { display: flex; gap: 3px; align-items: center; }
+    
+    .result-right-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: flex-end;
+      flex-grow: 1;
+      overflow: hidden;
+    }
+    .result-history-summary {
+      font-size: 0.74rem;
+      color: var(--text-sub);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: right;
+    }
+    .result-history-summary b { color: var(--primary-accent); }
+
+    /* 보관함 액션 버튼 */
+    .action-btn-group { display: flex; gap: 6px; align-items: center; }
+    .btn-sm { padding: 5px 9px; border-radius: 6px; font-size: 0.74rem; font-weight: 600; border: none; cursor: pointer; flex-shrink: 0; }
+    .btn-del { background: rgba(239,68,68,0.2); color: var(--danger-accent); }
+    .btn-omr { background: rgba(59,130,246,0.2); color: var(--secondary-accent); }
+    .btn-save-all { background: var(--secondary-accent); color: #fff; }
+    .btn-reset { background: rgba(148,163,184,0.15); color: var(--text-sub); border: 1px solid var(--border-color); }
+    .btn-reset:hover { color: #fff; border-color: var(--text-sub); }
+
+    /* 로또용지 OMR 모달 */
+    .omr-modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 10px; }
+    .omr-modal-backdrop.open { display: flex; }
+    .omr-card { width: 100%; max-width: 462px; background: #fafafa; border-radius: 12px; padding: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); color: #111; position: relative; border-top: 6px solid #e11d48; }
+    .omr-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed #cbd5e1; padding-bottom: 8px; margin-bottom: 12px; }
+    .omr-header h4 { color: #b91c1c; font-size: 1.05rem; font-weight: 800; }
+    .omr-close-btn { background: none; border: none; font-size: 1.3rem; line-height: 1; cursor: pointer; color: #64748b; }
+    .omr-grid-container { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; background: #fff; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; }
+    .omr-cell { aspect-ratio: 1.1; border: 1px solid #e2e8f0; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; color: #334155; position: relative; }
+    .omr-cell.marked { background: #b91c1c; color: #fff; border-color: #991b1b; }
+    .omr-cell.marked::after { content: ''; position: absolute; width: 60%; height: 3px; background: #000; transform: rotate(-25deg); opacity: 0.2; }
+    .omr-nav-btn-row { display: flex; justify-content: space-between; margin-top: 10px; gap: 8px; }
+    .omr-nav-btn { flex: 1; padding: 8px; background: #e2e8f0; border: none; border-radius: 6px; font-weight: 700; color: #334155; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- 헤더 패널 -->
+    <header class="header-panel">
+      <div class="brand-title">Aipluslotto.com</div>
+      <div class="stat-badge-row">
+        <span class="stat-badge">당일 접속자 수 <b id="daily-visitor-count">1,248</b>명</span>
+      </div>
+    </header>
+
+    <!-- 최근 당첨 번호 통계 -->
+    <section class="card">
+      <div class="title-row">
+        <h3>최근 당첨 번호 통계</h3>
+        <span style="font-size:0.75rem; color:var(--text-sub);" id="latest-round-title">직전 회차</span>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-item">
+          <div class="stat-header"><span>직전 1회차 당첨번호 (보너스 포함)</span><span></span></div>
+          <div class="stat-ball-list" id="stat-latest-balls"></div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-header"><span>최근 5회차 다빈도 출현수 (2회 이상 중복)</span><span id="stat-freq-count">0개</span></div>
+          <div class="stat-ball-list" id="stat-freq-5"></div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-header"><span>최근 10회차 상위 출현수 (TOP 7)</span><span>번호순 정렬</span></div>
+          <div class="stat-ball-list" id="stat-top-10"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2대 번호 추천 엔진 -->
+    <section class="card">
+      <div class="title-row">
+        <h3>2대 번호 추천 엔진</h3>
+        <button class="btn-sm" style="background:var(--card-inner); border:1px solid var(--secondary-accent); color:var(--secondary-accent); font-weight:700;" onclick="applyCurrentEngineCandidates()">적용</button>
+      </div>
+
+      <div class="engine-toggle-group">
+        <button class="engine-tab-btn active engine-ai" id="tab-engine-ai" onclick="switchEngine('AI')">🤖 AI 딥러닝 통합 엔진</button>
+        <button class="engine-tab-btn engine-score" id="tab-engine-score" onclick="switchEngine('SCORE')">🎯 924 통계 스코어링 엔진</button>
+      </div>
+
+      <div class="ai-ball-grid" id="engine-candidates-grid"></div>
+
+      <div style="margin-top:6px; display:flex; align-items:center; gap:6px;">
+        <span style="font-size:0.75rem; color:var(--text-sub);">두 엔진 공통 추천수:</span>
+        <div id="engine-common-balls" style="display:flex; gap:4px; flex-wrap:wrap;"></div>
+      </div>
+    </section>
+
+    <!-- 사주 운세 & 꿈해몽 추천 -->
+    <section class="card">
+      <div class="title-row">
+        <h3>사주 운세 &amp; 꿈해몽 추천</h3>
+        <span style="font-size:0.75rem; color:var(--primary-accent);">오행 및 의미 분석 연동</span>
+      </div>
+      
+      <div style="margin-bottom:8px;">
+        <select class="select-input" id="fortune-mode" onchange="toggleFortuneMode()">
+          <option value="single">1인 사주 분석</option>
+          <option value="couple">2인 궁합 분석</option>
+        </select>
+      </div>
+
+      <div class="couple-container" id="person1-box">
+        <div class="couple-title" id="person1-title" style="display:none;">본인 사주 정보</div>
+        <div class="fortune-controls">
+          <input type="text" class="text-input" id="p1-birth" placeholder="예: 19900101" maxlength="8" inputmode="numeric" value="19900101" />
+          <select class="select-input" id="p1-calendar">
+            <option value="sol">양력</option>
+            <option value="lun">음력</option>
+            <option value="leap">윤달</option>
+          </select>
+          <select class="select-input" id="p1-time">
+            <option value="0">자시 (23~01)</option>
+            <option value="1">축시 (01~03)</option>
+            <option value="2">인시 (03~05)</option>
+            <option value="3">묘시 (05~07)</option>
+            <option value="4">진시 (07~09)</option>
+            <option value="5">사시 (09~11)</option>
+            <option value="6">오시 (11~13)</option>
+            <option value="7">미시 (13~15)</option>
+            <option value="8">신시 (15~17)</option>
+            <option value="9">유시 (17~19)</option>
+            <option value="10">술시 (19~21)</option>
+            <option value="11">해시 (21~23)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="couple-container" id="person2-box" style="display:none;">
+        <div class="couple-title">상대방 사주 정보</div>
+        <div class="fortune-controls">
+          <input type="text" class="text-input" id="p2-birth" placeholder="예: 19920505" maxlength="8" inputmode="numeric" value="19920505" />
+          <select class="select-input" id="p2-calendar">
+            <option value="sol">양력</option>
+            <option value="lun">음력</option>
+            <option value="leap">윤달</option>
+          </select>
+          <select class="select-input" id="p2-time">
+            <option value="6">오시 (11~13)</option>
+            <option value="0">자시 (23~01)</option>
+            <option value="1">축시 (01~03)</option>
+            <option value="2">인시 (03~05)</option>
+            <option value="3">묘시 (05~07)</option>
+            <option value="4">진시 (07~09)</option>
+            <option value="5">사시 (09~11)</option>
+            <option value="7">미시 (13~15)</option>
+            <option value="8">신시 (15~17)</option>
+            <option value="9">유시 (17~19)</option>
+            <option value="10">술시 (19~21)</option>
+            <option value="11">해시 (21~23)</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:6px; margin-bottom:8px;">
+        <input type="text" class="text-input" id="dream-input" placeholder="꿈 키워드 입력 (예: 황금 돼지, 조상님, 용)" />
+        <button class="btn-sm" style="background:var(--primary-accent); color:#000; font-weight:700; width:70px;" onclick="runFortuneAndDream()">분석</button>
+      </div>
+
+      <div class="fixed-scroll-panel" id="fortune-result-panel">
+        <div class="fortune-score-badge" id="fortune-score-tag">행운력 지수: 88점</div>
+        <p id="fortune-analysis-desc" style="color:var(--text-sub); margin-bottom:8px;"></p>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span style="color:#10b981; font-weight:700; width:52px;">좋은 수:</span>
+            <div id="fortune-good-balls" style="display:flex; gap:4px; flex-wrap:wrap;"></div>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span style="color:#ef4444; font-weight:700; width:52px;">나쁜 수:</span>
+            <div id="fortune-bad-balls" style="display:flex; gap:4px; flex-wrap:wrap;"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 번호 선택 패드 -->
+    <section class="card pad-container">
+      <div>
+        <div class="title-row">
+          <h3>번호 선택 패드</h3>
+          <span class="max-combo-badge" id="max-combo-display">최대 조합: 0개</span>
+        </div>
+        <div class="number-pad" id="main-number-pad"></div>
+        <div class="pad-info-bar">
+          <span>선택된 고정수: <b id="fixed-count" style="color:var(--primary-accent);">0</b>개</span>
+          <button class="btn-sm" style="background:var(--card-inner); color:var(--text-sub);" onclick="clearFixedNumbers()">초기화</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="quick-qty-group">
+          <button class="btn-qty" onclick="setQuickQty(5)">5개</button>
+          <button class="btn-qty active" onclick="setQuickQty(10)">10개</button>
+          <button class="btn-qty" onclick="setQuickQty(20)">20개</button>
+          <button class="btn-qty" onclick="setQuickQty(50)">50개</button>
+          <button class="btn-qty" onclick="setQuickQty(100)">100개</button>
+        </div>
+        <div class="range-control">
+          <span style="font-size:0.8rem; color:var(--text-sub);">추출 수량:</span>
+          <input type="range" class="range-slider" id="extract-range" min="1" max="100" value="10" oninput="updateRangeFromSlider(this.value)" />
+          <span id="range-val-badge" style="font-size:0.85rem; font-weight:700; color:var(--primary-accent); width:45px; text-align:right;">10G</span>
+        </div>
+        <button class="btn-extract" onclick="runDualEngineExtraction()">조합</button>
+      </div>
+    </section>
+
+    <!-- 추출 결과 -->
+    <section class="card" id="result-section" style="display:none;">
+      <div class="title-row">
+        <h3>추출 결과 <span id="result-limit-badge" style="font-size:0.75rem; color:#10b981;"></span></h3>
+        <div class="action-btn-group">
+          <button class="btn-sm btn-omr" onclick="openOMRFromExtract(0)">[로또용지]</button>
+          <button class="btn-sm btn-save-all" onclick="saveAllCurrentResults()">[전체 보관]</button>
+          <button class="btn-sm btn-reset" onclick="resetExtractedResults()">[초기화]</button>
+        </div>
+      </div>
+      <div id="extracted-games-list" class="list-scroll-5items"></div>
+    </section>
+
+    <!-- 보관함 (추출결과와 동일한 공 크기 & 역대 당첨이력 표기 적용) -->
+    <section class="card">
+      <div class="title-row">
+        <h3>보관함</h3>
+        <div class="action-btn-group">
+          <button class="btn-sm btn-omr" onclick="openOMRFromStorage(0)">[로또용지]</button>
+          <button class="btn-sm btn-del" onclick="clearStorage()">[보관함 비우기]</button>
+        </div>
+      </div>
+      <div id="storage-list" class="list-scroll-5items">
+        <div style="font-size:0.8rem; color:var(--text-sub); text-align:center; padding:12px 0;">보관된 게임이 없습니다.</div>
+      </div>
+    </section>
+  </div>
+
+  <!-- OMR 모달 -->
+  <div class="omr-modal-backdrop" id="omr-modal" onclick="closeOMR(event)">
+    <div class="omr-card" onclick="event.stopPropagation()">
+      <div class="omr-header">
+        <h4 id="omr-game-title">[로또용지] 제 A 게임</h4>
+        <button class="omr-close-btn" onclick="closeOMR()">&times;</button>
+      </div>
+      <div style="display:flex; justify-content:center; gap:6px; margin-bottom:12px;" id="omr-ball-preview"></div>
+      <div class="omr-grid-container" id="omr-grid"></div>
+      <div class="omr-nav-btn-row">
+        <button class="omr-nav-btn" onclick="prevOMRGame()">&lt; 이전 게임</button>
+        <button class="omr-nav-btn" onclick="nextOMRGame()">다음 게임 &gt;</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ==========================================================================
+       전역 상태 관리
+       ========================================================================== */
+    const STATE = {
+      fixedNumbers: new Set(),
+      activeEngineTab: 'AI', // 'AI' | 'SCORE'
+      engineCandidates: {
+        AI: [],
+        SCORE: []
+      },
+      commonCandidates: [],
+      historyDB: [],
+      targetRound: 1243,
+      prevRound: 1242,
+      generatedGames: [],
+      omrCurrentIndex: 0,
+      omrActiveSource: [],
+      savedGames: []
+    };
+
+    const LATEST_FALLBACK_SNIPPET = [
+      { round: 1242, numbers: [2, 4, 10, 16, 31, 41], bonus: 9 },
+      { round: 1241, numbers: [7, 13, 16, 23, 24, 43], bonus: 9 },
+      { round: 1240, numbers: [11, 13, 19, 20, 31, 44], bonus: 27 },
+      { round: 1239, numbers: [11, 13, 22, 32, 33, 36], bonus: 8 },
+      { round: 1238, numbers: [2, 13, 18, 32, 38, 42], bonus: 22 },
+      { round: 1237, numbers: [10, 20, 23, 34, 37, 40], bonus: 36 },
+      { round: 1236, numbers: [12, 18, 21, 29, 34, 38], bonus: 10 },
+      { round: 1235, numbers: [6, 7, 11, 15, 39, 43], bonus: 20 },
+      { round: 1234, numbers: [1, 15, 19, 31, 35, 43], bonus: 27 },
+      { round: 1233, numbers: [2, 7, 20, 25, 37, 40], bonus: 29 }
+    ];
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      initDailyVisitors();
+      initNumberPad();
+      initSavedGames();
+      await loadHistoryDB();
+      calculateTargetRounds();
+      generateWeeklyCandidates();
+      analyzeRecentStatistics();
+      runFortuneAndDream();
+      updateMaxComboDisplay();
+    });
+
+    /* 당일 접속자 수 계산 및 로컬스토리지 보존 */
+    function initDailyVisitors() {
+      const todayKey = 'lotto_visitor_date';
+      const countKey = 'lotto_visitor_count';
+      const todayStr = new Date().toISOString().slice(0, 10);
+      
+      let storedDate = localStorage.getItem(todayKey);
+      let count = parseInt(localStorage.getItem(countKey) || '0', 10);
+
+      if (storedDate !== todayStr) {
+        const baseSeed = todayStr.split('-').reduce((a, b) => a + parseInt(b, 10), 0);
+        count = 1180 + (baseSeed % 370);
+        localStorage.setItem(todayKey, todayStr);
+      } else {
+        count += Math.floor(Math.random() * 2) + 1;
+      }
+      localStorage.setItem(countKey, count);
+      document.getElementById('daily-visitor-count').innerText = count.toLocaleString();
+    }
+
+    function normalizeNumbers(arr) {
+      if (!Array.isArray(arr)) return [];
+      return arr.map(n => parseInt(n, 10)).filter(n => !isNaN(n)).sort((a, b) => a - b);
+    }
+
+    async function loadHistoryDB() {
+      const cached = localStorage.getItem('cached_lotto_history');
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            STATE.historyDB = parsed.sort((a, b) => Number(b.round || 0) - Number(a.round || 0));
+          } else {
+            STATE.historyDB = LATEST_FALLBACK_SNIPPET;
+          }
+        } catch (e) {
+          STATE.historyDB = LATEST_FALLBACK_SNIPPET;
+        }
+      } else {
+        STATE.historyDB = LATEST_FALLBACK_SNIPPET;
+      }
+
+      try {
+        const res = await fetch('./data/lotto-history.json');
+        if (res.ok) {
+          const freshData = await res.json();
+          freshData.sort((a, b) => Number(b.round || 0) - Number(a.round || 0));
+          STATE.historyDB = freshData;
+          localStorage.setItem('cached_lotto_history', JSON.stringify(freshData));
+          calculateTargetRounds();
+          generateWeeklyCandidates();
+          analyzeRecentStatistics();
+          renderStorageList(); // DB 갱신 후 보관함 이력 재계산
+        }
+      } catch (err) {}
+    }
+
+    function calculateTargetRounds() {
+      const latestDbRound = (STATE.historyDB && STATE.historyDB.length > 0)
+        ? Number(STATE.historyDB[0].round || 1242)
+        : 1242;
+
+      STATE.prevRound = latestDbRound;
+      STATE.targetRound = latestDbRound + 1;
+    }
+
+    /* 924 통계 스코어링 기반 함수군 */
+    function normalizeArr(arr) {
+      if (!arr || !arr.length) return [];
+      const min = Math.min(...arr), max = Math.max(...arr);
+      if (max === min) return arr.map(() => 50);
+      return arr.map(v => ((v - min) / (max - min)) * 100);
+    }
+
+    function getSectionIndex(n) {
+      return Math.floor((n - 1) / 10);
+    }
+
+    function buildNumberStats(historyList) {
+      const freqAll = Array(46).fill(0), freq30 = Array(46).fill(0), freq100 = Array(46).fill(0);
+      const recent10 = Array(46).fill(0), prev30 = Array(46).fill(0), lastSeen = Array(46).fill(Infinity);
+
+      historyList.forEach((draw, idx) => {
+        const nums = Array.isArray(draw) ? draw : (draw.numbers || []);
+        nums.forEach(n => {
+          if (n >= 1 && n <= 45) {
+            freqAll[n]++;
+            if (idx < 30) freq30[n]++;
+            if (idx < 100) freq100[n]++;
+            if (idx < 10) recent10[n]++;
+            if (idx >= 10 && idx < 40) prev30[n]++;
+            if (lastSeen[n] === Infinity) lastSeen[n] = idx;
+          }
+        });
+      });
+
+      const freqScore = normalizeArr(freqAll.slice(1));
+      const f30Score = normalizeArr(freq30.slice(1));
+      const f100Score = normalizeArr(freq100.slice(1));
+      const gapRaw = lastSeen.slice(1).map(v => (v === Infinity ? historyList.length : v));
+      const gapScore = normalizeArr(gapRaw);
+      const trendRaw = recent10.slice(1).map((v, i) => (v / 10) - (prev30[i + 1] / 30));
+      const trendScore = normalizeArr(trendRaw);
+
+      const stats = {};
+      for (let n = 1; n <= 45; n++) {
+        stats[n] = {
+          freqAll: freqScore[n - 1],
+          freq30: f30Score[n - 1],
+          freq100: f100Score[n - 1],
+          gap: gapScore[n - 1],
+          trend: trendScore[n - 1],
+          rawFreq: freqAll[n],
+          lastGap: gapRaw[n - 1]
+        };
+      }
+      return { stats, freqAll };
+    }
+
+    function buildPairMatrix(historyList) {
+      const pair = Array.from({ length: 46 }, () => Array(46).fill(0));
+      historyList.forEach(draw => {
+        const nums = Array.isArray(draw) ? draw : (draw.numbers || []);
+        for (let i = 0; i < nums.length; i++) {
+          for (let j = i + 1; j < nums.length; j++) {
+            const a = nums[i], b = nums[j];
+            if (a <= 45 && b <= 45) {
+              pair[a][b]++;
+              pair[b][a]++;
+            }
+          }
+        }
+      });
+      return pair;
+    }
+
+    function getNumberBaseScore(n, stats) {
+      return (
+        stats[n].freq30 * 0.20 +
+        stats[n].freq100 * 0.15 +
+        stats[n].freqAll * 0.10 +
+        stats[n].gap * 0.15 +
+        stats[n].trend * 0.10
+      );
+    }
+
+    /* 924 엔진: 12개 후보 도출 함수 */
+    function derive12CandidatesByStats(historyList, targetRound) {
+      const { stats } = buildNumberStats(historyList);
+      const pair = buildPairMatrix(historyList);
+      const pool = [];
+
+      for (let n = 1; n <= 45; n++) {
+        let partnerScore = 0;
+        if (historyList.length > 0) {
+          const pairValues = Array.from({ length: 45 }, (_, i) => pair[n][i + 1]);
+          partnerScore = normalizeArr(pairValues)[0] || 0;
+        }
+        const roundVariance = ((n * 13 + targetRound * 17) % 19);
+        const score = getNumberBaseScore(n, stats) + (partnerScore * 0.15) + (roundVariance * 0.3);
+        pool.push({ n, score, stats: stats[n] });
+      }
+
+      pool.sort((a, b) => b.score - a.score);
+
+      const selected = [];
+      const sectionCounts = Array(5).fill(0);
+
+      for (const item of pool) {
+        if (selected.length >= 12) break;
+        const sec = getSectionIndex(item.n);
+        if (sectionCounts[sec] >= 3 && selected.length < 10) continue;
+        selected.push(item.n);
+        sectionCounts[sec]++;
+      }
+
+      while (selected.length < 12) {
+        for (const item of pool) {
+          if (!selected.includes(item.n)) {
+            selected.push(item.n);
+            break;
+          }
+        }
+      }
+
+      return {
+        candidates: selected.sort((a, b) => a - b),
+        stats,
+        pair
+      };
+    }
+
+    /* AI 딥러닝 통합 엔진: 12개 후보 도출 함수 */
+    function derive12CandidatesByIntegratedAI(roundNumber) {
+      const weights = Array(46).fill(0);
+      const seeds = [
+        roundNumber * 9301 + 101 * 49297,
+        roundNumber * 7919 + 202 * 31337,
+        roundNumber * 6571 + 303 * 17929
+      ];
+
+      seeds.forEach((s, idx) => {
+        let curr = s % 233280;
+        for (let i = 0; i < 20; i++) {
+          curr = (curr * 9301 + 49297) % 233280;
+          const num = (Math.floor((curr / 233280) * 45)) + 1;
+          weights[num] += (3 - idx) * (20 - i);
+        }
+      });
+
+      const sortedNums = Array.from({ length: 45 }, (_, i) => i + 1)
+        .sort((a, b) => weights[b] - weights[a]);
+
+      return sortedNums.slice(0, 12).sort((a, b) => a - b);
+    }
+
+    /* 추천 엔진 12수 후보 생성 */
+    function generateWeeklyCandidates() {
+      STATE.engineCandidates.AI = derive12CandidatesByIntegratedAI(STATE.targetRound);
+
+      const scoreResult = derive12CandidatesByStats(STATE.historyDB, STATE.targetRound);
+      STATE.engineCandidates.SCORE = scoreResult.candidates;
+
+      STATE.commonCandidates = STATE.engineCandidates.AI.filter(n => STATE.engineCandidates.SCORE.includes(n));
+      renderEngineCandidates();
+    }
+
+    function switchEngine(engineKey) {
+      STATE.activeEngineTab = engineKey;
+      document.getElementById('tab-engine-ai').classList.toggle('active', engineKey === 'AI');
+      document.getElementById('tab-engine-score').classList.toggle('active', engineKey === 'SCORE');
+      renderEngineCandidates();
+    }
+
+    function renderEngineCandidates() {
+      const container = document.getElementById('engine-candidates-grid');
+      container.innerHTML = '';
+
+      const mode = STATE.activeEngineTab;
+      const list = STATE.engineCandidates[mode] || [];
+
+      list.forEach(num => {
+        const isSelected = STATE.fixedNumbers.has(num);
+        const ball = createBall(num, () => {
+          toggleFixedNumber(num);
+          renderEngineCandidates();
+        });
+        if (isSelected) ball.classList.add('selected-ring');
+        container.appendChild(ball);
+      });
+
+      const commonContainer = document.getElementById('engine-common-balls');
+      commonContainer.innerHTML = '';
+      if (STATE.commonCandidates.length === 0) {
+        commonContainer.innerHTML = `<span style="font-size:0.75rem; color:#64748b;">(공통수 없음)</span>`;
+      } else {
+        STATE.commonCandidates.forEach(n => {
+          commonContainer.appendChild(createBall(n, () => toggleFixedNumber(n)));
+        });
+      }
+    }
+
+    function applyCurrentEngineCandidates() {
+      const list = STATE.engineCandidates[STATE.activeEngineTab] || [];
+      list.forEach(n => STATE.fixedNumbers.add(n));
+      syncPadUI();
+      renderEngineCandidates();
+      updateMaxComboDisplay();
+    }
+
+    /* 번호 선택 패드 */
+    function initNumberPad() {
+      const pad = document.getElementById('main-number-pad');
+      pad.innerHTML = '';
+      for (let i = 1; i <= 45; i++) {
+        const ball = createBall(i, () => toggleFixedNumber(i));
+        ball.id = `pad-ball-${i}`;
+        ball.className = `ball ball-unselected`;
+        pad.appendChild(ball);
+      }
+    }
+
+    function toggleFixedNumber(num) {
+      if (STATE.fixedNumbers.has(num)) {
+        STATE.fixedNumbers.delete(num);
+      } else {
+        STATE.fixedNumbers.add(num);
+      }
+      syncPadUI();
+      renderEngineCandidates();
+      updateMaxComboDisplay();
+    }
+
+    function clearFixedNumbers() {
+      STATE.fixedNumbers.clear();
+      syncPadUI();
+      renderEngineCandidates();
+      updateMaxComboDisplay();
+    }
+
+    function syncPadUI() {
+      for (let i = 1; i <= 45; i++) {
+        const ball = document.getElementById(`pad-ball-${i}`);
+        if (!ball) continue;
+        if (STATE.fixedNumbers.has(i)) {
+          ball.className = `ball ${getBallClass(i)} selected-ring`;
+        } else {
+          ball.className = `ball ball-unselected`;
+        }
+      }
+      document.getElementById('fixed-count').innerText = STATE.fixedNumbers.size;
+    }
+
+    /* 번호 선택 패드 옆 최대 조합갯수 실시간 계산 표기 */
+    function updateMaxComboDisplay() {
+      const count = STATE.fixedNumbers.size;
+      const displayEl = document.getElementById('max-combo-display');
+      if (count < 6) {
+        displayEl.innerText = `최대 조합: 0개`;
+      } else {
+        const total = combinationsCount(count, 6);
+        displayEl.innerText = `최대 조합: ${total.toLocaleString()}개`;
+      }
+    }
+
+    function setQuickQty(qty) {
+      document.getElementById('extract-range').value = qty;
+      updateRangeFromSlider(qty);
+    }
+
+    function updateRangeFromSlider(val) {
+      const intVal = parseInt(val, 10);
+      document.getElementById('range-val-badge').innerText = `${intVal}G`;
+      document.querySelectorAll('.btn-qty').forEach(btn => {
+        btn.classList.toggle('active', parseInt(btn.innerText, 10) === intVal);
+      });
+    }
+
+    function combinationsCount(n, r) {
+      if (r < 0 || r > n) return 0;
+      if (r === 0 || r === n) return 1;
+      let c = 1;
+      for (let i = 1; i <= r; i++) c = (c * (n - (r - i))) / i;
+      return Math.round(c);
+    }
+
+    function getAllCombinations(arr, m) {
+      const result = [];
+      function f(indices, start) {
+        if (indices.length === m) {
+          result.push(indices.map(i => arr[i]));
+          return;
+        }
+        for (let i = start; i < arr.length; i++) f(indices.concat(i), i + 1);
+      }
+      f([], 0);
+      return result;
+    }
+
+    function getCombinations12C6(arr) {
+      const out = [];
+      const len = arr.length;
+      for (let a = 0; a < len - 5; a++) {
+        for (let b = a + 1; b < len - 4; b++) {
+          for (let c = b + 1; c < len - 3; c++) {
+            for (let d = c + 1; d < len - 2; d++) {
+              for (let e = d + 1; e < len - 1; e++) {
+                for (let f = e + 1; f < len; f++) {
+                  out.push([arr[a], arr[b], arr[c], arr[d], arr[e], arr[f]]);
+                }
+              }
+            }
+          }
+        }
+      }
+      return out;
+    }
+
+    function calculateComboScore(combo, stats, pair, totalHistoryLen) {
+      const nums = combo;
+      const baseAvg = nums.reduce((s, n) => s + getNumberBaseScore(n, stats), 0) / 6;
+      const sum = nums.reduce((a, b) => a + b, 0);
+      const sumScore = Math.max(0, 100 - Math.abs(sum - 138) * 1.4);
+      const oddCount = nums.filter(n => n % 2 === 1).length;
+      const oddScore = [2, 3, 4].includes(oddCount) ? 100 : 55;
+      const sections = new Set(nums.map(getSectionIndex)).size;
+      const sectionScore = sections >= 4 ? 100 : (sections === 3 ? 85 : (sections === 2 ? 65 : 35));
+      const hasConsecutive = nums.some((n, i) => i > 0 && n === nums[i - 1] + 1);
+      const consecutiveScore = hasConsecutive ? 75 : 50;
+
+      let pairScore = 0;
+      let pairs = 0;
+      for (let i = 0; i < 6; i++) {
+        for (let j = i + 1; j < 6; j++) {
+          pairScore += pair[nums[i]][nums[j]];
+          pairs++;
+        }
+      }
+      pairScore = pairs ? Math.min(100, (pairScore / (pairs * Math.max(1, totalHistoryLen))) * 100 * 6) : 50;
+
+      return (
+        baseAvg * 0.40 +
+        sectionScore * 0.15 +
+        oddScore * 0.10 +
+        sumScore * 0.10 +
+        consecutiveScore * 0.05 +
+        pairScore * 0.20
+      );
+    }
+
+    /* 메인 조합 추출 핸들러 (번호 선택 필수) */
+    function runDualEngineExtraction() {
+      const fixedNums = Array.from(STATE.fixedNumbers);
+
+      // 번호 미선택 시 조합 차단
+      if (fixedNums.length === 0) {
+        alert('번호 선택 패드에서 번호를 1개 이상 선택해주세요.');
+        return;
+      }
+
+      const requested = parseInt(document.getElementById('extract-range').value, 10) || 10;
+      const fixedSet = new Set(fixedNums);
+
+      // 번호판에서 6개 이상 직접 선택한 경우
+      if (fixedNums.length >= 6) {
+        fixedNums.sort((a, b) => a - b);
+        const allPossibleCombos = getAllCombinations(fixedNums, 6);
+        const { stats } = buildNumberStats(STATE.historyDB);
+        const pair = buildPairMatrix(STATE.historyDB);
+
+        const scored = allPossibleCombos.map(combo => ({
+          game: combo,
+          score: calculateComboScore(combo, stats, pair, STATE.historyDB.length)
+        })).sort((a, b) => b.score - a.score);
+
+        const targetGames = scored.slice(0, requested).map(item => item.game);
+        const isCapped = targetGames.length < requested;
+        STATE.generatedGames = targetGames;
+        renderExtractedResults(isCapped, targetGames.length);
+        return;
+      }
+
+      // 1~5개 선택 시: 활성 엔진 12수 후보와 결합하여 조합 생성
+      let candidatePool = [...STATE.engineCandidates[STATE.activeEngineTab]];
+
+      fixedNums.forEach(fn => {
+        if (!candidatePool.includes(fn)) {
+          candidatePool.unshift(fn);
+        }
+      });
+      candidatePool = candidatePool.slice(0, 12).sort((a, b) => a - b);
+
+      if (candidatePool.length < 6) {
+        alert('조합 생성을 위해 번호를 추가로 선택해주세요.');
+        return;
+      }
+
+      const all924Combos = getCombinations12C6(candidatePool);
+
+      const validCombos = all924Combos.filter(combo => {
+        return Array.from(fixedSet).every(n => combo.includes(n));
+      });
+
+      const { stats } = buildNumberStats(STATE.historyDB);
+      const pair = buildPairMatrix(STATE.historyDB);
+
+      const scoredList = (validCombos.length ? validCombos : all924Combos).map(combo => ({
+        game: combo,
+        score: calculateComboScore(combo, stats, pair, STATE.historyDB.length)
+      })).sort((a, b) => b.score - a.score);
+
+      const targetGames = scoredList.slice(0, requested).map(item => item.game);
+      const isCapped = targetGames.length < requested;
+
+      STATE.generatedGames = targetGames;
+      renderExtractedResults(isCapped, targetGames.length);
+    }
+
+    function resetExtractedResults() {
+      STATE.generatedGames = [];
+      document.getElementById('extracted-games-list').innerHTML = '';
+      document.getElementById('result-section').style.display = 'none';
+    }
+
+    /* 추출 결과 렌더링 */
+    function renderExtractedResults(isCapped, count) {
+      const section = document.getElementById('result-section');
+      const badge = document.getElementById('result-limit-badge');
+      const list = document.getElementById('extracted-games-list');
+      section.style.display = 'block';
+      list.innerHTML = '';
+
+      badge.innerText = `(${count}게임)`;
+
+      STATE.generatedGames.forEach((game, idx) => {
+        const row = document.createElement('div');
+        row.className = 'single-line-result';
+
+        const ballsHtml = game.map(n => getBallHtmlSm(n)).join('');
+        const histText = verifyHistoryFormatted(game);
+
+        row.innerHTML = `
+          <div class="result-left-group">
+            <div class="result-game-label">${idx + 1}</div>
+            <div class="result-balls-group">${ballsHtml}</div>
+          </div>
+          <div class="result-right-group">
+            <div class="result-history-summary" title="${histText}">${histText}</div>
+            <button class="btn-sm" style="background:var(--card-bg); color:var(--secondary-accent); border:1px solid var(--secondary-accent);" onclick="saveSingleGame([${game.join(',')}])">저장</button>
+          </div>
+        `;
+        list.appendChild(row);
+      });
+
+      section.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    /* 역대 DB 전수 대조 ("몇회 몇등") */
+    function verifyHistoryFormatted(game) {
+      const normGame = normalizeNumbers(game);
+      const gameSet = new Set(normGame);
+
+      let r1Rounds = [];
+      let r2Rounds = [];
+      let r3Rounds = [];
+
+      if (!STATE.historyDB || STATE.historyDB.length === 0) return `없음`;
+
+      for (let i = 0; i < STATE.historyDB.length; i++) {
+        const draw = STATE.historyDB[i];
+        if (!draw) continue;
+
+        const round = Number(draw.round || draw.drwNo || 0);
+        if (isNaN(round) || round <= 0) continue;
+
+        const drawNums = normalizeNumbers(draw.numbers);
+        const bonus = parseInt(draw.bonus, 10);
+
+        let matchCount = 0;
+        for (let j = 0; j < drawNums.length; j++) {
+          if (gameSet.has(drawNums[j])) matchCount++;
+        }
+
+        if (matchCount === 6) {
+          r1Rounds.push(round);
+        } else if (matchCount === 5 && gameSet.has(bonus)) {
+          r2Rounds.push(round);
+        } else if (matchCount === 5) {
+          r3Rounds.push(round);
+        }
+      }
+
+      if (r1Rounds.length > 0) {
+        const countSuffix = r1Rounds.length > 1 ? ` (총 ${r1Rounds.length}회)` : '';
+        return `${r1Rounds[0]}회 1등${countSuffix}`;
+      }
+      if (r2Rounds.length > 0) {
+        const countSuffix = r2Rounds.length > 1 ? ` (총 ${r2Rounds.length}회)` : '';
+        return `${r2Rounds[0]}회 2등${countSuffix}`;
+      }
+      if (r3Rounds.length > 0) {
+        const countSuffix = r3Rounds.length > 1 ? ` (총 ${r3Rounds.length}회)` : '';
+        return `${r3Rounds[0]}회 3등${countSuffix}`;
+      }
+      return `없음`;
+    }
+
+    /* 최근 당첨 번호 통계 분석 */
+    function analyzeRecentStatistics() {
+      if (!STATE.historyDB || STATE.historyDB.length === 0) return;
+      
+      const latest = STATE.historyDB[0];
+      const latestRoundNum = Number(latest.round || 1242);
+      document.getElementById('latest-round-title').innerText = `제 ${latestRoundNum}회 기준`;
+
+      const latestBox = document.getElementById('stat-latest-balls');
+      latestBox.innerHTML = '';
+      latest.numbers.forEach(n => latestBox.appendChild(createBall(n, () => toggleFixedNumber(n))));
+      const bonusBall = createBall(latest.bonus, () => toggleFixedNumber(latest.bonus));
+      bonusBall.style.boxShadow = '0 0 0 2px var(--primary-accent)';
+      latestBox.appendChild(document.createTextNode('+'));
+      latestBox.appendChild(bonusBall);
+
+      const last5 = STATE.historyDB.slice(0, 5);
+      const count5 = {};
+      last5.forEach(d => d.numbers.forEach(n => count5[n] = (count5[n] || 0) + 1));
+      const freq5 = Object.keys(count5).filter(n => count5[n] >= 2).map(Number).sort((a,b) => a - b);
+      
+      const freq5Box = document.getElementById('stat-freq-5');
+      freq5Box.innerHTML = '';
+      document.getElementById('stat-freq-count').innerText = `${freq5.length}개`;
+      freq5.forEach(n => freq5Box.appendChild(createBall(n, () => toggleFixedNumber(n))));
+
+      const last10 = STATE.historyDB.slice(0, 10);
+      const count10 = {};
+      last10.forEach(d => d.numbers.forEach(n => count10[n] = (count10[n] || 0) + 1));
+      const top10 = Object.keys(count10)
+        .sort((a, b) => count10[b] - count10[a] || a - b)
+        .slice(0, 7)
+        .map(Number)
+        .sort((a,b) => a - b);
+
+      const top10Box = document.getElementById('stat-top-10');
+      top10Box.innerHTML = '';
+      top10.forEach(n => top10Box.appendChild(createBall(n, () => toggleFixedNumber(n))));
+    }
+
+    /* 사주 및 꿈해몽 분석 */
+    function toggleFortuneMode() {
+      const mode = document.getElementById('fortune-mode').value;
+      const isCouple = mode === 'couple';
+      document.getElementById('person2-box').style.display = isCouple ? 'flex' : 'none';
+      document.getElementById('person1-title').style.display = isCouple ? 'block' : 'none';
+    }
+
+    function runFortuneAndDream() {
+      const mode = document.getElementById('fortune-mode').value;
+      const dream = document.getElementById('dream-input').value.trim();
+      const t1 = parseInt(document.getElementById('p1-time').value, 10);
+      
+      let b1 = document.getElementById('p1-birth').value.replace(/[^0-9]/g, '');
+      if (b1.length !== 8) b1 = "19900101";
+
+      let seed = (t1 + 1) * 37;
+      for (let i = 0; i < b1.length; i++) seed += b1.charCodeAt(i);
+      for (let i = 0; i < dream.length; i++) seed += dream.charCodeAt(i);
+
+      if (mode === 'couple') {
+        const t2 = parseInt(document.getElementById('p2-time').value, 10);
+        let b2 = document.getElementById('p2-birth').value.replace(/[^0-9]/g, '');
+        if (b2.length !== 8) b2 = "19920505";
+        seed += (t2 + 1) * 41;
+        for (let i = 0; i < b2.length; i++) seed += b2.charCodeAt(i);
+      }
+
+      function getSeededNums(count, offset) {
+        const res = new Set();
+        let curr = seed + offset;
+        while(res.size < count) {
+          curr = (curr * 9301 + 49297) % 233280;
+          res.add((curr % 45) + 1);
+        }
+        return Array.from(res).sort((a,b) => a - b);
+      }
+
+      const goodNums = getSeededNums(6, 11);
+      const badNums = getSeededNums(6, 47);
+      const score = 75 + (seed % 25);
+
+      document.getElementById('fortune-score-tag').innerText = `행운력 지수: ${score}점`;
+
+      const descEl = document.getElementById('fortune-analysis-desc');
+      if (mode === 'couple') {
+        descEl.innerText = `[2인 궁합 분석] 두 사람의 오행 상생(相生) 조화를 바탕으로 상호 결핍된 기운을 채워주는 맞춤 길수 조합입니다.`;
+        descEl.style.display = 'block';
+      } else if (dream) {
+        descEl.innerText = `[사주 + 꿈: "${dream}"] 꿈의 형상 에너지와 사주 일주를 조화롭게 융합한 맞춤 행운수입니다.`;
+        descEl.style.display = 'block';
+      } else {
+        descEl.innerText = '';
+        descEl.style.display = 'none';
+      }
+
+      const goodBox = document.getElementById('fortune-good-balls');
+      goodBox.innerHTML = '';
+      goodNums.forEach(n => goodBox.appendChild(createBall(n, () => toggleFixedNumber(n))));
+
+      const badBox = document.getElementById('fortune-bad-balls');
+      badBox.innerHTML = '';
+      badNums.forEach(n => badBox.appendChild(createBall(n, () => toggleFixedNumber(n))));
+    }
+
+    /* 보관함 */
+    function initSavedGames() {
+      const raw = localStorage.getItem('saved_lotto_slots');
+      if (raw) {
+        try { STATE.savedGames = JSON.parse(raw); } catch (e) { STATE.savedGames = []; }
+      }
+      renderStorageList();
+    }
+
+    function saveSingleGame(numbers) {
+      STATE.savedGames.push(numbers);
+      localStorage.setItem('saved_lotto_slots', JSON.stringify(STATE.savedGames));
+      renderStorageList();
+    }
+
+    function saveAllCurrentResults() {
+      if (!STATE.generatedGames.length) return;
+      STATE.generatedGames.forEach(g => STATE.savedGames.push(g));
+      localStorage.setItem('saved_lotto_slots', JSON.stringify(STATE.savedGames));
+      renderStorageList();
+      alert(`${STATE.generatedGames.length}개 게임이 보관함에 저장되었습니다.`);
+    }
+
+    function removeSavedGame(index) {
+      STATE.savedGames.splice(index, 1);
+      localStorage.setItem('saved_lotto_slots', JSON.stringify(STATE.savedGames));
+      renderStorageList();
+    }
+
+    function clearStorage() {
+      if (confirm('보관함을 모두 비우시겠습니까?')) {
+        STATE.savedGames = [];
+        localStorage.removeItem('saved_lotto_slots');
+        renderStorageList();
+      }
+    }
+
+    /* 보관함 렌더링: 추출결과와 동일한 ball-sm 적용 및 역대 당첨이력 표기 */
+    function renderStorageList() {
+      const container = document.getElementById('storage-list');
+      if (STATE.savedGames.length === 0) {
+        container.innerHTML = `<div style="font-size:0.8rem; color:var(--text-sub); text-align:center; padding:12px 0;">보관된 게임이 없습니다.</div>`;
+        return;
+      }
+      container.innerHTML = '';
+      STATE.savedGames.forEach((game, idx) => {
+        const row = document.createElement('div');
+        row.className = 'single-line-result';
+
+        const ballsHtml = game.map(n => getBallHtmlSm(n)).join('');
+        const histText = verifyHistoryFormatted(game);
+
+        row.innerHTML = `
+          <div class="result-left-group">
+            <div class="result-game-label">${idx + 1}</div>
+            <div class="result-balls-group">${ballsHtml}</div>
+          </div>
+          <div class="result-right-group">
+            <div class="result-history-summary" title="${histText}">${histText}</div>
+            <button class="btn-sm btn-del" onclick="removeSavedGame(${idx})">삭제</button>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    /* OMR 뷰어 */
+    function openOMRFromExtract(index = 0) {
+      if (!STATE.generatedGames.length) {
+        alert('추출된 게임 결과가 없습니다.');
+        return;
+      }
+      STATE.omrActiveSource = STATE.generatedGames;
+      STATE.omrCurrentIndex = index;
+      renderOMR();
+      document.getElementById('omr-modal').classList.add('open');
+    }
+
+    function openOMRFromStorage(index = 0) {
+      if (!STATE.savedGames.length) {
+        alert('보관함에 저장된 게임이 없습니다.');
+        return;
+      }
+      STATE.omrActiveSource = STATE.savedGames;
+      STATE.omrCurrentIndex = index;
+      renderOMR();
+      document.getElementById('omr-modal').classList.add('open');
+    }
+
+    function closeOMR() {
+      document.getElementById('omr-modal').classList.remove('open');
+    }
+
+    function prevOMRGame() {
+      if (STATE.omrCurrentIndex > 0) {
+        STATE.omrCurrentIndex--;
+        renderOMR();
+      }
+    }
+
+    function nextOMRGame() {
+      if (STATE.omrCurrentIndex < STATE.omrActiveSource.length - 1) {
+        STATE.omrCurrentIndex++;
+        renderOMR();
+      }
+    }
+
+    function renderOMR() {
+      const game = STATE.omrActiveSource[STATE.omrCurrentIndex];
+      if (!game) return;
+      const gameCode = String.fromCharCode(65 + (STATE.omrCurrentIndex % 5));
+      document.getElementById('omr-game-title').innerText = `[로또용지] 제 ${gameCode} 게임 (${STATE.omrCurrentIndex + 1}/${STATE.omrActiveSource.length})`;
+
+      const preview = document.getElementById('omr-ball-preview');
+      preview.innerHTML = game.map(n => getBallHtml(n)).join(' ');
+
+      const grid = document.getElementById('omr-grid');
+      grid.innerHTML = '';
+      const set = new Set(game);
+      for (let i = 1; i <= 45; i++) {
+        const cell = document.createElement('div');
+        cell.className = `omr-cell ${set.has(i) ? 'marked' : ''}`;
+        cell.innerText = i;
+        grid.appendChild(cell);
+      }
+    }
+
+    function getBallClass(n) {
+      if (n <= 10) return 'ball-y';
+      if (n <= 20) return 'ball-b';
+      if (n <= 30) return 'ball-r';
+      if (n <= 40) return 'ball-g';
+      return 'ball-gr';
+    }
+
+    function createBall(number, onClick) {
+      const el = document.createElement('span');
+      el.className = `ball ${getBallClass(number)}`;
+      el.innerText = number;
+      if (onClick) el.onclick = onClick;
+      return el;
+    }
+
+    function getBallHtml(number) {
+      return `<span class="ball ${getBallClass(number)}">${number}</span>`;
+    }
+
+    function getBallHtmlSm(number) {
+      return `<span class="ball ball-sm ${getBallClass(number)}">${number}</span>`;
+    }
+  </script>
+</body>
+</html>
