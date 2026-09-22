@@ -17,10 +17,10 @@ jobs:
       - name: 저장소 체크아웃
         uses: actions/checkout@v4
 
-      - name: Node.js 20 환경 세팅
+      - name: Node.js 22 환경 세팅
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: 최신 당첨 번호 스크래핑 및 JSON 갱신
         run: node scripts/update-lotto.js
