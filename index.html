@@ -50,8 +50,7 @@
       cursor: pointer;
       user-select: none;
       flex-shrink: 0;
-      transition: transform 0.1s ease, outline 0.1s ease;
-      position: relative;
+      transition: transform 0.1s ease;
     }
     .ball:active { transform: scale(0.92); }
 
@@ -73,11 +72,7 @@
     .ball-g { background: var(--ball-g); }
     .ball-gr { background: var(--ball-gr); }
     .ball-unselected { background: #1e293b; color: #64748b; box-shadow: none; border: 1px solid #334155; }
-    
-    /* 고정수 선택 스타일 */
-    .ball.selected-ring { outline: 2.5px solid var(--primary-accent); outline-offset: 1px; }
-    /* 제외수 선택 스타일 */
-    .ball.selected-excluded { background: #7f1d1d !important; color: #fca5a5 !important; text-decoration: line-through; border: 1.5px dashed #ef4444; outline: none; }
+    .ball.selected-ring { outline: 2.5px solid #fff; outline-offset: 1px; }
 
     /* 헤더 패널 */
     .header-panel { text-align: center; padding: 6px 0; }
@@ -358,14 +353,8 @@
         </div>
         <div class="number-pad" id="main-number-pad"></div>
         <div class="pad-info-bar">
-          <div>
-            <span>고정: <b id="fixed-count" style="color:var(--primary-accent);">0</b>개</span> / 
-            <span>제외: <b id="exclude-count" style="color:var(--danger-accent);">0</b>개</span>
-          </div>
-          <div style="display:flex; gap:4px;">
-            <button class="btn-sm" style="background:var(--card-inner); color:var(--danger-accent);" onclick="clearExcludedNumbers()">제외 취소</button>
-            <button class="btn-sm" style="background:var(--card-inner); color:var(--text-sub);" onclick="clearFixedNumbers()">전체 초기화</button>
-          </div>
+          <span>선택된 고정수: <b id="fixed-count" style="color:var(--primary-accent);">0</b>개</span>
+          <button class="btn-sm" style="background:var(--card-inner); color:var(--text-sub);" onclick="clearFixedNumbers()">초기화</button>
         </div>
       </div>
 
@@ -399,7 +388,7 @@
       <div id="extracted-games-list" class="list-scroll-5items"></div>
     </section>
 
-    <!-- 보관함 (추출결과와 동일한 공 크기 & 역대 당첨이력 표기 적용) -->
+    <!-- 보관함 (중복 방지 적용) -->
     <section class="card">
       <div class="title-row">
         <h3>보관함</h3>
@@ -436,7 +425,6 @@
        ========================================================================== */
     const STATE = {
       fixedNumbers: new Set(),
-      excludedNumbers: new Set(), // 제외수 관리용 Set
       activeEngineTab: 'AI', // 'AI' | 'SCORE'
       engineCandidates: {
         AI: [],
@@ -502,7 +490,7 @@
       return arr.map(n => parseInt(n, 10)).filter(n => !isNaN(n)).sort((a, b) => a - b);
     }
 
-    /* 캐시 우회(t=Date.now())가 적용된 DB 로드 */
+    /* 캐시 우회(t=Date.now()) 적용된 DB 로드 */
     async function loadHistoryDB() {
       const cached = localStorage.getItem('cached_lotto_history');
       if (cached) {
@@ -721,16 +709,11 @@
 
       list.forEach(num => {
         const isSelected = STATE.fixedNumbers.has(num);
-        const isExcluded = STATE.excludedNumbers.has(num);
-
         const ball = createBall(num, () => {
-          cycleNumberState(num);
+          toggleFixedNumber(num);
           renderEngineCandidates();
         });
-
         if (isSelected) ball.classList.add('selected-ring');
-        if (isExcluded) ball.classList.add('selected-excluded');
-
         container.appendChild(ball);
       });
 
@@ -740,45 +723,36 @@
         commonContainer.innerHTML = `<span style="font-size:0.75rem; color:#64748b;">(공통수 없음)</span>`;
       } else {
         STATE.commonCandidates.forEach(n => {
-          commonContainer.appendChild(createBall(n, () => {
-            cycleNumberState(n);
-            renderEngineCandidates();
-          }));
+          commonContainer.appendChild(createBall(n, () => toggleFixedNumber(n)));
         });
       }
     }
 
     function applyCurrentEngineCandidates() {
       const list = STATE.engineCandidates[STATE.activeEngineTab] || [];
-      list.forEach(n => {
-        STATE.excludedNumbers.delete(n);
-        STATE.fixedNumbers.add(n);
-      });
+      list.forEach(n => STATE.fixedNumbers.add(n));
       syncPadUI();
       renderEngineCandidates();
       updateMaxComboDisplay();
     }
 
-    /* 번호 선택 패드 및 3단계 순환 토글 (미선택 ➔ 고정 ➔ 제외 ➔ 해제) */
+    /* 번호 선택 패드 */
     function initNumberPad() {
       const pad = document.getElementById('main-number-pad');
       pad.innerHTML = '';
       for (let i = 1; i <= 45; i++) {
-        const ball = createBall(i, () => cycleNumberState(i));
+        const ball = createBall(i, () => toggleFixedNumber(i));
         ball.id = `pad-ball-${i}`;
         ball.className = `ball ball-unselected`;
         pad.appendChild(ball);
       }
     }
 
-    function cycleNumberState(num) {
-      if (!STATE.fixedNumbers.has(num) && !STATE.excludedNumbers.has(num)) {
-        STATE.fixedNumbers.add(num);
-      } else if (STATE.fixedNumbers.has(num)) {
+    function toggleFixedNumber(num) {
+      if (STATE.fixedNumbers.has(num)) {
         STATE.fixedNumbers.delete(num);
-        STATE.excludedNumbers.add(num);
       } else {
-        STATE.excludedNumbers.delete(num);
+        STATE.fixedNumbers.add(num);
       }
       syncPadUI();
       renderEngineCandidates();
@@ -787,14 +761,6 @@
 
     function clearFixedNumbers() {
       STATE.fixedNumbers.clear();
-      STATE.excludedNumbers.clear();
-      syncPadUI();
-      renderEngineCandidates();
-      updateMaxComboDisplay();
-    }
-
-    function clearExcludedNumbers() {
-      STATE.excludedNumbers.clear();
       syncPadUI();
       renderEngineCandidates();
       updateMaxComboDisplay();
@@ -804,17 +770,13 @@
       for (let i = 1; i <= 45; i++) {
         const ball = document.getElementById(`pad-ball-${i}`);
         if (!ball) continue;
-
         if (STATE.fixedNumbers.has(i)) {
           ball.className = `ball ${getBallClass(i)} selected-ring`;
-        } else if (STATE.excludedNumbers.has(i)) {
-          ball.className = `ball selected-excluded`;
         } else {
           ball.className = `ball ball-unselected`;
         }
       }
       document.getElementById('fixed-count').innerText = STATE.fixedNumbers.size;
-      document.getElementById('exclude-count').innerText = STATE.excludedNumbers.size;
     }
 
     /* 번호 선택 패드 옆 최대 조합갯수 실시간 계산 표기 */
@@ -914,11 +876,11 @@
       );
     }
 
-    /* 메인 조합 추출 핸들러 (제외수 필터링 연동) */
+    /* 메인 조합 추출 핸들러 (번호 선택 필수) */
     function runDualEngineExtraction() {
       const fixedNums = Array.from(STATE.fixedNumbers);
-      const excludedNums = STATE.excludedNumbers;
 
+      // 번호 미선택 시 조합 차단
       if (fixedNums.length === 0) {
         alert('번호 선택 패드에서 번호를 1개 이상 선택해주세요.');
         return;
@@ -930,20 +892,7 @@
       // 번호판에서 6개 이상 직접 선택한 경우
       if (fixedNums.length >= 6) {
         fixedNums.sort((a, b) => a - b);
-        let allPossibleCombos = getAllCombinations(fixedNums, 6);
-
-        // 제외수가 포함된 조합 사전 필터링
-        if (excludedNums.size > 0) {
-          allPossibleCombos = allPossibleCombos.filter(combo => 
-            !combo.some(n => excludedNums.has(n))
-          );
-        }
-
-        if (allPossibleCombos.length === 0) {
-          alert('제외수 설정으로 인해 생성 가능한 유효 조합이 없습니다.');
-          return;
-        }
-
+        const allPossibleCombos = getAllCombinations(fixedNums, 6);
         const { stats } = buildNumberStats(STATE.historyDB);
         const pair = buildPairMatrix(STATE.historyDB);
 
@@ -962,48 +911,28 @@
       // 1~5개 선택 시: 활성 엔진 12수 후보와 결합하여 조합 생성
       let candidatePool = [...STATE.engineCandidates[STATE.activeEngineTab]];
 
-      // 제외수는 후보 풀에서 배제
-      candidatePool = candidatePool.filter(n => !excludedNums.has(n));
-
       fixedNums.forEach(fn => {
         if (!candidatePool.includes(fn)) {
           candidatePool.unshift(fn);
         }
       });
-
-      // 제외수로 인해 12수가 부족해진 경우 일반 번호에서 보충
-      let fillNum = 1;
-      while (candidatePool.length < 12 && fillNum <= 45) {
-        if (!candidatePool.includes(fillNum) && !excludedNums.has(fillNum)) {
-          candidatePool.push(fillNum);
-        }
-        fillNum++;
-      }
-
       candidatePool = candidatePool.slice(0, 12).sort((a, b) => a - b);
 
       if (candidatePool.length < 6) {
-        alert('제외수가 너무 많아 조합을 만들 수 없습니다. 제외수를 해제해주세요.');
+        alert('조합 생성을 위해 번호를 추가로 선택해주세요.');
         return;
       }
 
       const all924Combos = getCombinations12C6(candidatePool);
 
       const validCombos = all924Combos.filter(combo => {
-        const hasFixed = Array.from(fixedSet).every(n => combo.includes(n));
-        const hasExcluded = combo.some(n => excludedNums.has(n));
-        return hasFixed && !hasExcluded;
+        return Array.from(fixedSet).every(n => combo.includes(n));
       });
-
-      if (validCombos.length === 0) {
-        alert('설정하신 고정수와 제외수 조건에 맞는 조합을 생성할 수 없습니다.');
-        return;
-      }
 
       const { stats } = buildNumberStats(STATE.historyDB);
       const pair = buildPairMatrix(STATE.historyDB);
 
-      const scoredList = validCombos.map(combo => ({
+      const scoredList = (validCombos.length ? validCombos : all924Combos).map(combo => ({
         game: combo,
         score: calculateComboScore(combo, stats, pair, STATE.historyDB.length)
       })).sort((a, b) => b.score - a.score);
@@ -1114,8 +1043,8 @@
 
       const latestBox = document.getElementById('stat-latest-balls');
       latestBox.innerHTML = '';
-      latest.numbers.forEach(n => latestBox.appendChild(createBall(n, () => cycleNumberState(n))));
-      const bonusBall = createBall(latest.bonus, () => cycleNumberState(latest.bonus));
+      latest.numbers.forEach(n => latestBox.appendChild(createBall(n, () => toggleFixedNumber(n))));
+      const bonusBall = createBall(latest.bonus, () => toggleFixedNumber(latest.bonus));
       bonusBall.style.boxShadow = '0 0 0 2px var(--primary-accent)';
       latestBox.appendChild(document.createTextNode('+'));
       latestBox.appendChild(bonusBall);
@@ -1128,7 +1057,7 @@
       const freq5Box = document.getElementById('stat-freq-5');
       freq5Box.innerHTML = '';
       document.getElementById('stat-freq-count').innerText = `${freq5.length}개`;
-      freq5.forEach(n => freq5Box.appendChild(createBall(n, () => cycleNumberState(n))));
+      freq5.forEach(n => freq5Box.appendChild(createBall(n, () => toggleFixedNumber(n))));
 
       const last10 = STATE.historyDB.slice(0, 10);
       const count10 = {};
@@ -1141,7 +1070,7 @@
 
       const top10Box = document.getElementById('stat-top-10');
       top10Box.innerHTML = '';
-      top10.forEach(n => top10Box.appendChild(createBall(n, () => cycleNumberState(n))));
+      top10.forEach(n => top10Box.appendChild(createBall(n, () => toggleFixedNumber(n))));
     }
 
     /* 사주 및 꿈해몽 분석 */
@@ -1202,11 +1131,11 @@
 
       const goodBox = document.getElementById('fortune-good-balls');
       goodBox.innerHTML = '';
-      goodNums.forEach(n => goodBox.appendChild(createBall(n, () => cycleNumberState(n))));
+      goodNums.forEach(n => goodBox.appendChild(createBall(n, () => toggleFixedNumber(n))));
 
       const badBox = document.getElementById('fortune-bad-balls');
       badBox.innerHTML = '';
-      badNums.forEach(n => badBox.appendChild(createBall(n, () => cycleNumberState(n))));
+      badNums.forEach(n => badBox.appendChild(createBall(n, () => toggleFixedNumber(n))));
     }
 
     /* 보관함 */
@@ -1218,18 +1147,60 @@
       renderStorageList();
     }
 
+    /* 단일 게임 보관 (동일 번호 자동 추가 방지) */
     function saveSingleGame(numbers) {
-      STATE.savedGames.push(numbers);
+      const normGame = normalizeNumbers(numbers);
+      const gameKey = normGame.join(',');
+
+      // 이미 보관함에 동일한 번호 조합이 있는지 검사
+      const isDuplicate = STATE.savedGames.some(saved => {
+        return normalizeNumbers(saved).join(',') === gameKey;
+      });
+
+      if (isDuplicate) {
+        alert('이미 보관함에 저장되어 있는 번호 조합입니다.');
+        return;
+      }
+
+      STATE.savedGames.push(normGame);
       localStorage.setItem('saved_lotto_slots', JSON.stringify(STATE.savedGames));
       renderStorageList();
+      alert('보관함에 성공적으로 저장되었습니다.');
     }
 
+    /* 전체 보관 (중복 번호 건너뛰고 새 번호만 추가) */
     function saveAllCurrentResults() {
       if (!STATE.generatedGames.length) return;
-      STATE.generatedGames.forEach(g => STATE.savedGames.push(g));
+
+      const existingKeys = new Set(STATE.savedGames.map(g => normalizeNumbers(g).join(',')));
+      let addedCount = 0;
+      let duplicateCount = 0;
+
+      STATE.generatedGames.forEach(g => {
+        const norm = normalizeNumbers(g);
+        const key = norm.join(',');
+        if (!existingKeys.has(key)) {
+          STATE.savedGames.push(norm);
+          existingKeys.add(key);
+          addedCount++;
+        } else {
+          duplicateCount++;
+        }
+      });
+
+      if (addedCount === 0) {
+        alert('추출된 모든 번호가 이미 보관함에 저장되어 있습니다.');
+        return;
+      }
+
       localStorage.setItem('saved_lotto_slots', JSON.stringify(STATE.savedGames));
       renderStorageList();
-      alert(`${STATE.generatedGames.length}개 게임이 보관함에 저장되었습니다.`);
+
+      if (duplicateCount > 0) {
+        alert(`${addedCount}개 게임이 보관함에 저장되었습니다. (중복 ${duplicateCount}개 제외)`);
+      } else {
+        alert(`${addedCount}개 게임이 보관함에 저장되었습니다.`);
+      }
     }
 
     function removeSavedGame(index) {
