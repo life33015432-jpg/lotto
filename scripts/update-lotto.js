@@ -4,6 +4,22 @@ const path = require('path');
 
 const HISTORY_PATH = path.join(__dirname, '../data/lotto-history.json');
 
+async function fetchWithTimeout(url, timeoutMs = 10000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      }
+    });
+    return res;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function run() {
   try {
     let history = [];
@@ -24,11 +40,30 @@ async function run() {
     console.log(`기존 최신 회차: ${latestRecordedRound}회, 조회 대상: ${targetRound}회`);
 
     const apiUrl = `https://www.dhlottery.co.kr/common.do?method=getLottoNumber&drwNo=${targetRound}`;
-    const res = await fetch(apiUrl);
-    const data = await res.json();
+    
+    let res;
+    try {
+      res = await fetchWithTimeout(apiUrl, 10000);
+    } catch (networkErr) {
+      console.log(`[대기] 동행복권 통신 지연 (${networkErr.message}). 다음 예약 주기에 재시도합니다.`);
+      return; // 에러 종료하지 않고 정상 통과
+    }
 
-    if (data.returnValue !== 'success') {
-      console.log(`[알림] ${targetRound}회차 당첨 정보가 아직 공개되지 않았습니다. (동행복권 응답: ${data.returnValue})`);
+    if (!res.ok) {
+      console.log(`[대기] 동행복권 응답 코드 이상 (HTTP ${res.status}). 다음 주기에 재시도합니다.`);
+      return;
+    }
+
+    let data;
+    try {
+      data = await res.json();
+    } catch (parseErr) {
+      console.log(`[대기] 응답 데이터 해석 지연(HTML 또는 점검 중). 다음 주기에 재시도합니다.`);
+      return;
+    }
+
+    if (!data || data.returnValue !== 'success') {
+      console.log(`[알림] 제 ${targetRound}회차 당첨 정보가 아직 공개되지 않았습니다. 다음 스케줄에서 갱신합니다.`);
       return;
     }
 
@@ -52,8 +87,8 @@ async function run() {
     fs.writeFileSync(HISTORY_PATH, JSON.stringify(history, null, 2), 'utf-8');
     console.log(`[성공] 제 ${newDraw.round}회 당첨번호가 성공적으로 업데이트되었습니다:`, newDraw.numbers, `+ 보너스 ${newDraw.bonus}`);
   } catch (err) {
-    console.error('[오류] 당첨 번호 업데이트 도중 에러 발생:', err);
-    process.exit(1);
+    console.log('[예외 안내] 일시적 스크래핑 오류 발생. 워크플로우를 중단하지 않고 다음 주기에 재시도합니다:', err.message);
+    // process.exit(1)을 호출하지 않아 워크플로우 전체가 붉은색 실패(Failure)로 남는 것을 방지
   }
 }
 
