@@ -4,6 +4,7 @@ const path = require('path');
 
 const HISTORY_PATH = path.join(__dirname, '../data/lotto-history.json');
 
+// 10초 타임아웃 및 User-Agent 차단 방지 적용 fetch 함수
 async function fetchWithTimeout(url, timeoutMs = 10000) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -37,7 +38,7 @@ async function run() {
       : 0;
     const targetRound = latestRecordedRound + 1;
 
-    console.log(`기존 최신 회차: ${latestRecordedRound}회, 조회 대상: ${targetRound}회`);
+    console.log(`[시작] 기존 최신 회차: ${latestRecordedRound}회, 조회 대상: ${targetRound}회`);
 
     const apiUrl = `https://www.dhlottery.co.kr/common.do?method=getLottoNumber&drwNo=${targetRound}`;
     
@@ -45,8 +46,8 @@ async function run() {
     try {
       res = await fetchWithTimeout(apiUrl, 10000);
     } catch (networkErr) {
-      console.log(`[대기] 동행복권 통신 지연 (${networkErr.message}). 다음 예약 주기에 재시도합니다.`);
-      return; // 에러 종료하지 않고 정상 통과
+      console.log(`[대기] 동행복권 통신 지연 (${networkErr.message}). 워크플로우를 중단하지 않고 다음 예약 주기에 재시도합니다.`);
+      return;
     }
 
     if (!res.ok) {
@@ -58,12 +59,12 @@ async function run() {
     try {
       data = await res.json();
     } catch (parseErr) {
-      console.log(`[대기] 응답 데이터 해석 지연(HTML 또는 점검 중). 다음 주기에 재시도합니다.`);
+      console.log(`[대기] 동행복권 응답 데이터 해석 지연 (점검 중이거나 HTML 반환). 다음 주기에 재시도합니다.`);
       return;
     }
 
     if (!data || data.returnValue !== 'success') {
-      console.log(`[알림] 제 ${targetRound}회차 당첨 정보가 아직 공개되지 않았습니다. 다음 스케줄에서 갱신합니다.`);
+      console.log(`[알림] 제 ${targetRound}회차 당첨 정보가 아직 공개되지 않았습니다. 다음 예약 스케줄에서 재시도합니다.`);
       return;
     }
 
@@ -87,8 +88,7 @@ async function run() {
     fs.writeFileSync(HISTORY_PATH, JSON.stringify(history, null, 2), 'utf-8');
     console.log(`[성공] 제 ${newDraw.round}회 당첨번호가 성공적으로 업데이트되었습니다:`, newDraw.numbers, `+ 보너스 ${newDraw.bonus}`);
   } catch (err) {
-    console.log('[예외 안내] 일시적 스크래핑 오류 발생. 워크플로우를 중단하지 않고 다음 주기에 재시도합니다:', err.message);
-    // process.exit(1)을 호출하지 않아 워크플로우 전체가 붉은색 실패(Failure)로 남는 것을 방지
+    console.log('[안내] 일시적 예외 발생. 워크플로우 실패(빨간색 X)를 방지하고 다음 예약 주기로 넘깁니다:', err.message);
   }
 }
 
