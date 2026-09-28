@@ -2,9 +2,11 @@ name: Auto Lotto Update
 
 on:
   schedule:
-    # UTC 기준 토요일 12:00, 12:30, 13:00 (한국 시간 KST 토요일 21:00, 21:30, 22:00)
+    # UTC 기준 토요일 12:00, 12:30, 13:00 (KST 21:00, 21:30, 22:00)
     - cron: '0,30 12 * * 6'
     - cron: '0 13 * * 6'
+    # 방송 지연 대비: UTC 토요일 14:59 (KST 토요일 23:59)
+    - cron: '59 14 * * 6'
   workflow_dispatch:
 
 permissions:
