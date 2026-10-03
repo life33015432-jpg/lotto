@@ -2,11 +2,12 @@ name: Auto Lotto Update
 
 on:
   schedule:
-    # UTC 토요일 12:00, 12:30, 13:00 (KST 21:00, 21:30, 22:00)
-    - cron: '0,30 12 * * 6'
+    # 토요일 저녁 8:45, 9:05, 9:30, 10:00, 11:00, 23:50 (KST 기준)
+    # UTC 기준 토요일 11:45, 12:05, 12:30, 13:00, 14:00, 14:50
+    - cron: '45 11 * * 6'
+    - cron: '5,30 12 * * 6'
     - cron: '0 13 * * 6'
-    # 지연 대비: UTC 토요일 14:59 (KST 토요일 23:59)
-    - cron: '59 14 * * 6'
+    - cron: '0,50 14 * * 6'
   workflow_dispatch:
 
 permissions:
@@ -16,10 +17,10 @@ jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-      - name: 저장소 체크아웃
+      - name: 리포지토리 체크아웃
         uses: actions/checkout@v4
 
-      - name: Node.js 22 환경 세팅
+      - name: Node.js 22 세팅
         uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -27,9 +28,9 @@ jobs:
       - name: 최신 당첨 번호 스크래핑 및 JSON 갱신
         run: node scripts/update-lotto.js
 
-      - name: 변경 사항 Git Commit & Push
+      - name: 변경 데이터 Git Commit & Push
         run: |
           git config --global user.name 'Aipluslotto-Bot'
           git config --global user.email 'bot@aipluslotto.com'
           git add data/
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto update lotto history" && git push)
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto update lotto data" && git push)
