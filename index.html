@@ -111,21 +111,21 @@
 
     .header-panel { text-align: center; padding: 6px 0; }
     .brand-title { font-size: 1.4rem; font-weight: 900; letter-spacing: -0.5px; color: var(--primary-accent); }
-    .stat-badge-row { display: flex; justify-content: center; gap: 10px; margin-top: 6px; font-size: 0.8rem; color: var(--text-sub); }
+    .stat-badge-row { display: flex; justify-content: center; gap: 8px; margin-top: 6px; font-size: 0.8rem; color: var(--text-sub); }
     .stat-badge { background: var(--card-inner); padding: 3px 12px; border-radius: 20px; border: 1px solid var(--border-color); }
     .stat-badge b { color: var(--secondary-accent); font-weight: 700; }
 
     .stat-grid { display: flex; flex-direction: column; gap: 8px; font-size: 0.82rem; }
     .stat-item { background: var(--card-inner); border-radius: 10px; padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; }
     .stat-header { display: flex; justify-content: space-between; color: var(--text-sub); font-size: 0.75rem; }
-    .stat-ball-list { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
+    .stat-ball-list { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; min-height: 32px; }
 
     .engine-toggle-group { display: flex; gap: 6px; background: #0e1726; padding: 4px; border-radius: 10px; margin-bottom: 10px; }
     .engine-tab-btn { flex: 1; padding: 8px 0; background: transparent; border: none; border-radius: 7px; color: var(--text-sub); font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
     .engine-tab-btn.active.engine-ai { background: var(--secondary-accent); color: #fff; box-shadow: 0 2px 6px rgba(59,130,246,0.35); }
     .engine-tab-btn.active.engine-score { background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: #fff; box-shadow: 0 2px 6px rgba(139,92,246,0.35); }
     
-    .ai-ball-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; justify-items: center; margin: 4px 0 10px; }
+    .ai-ball-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; justify-items: center; margin: 4px 0 10px; min-height: 72px; }
 
     .fixed-scroll-panel { max-height: 220px; overflow-y: auto; background: var(--card-inner); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; font-size: 0.78rem; line-height: 1.45; }
     .fixed-scroll-panel::-webkit-scrollbar,
@@ -350,10 +350,12 @@
   <div class="app-container">
     <header class="header-panel">
       <div class="brand-title">Aipluslotto.com</div>
+      <!-- 당일 접속자 및 누적 접속자 분리 표시 -->
       <div class="stat-badge-row">
         <span class="stat-badge">당일 접속 <b id="daily-visitor-count">1</b>명</span>
         <span class="stat-badge">누적 접속 <b id="total-visitor-count">1</b>명</span>
       </div>
+
       <!-- 상단 네비게이션 탭 -->
       <nav class="main-nav-tabs">
         <button class="main-nav-btn active" id="menu-btn-standard" onclick="switchMainMenu('standard')">
@@ -696,6 +698,20 @@
   </div>
 
   <script>
+    // JSON 로딩 지연 시 화면이 비어 보이지 않도록 즉시 주입되는 최신 로또 Fallback 기준 데이터
+    const FALLBACK_HISTORY = [
+      { "round": 1243, "numbers": [9, 18, 24, 38, 43, 44], "bonus": 35 },
+      { "round": 1242, "numbers": [2, 4, 10, 16, 31, 41], "bonus": 9 },
+      { "round": 1241, "numbers": [7, 13, 16, 23, 24, 43], "bonus": 9 },
+      { "round": 1240, "numbers": [11, 13, 19, 20, 31, 44], "bonus": 27 },
+      { "round": 1239, "numbers": [11, 13, 22, 32, 33, 36], "bonus": 8 },
+      { "round": 1238, "numbers": [2, 13, 18, 32, 38, 42], "bonus": 22 },
+      { "round": 1237, "numbers": [10, 20, 23, 34, 37, 40], "bonus": 36 },
+      { "round": 1236, "numbers": [12, 18, 21, 29, 34, 38], "bonus": 10 },
+      { "round": 1235, "numbers": [6, 7, 11, 15, 39, 43], "bonus": 20 },
+      { "round": 1234, "numbers": [1, 15, 19, 31, 35, 43], "bonus": 27 }
+    ];
+
     const PRECOMPUTED_MYEONGDANG = {
       "seoul_rank1": [
         {num: 34, count: 11}, {num: 18, count: 10}, {num: 43, count: 9}, {num: 20, count: 9}, {num: 1, count: 8},
@@ -750,7 +766,7 @@
       activeEngineTab: 'AI',
       engineCandidates: { AI: [], SCORE: [] },
       commonCandidates: [],
-      historyDB: [],
+      historyDB: FALLBACK_HISTORY,
       mdTop15Pool: [],
       mdSelected: new Set(),
       mdTargetQty: 10,
@@ -788,15 +804,21 @@
       initMyeongdangPad();
       initSavedGames();
       
-      // 최신 history JSON을 먼저 확실하게 읽어 STATE 구성 후 통계 화면 표출
+      // 1. Fallback 데이터로 화면 즉시 초기 구성 (공 공백 현상 방지)
+      calculateTargetRounds();
+      generateWeeklyCandidates();
+      analyzeRecentStatistics();
+      runFortuneAndDream();
+      updateMaxComboDisplay();
+      applyMyeongdangPrecomputed();
+
+      // 2. 서버 파일 비동기 로드 후 화면 최신 상태로 재동기화
       await loadHistoryDB();
       calculateTargetRounds();
       generateWeeklyCandidates();
       analyzeRecentStatistics();
       runFortuneAndDream();
       updateMaxComboDisplay();
-      
-      applyMyeongdangPrecomputed();
     });
 
     function switchMainMenu(menuKey) {
@@ -1102,7 +1124,7 @@
       document.getElementById('omr-modal').classList.add('open');
     }
 
-    /* 방법 B: 정직한 1부터 시작 카운터 로직 */
+    /* 방법 B: 정직한 1부터 시작 카운터 로직 (당일/누적 분리 관리) */
     function initDailyVisitors() {
       const todayKey = 'lotto_visitor_date';
       const dailyCountKey = 'lotto_visitor_daily_count';
@@ -1113,10 +1135,9 @@
       let dailyCount = parseInt(localStorage.getItem(dailyCountKey) || '0', 10);
       let totalCount = parseInt(localStorage.getItem(totalCountKey) || '0', 10);
 
-      // 날짜가 바뀌었거나 기존 비정상적인 1000명대 데이터가 남아있는 경우 리셋
+      // 날짜가 변경되었거나 과거 1,000명대 가짜 난수 데이터가 남아있는 경우 리셋
       if (storedDate !== todayStr || dailyCount > 100) {
         dailyCount = 1;
-        // 누적 카운터가 비어있거나 기존 비정상 수치면 1부터 재시작
         if (!totalCount || totalCount > 500) {
           totalCount = 1;
         } else {
@@ -1125,7 +1146,7 @@
         localStorage.setItem(todayKey, todayStr);
         sessionStorage.setItem('visited_session', 'true');
       } else {
-        // 새로고침으로 인한 과다 집계 방지: 현재 세션 첫 진입 시에만 1씩 증가
+        // 새로고침 과다 집계 방지: 브라우저 탭 세션 첫 진입 시에만 1씩 증가
         if (!sessionStorage.getItem('visited_session')) {
           dailyCount += 1;
           totalCount += 1;
@@ -1133,16 +1154,13 @@
         }
       }
 
-      // 로컬 스토리지 저장
       localStorage.setItem(dailyCountKey, dailyCount);
       localStorage.setItem(totalCountKey, totalCount);
 
-      // 화면에 당일 및 누적 접속자 수 반영
       const dailyEl = document.getElementById('daily-visitor-count');
       const totalEl = document.getElementById('total-visitor-count');
       if (dailyEl) dailyEl.innerText = dailyCount.toLocaleString();
       if (totalEl) totalEl.innerText = totalCount.toLocaleString();
-      }
     }
 
     function normalizeNumbers(arr) {
@@ -1150,7 +1168,7 @@
       return arr.map(n => parseInt(n, 10)).filter(n => !isNaN(n)).sort((a, b) => a - b);
     }
 
-    /* 캐시 강제 무효화 및 항상 최신본을 반영하는 핵심 함수 */
+    /* 최신 history JSON을 읽어와 STATE 갱신 */
     async function loadHistoryDB() {
       let fetchedFresh = false;
       try {
@@ -1430,6 +1448,7 @@
     function updateMaxComboDisplay() {
       const count = STATE.fixedNumbers.size;
       const displayEl = document.getElementById('max-combo-display');
+      if (!displayEl) return;
       if (count < 6) {
         displayEl.innerText = `최대 조합: 0개`;
       } else {
@@ -1784,7 +1803,6 @@
       const latest = STATE.historyDB[0];
       const latestRoundNum = Number(latest.round || 1243);
       
-      // 최신 회차 번호 화면에 즉시 동적 표출
       document.getElementById('latest-round-title').innerText = `제 ${latestRoundNum}회 기준`;
 
       const latestBox = document.getElementById('stat-latest-balls');
