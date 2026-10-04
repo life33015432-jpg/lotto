@@ -351,9 +351,9 @@
     <header class="header-panel">
       <div class="brand-title">Aipluslotto.com</div>
       <div class="stat-badge-row">
-        <span class="stat-badge">당일 접속자 수 <b id="daily-visitor-count">1</b>명</span>
+        <span class="stat-badge">당일 접속 <b id="daily-visitor-count">1</b>명</span>
+        <span class="stat-badge">누적 접속 <b id="total-visitor-count">1</b>명</span>
       </div>
-
       <!-- 상단 네비게이션 탭 -->
       <nav class="main-nav-tabs">
         <button class="main-nav-btn active" id="menu-btn-standard" onclick="switchMainMenu('standard')">
@@ -1105,29 +1105,43 @@
     /* 방법 B: 정직한 1부터 시작 카운터 로직 */
     function initDailyVisitors() {
       const todayKey = 'lotto_visitor_date';
-      const countKey = 'lotto_visitor_count';
+      const dailyCountKey = 'lotto_visitor_daily_count';
+      const totalCountKey = 'lotto_visitor_total_count';
       const todayStr = new Date().toISOString().slice(0, 10);
       
       let storedDate = localStorage.getItem(todayKey);
-      let count = parseInt(localStorage.getItem(countKey) || '0', 10);
+      let dailyCount = parseInt(localStorage.getItem(dailyCountKey) || '0', 10);
+      let totalCount = parseInt(localStorage.getItem(totalCountKey) || '0', 10);
 
-      // 날짜가 바뀌었거나 기존 가짜 데이터(100명 이상)가 남아있는 경우 1로 리셋
-      if (storedDate !== todayStr || count > 100) {
-        count = 1;
+      // 날짜가 바뀌었거나 기존 비정상적인 1000명대 데이터가 남아있는 경우 리셋
+      if (storedDate !== todayStr || dailyCount > 100) {
+        dailyCount = 1;
+        // 누적 카운터가 비어있거나 기존 비정상 수치면 1부터 재시작
+        if (!totalCount || totalCount > 500) {
+          totalCount = 1;
+        } else {
+          totalCount += 1;
+        }
         localStorage.setItem(todayKey, todayStr);
         sessionStorage.setItem('visited_session', 'true');
       } else {
-        // 새로고침할 때마다 올라가지 않도록 현재 브라우저 탭 세션당 1회만 카운트
+        // 새로고침으로 인한 과다 집계 방지: 현재 세션 첫 진입 시에만 1씩 증가
         if (!sessionStorage.getItem('visited_session')) {
-          count += 1;
+          dailyCount += 1;
+          totalCount += 1;
           sessionStorage.setItem('visited_session', 'true');
         }
       }
 
-      localStorage.setItem(countKey, count);
-      const displayEl = document.getElementById('daily-visitor-count');
-      if (displayEl) {
-        displayEl.innerText = count.toLocaleString();
+      // 로컬 스토리지 저장
+      localStorage.setItem(dailyCountKey, dailyCount);
+      localStorage.setItem(totalCountKey, totalCount);
+
+      // 화면에 당일 및 누적 접속자 수 반영
+      const dailyEl = document.getElementById('daily-visitor-count');
+      const totalEl = document.getElementById('total-visitor-count');
+      if (dailyEl) dailyEl.innerText = dailyCount.toLocaleString();
+      if (totalEl) totalEl.innerText = totalCount.toLocaleString();
       }
     }
 
