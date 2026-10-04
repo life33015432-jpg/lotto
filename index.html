@@ -161,7 +161,9 @@
     .range-slider { flex: 1; accent-color: var(--primary-accent); }
     .btn-extract { width: 100%; padding: 13px; background: linear-gradient(135deg, #10b981, #059669); border: none; border-radius: 10px; color: #fff; font-size: 1rem; font-weight: 800; cursor: pointer; box-shadow: 0 3px 10px rgba(16,185,129,0.3); }
 
-    /* 로또 추첨기 챔버 */
+    /* =========================================================
+       로또 추첨기 챔버 (하단 정렬 ➔ 2초 난류 추첨)
+       ========================================================= */
     .chamber-wrapper {
       display: flex;
       flex-direction: column;
@@ -328,7 +330,7 @@
     .btn-reset { background: rgba(148,163,184,0.15); color: var(--text-sub); border: 1px solid var(--border-color); }
     .btn-reset:hover { color: #fff; border-color: var(--text-sub); }
 
-    /* 공통 모달 기본 */
+    /* 로또용지 및 QR 모달 */
     .omr-modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 10px; }
     .omr-modal-backdrop.open { display: flex; }
     .omr-card { width: 100%; max-width: 462px; background: #fafafa; border-radius: 12px; padding: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); color: #111; position: relative; border-top: 6px solid #e11d48; }
@@ -349,7 +351,7 @@
     <header class="header-panel">
       <div class="brand-title">Aipluslotto.com</div>
       <div class="stat-badge-row">
-        <span class="stat-badge">당일 접속자 수 <b id="daily-visitor-count">1,248</b>명</span>
+        <span class="stat-badge">당일 접속자 수 <b id="daily-visitor-count">1</b>명</span>
       </div>
 
       <!-- 상단 네비게이션 탭 -->
@@ -538,7 +540,7 @@
     <!-- ================= [메뉴 2] 전국 2대 명당 추출기 영역 ================= -->
     <main id="view-myeongdang-panel" style="display:none; flex-direction:column; gap:14px;">
       
-      <!-- 실제 로또 추첨기 챔버 -->
+      <!-- 실제 로또 추첨기 챔버 (하단 정렬 ➔ 2초 난류 추첨) -->
       <section class="card chamber-wrapper">
         <div class="lotto-chamber" id="lotto-chamber">
           <div class="chamber-glass-glare"></div>
@@ -550,7 +552,7 @@
         </div>
       </section>
 
-      <!-- 2대 명당 상위 15수 및 조건 선택 -->
+      <!-- 2대 명당 상위 15수 및 조건 선택 + [적용] 버튼 -->
       <section class="card">
         <div class="title-row">
           <h3>명당 빈도 1위~15위 번호</h3>
@@ -647,7 +649,7 @@
     </section>
   </div>
 
-  <!-- 로또용지 OMR 모달 -->
+  <!-- 로또용지 OMR 모달 (1게임 상세 마킹) -->
   <div class="omr-modal-backdrop" id="omr-modal" onclick="closeOMR(event)">
     <div class="omr-card" onclick="event.stopPropagation()">
       <div class="omr-header">
@@ -663,7 +665,7 @@
     </div>
   </div>
 
-  <!-- 5게임 묶음 1개 QR 전용 모달 (추가) -->
+  <!-- 동행복권 5게임 통합 QR 전용 모달 (1장당 5게임 연동) -->
   <div class="omr-modal-backdrop" id="qr-modal" onclick="closeQRModal(event)">
     <div class="omr-card" onclick="event.stopPropagation()" style="border-top:6px solid #10b981; max-height:88vh; overflow-y:auto;">
       <div class="omr-header" style="border-bottom:2px dashed #a7f3d0;">
@@ -674,11 +676,11 @@
         <button class="omr-close-btn" onclick="closeQRModal()">&times;</button>
       </div>
 
-      <!-- 동행복권 통합 QR 박스 -->
+      <!-- 동행복권 모바일 연동 QR 이미지 -->
       <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:12px; margin-bottom:12px;">
         <div id="qr-canvas-box" style="width:120px; height:120px; display:flex; align-items:center; justify-content:center;"></div>
         <span style="font-size:0.72rem; color:#475569; margin-top:8px; font-weight:700; text-align:center;">
-          📷 카메라로 스캔하면 이 용지의 번호 전체(최대 5게임)가<br>동행복권 모바일 당첨조회 화면으로 열립니다
+          📷 카메라나 카카오톡 스캐너로 비추면<br>해당 용지의 모든 게임(최대 5개) 당첨조회가 열립니다
         </span>
       </div>
 
@@ -786,6 +788,7 @@
       initMyeongdangPad();
       initSavedGames();
       
+      // 최신 history JSON을 먼저 확실하게 읽어 STATE 구성 후 통계 화면 표출
       await loadHistoryDB();
       calculateTargetRounds();
       generateWeeklyCandidates();
@@ -1099,6 +1102,7 @@
       document.getElementById('omr-modal').classList.add('open');
     }
 
+    /* 방법 B: 정직한 1부터 시작 카운터 로직 */
     function initDailyVisitors() {
       const todayKey = 'lotto_visitor_date';
       const countKey = 'lotto_visitor_count';
@@ -1107,15 +1111,24 @@
       let storedDate = localStorage.getItem(todayKey);
       let count = parseInt(localStorage.getItem(countKey) || '0', 10);
 
-      if (storedDate !== todayStr) {
-        const baseSeed = todayStr.split('-').reduce((a, b) => a + parseInt(b, 10), 0);
-        count = 1180 + (baseSeed % 370);
+      // 날짜가 바뀌었거나 기존 가짜 데이터(100명 이상)가 남아있는 경우 1로 리셋
+      if (storedDate !== todayStr || count > 100) {
+        count = 1;
         localStorage.setItem(todayKey, todayStr);
+        sessionStorage.setItem('visited_session', 'true');
       } else {
-        count += Math.floor(Math.random() * 2) + 1;
+        // 새로고침할 때마다 올라가지 않도록 현재 브라우저 탭 세션당 1회만 카운트
+        if (!sessionStorage.getItem('visited_session')) {
+          count += 1;
+          sessionStorage.setItem('visited_session', 'true');
+        }
       }
+
       localStorage.setItem(countKey, count);
-      document.getElementById('daily-visitor-count').innerText = count.toLocaleString();
+      const displayEl = document.getElementById('daily-visitor-count');
+      if (displayEl) {
+        displayEl.innerText = count.toLocaleString();
+      }
     }
 
     function normalizeNumbers(arr) {
@@ -1123,6 +1136,7 @@
       return arr.map(n => parseInt(n, 10)).filter(n => !isNaN(n)).sort((a, b) => a - b);
     }
 
+    /* 캐시 강제 무효화 및 항상 최신본을 반영하는 핵심 함수 */
     async function loadHistoryDB() {
       let fetchedFresh = false;
       try {
@@ -1756,6 +1770,7 @@
       const latest = STATE.historyDB[0];
       const latestRoundNum = Number(latest.round || 1243);
       
+      // 최신 회차 번호 화면에 즉시 동적 표출
       document.getElementById('latest-round-title').innerText = `제 ${latestRoundNum}회 기준`;
 
       const latestBox = document.getElementById('stat-latest-balls');
@@ -1916,7 +1931,7 @@
     }
 
     /* =========================================================
-       5게임당 1개 동행복권 통합 QR 제어 로직 (신규 추가)
+       5게임당 1개 동행복권 통합 QR 제어 로직
        ========================================================= */
     function openQRModal(sourceType) {
       let list = [];
@@ -1975,7 +1990,7 @@
       document.getElementById('qr-modal-subtitle').innerText = 
         `제 ${STATE.targetRound}회 대상 (${sheetGames.length}게임 수록)`;
 
-      // 동행복권 공식 규격 조립: v=1244q010203040506q070809101112q...
+      // 동행복권 모바일 규격 파라미터 조합 (v=1244q010203040506q070809101112...)
       const roundStr = String(STATE.targetRound).padStart(4, '0');
       const gamesParam = sheetGames.map(game => {
         return normalizeNumbers(game)
