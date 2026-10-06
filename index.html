@@ -371,156 +371,192 @@
     .omr-nav-btn:active { background: #cbd5e1; }
 
     /* =========================================================
-       첨부 스크린샷 100% 동일 복원: 다크 테마 QR 모달 양식
+       동행복권 공식 모바일 앱 표준 전자슬립 QR 모달 스타일
        ========================================================= */
     .qr-custom-modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(3, 7, 18, 0.88);
+      background: rgba(0, 0, 0, 0.7);
       display: none;
       justify-content: center;
       align-items: center;
       z-index: 1000;
-      padding: 14px 12px;
-      backdrop-filter: blur(4px);
+      padding: 10px;
     }
     .qr-custom-modal-backdrop.open { display: flex; }
     .qr-custom-card {
       width: 100%;
-      max-width: 440px;
-      background: #111a2d;
-      border: 1px solid #23344e;
-      border-radius: 20px;
+      max-width: 420px;
+      background: #f2f4f6;
+      border-radius: 14px;
+      padding: 0 0 16px 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+    }
+    
+    .qr-top-warning-bar {
+      background: #ffffff;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      color: #64748b;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .qr-blue-container {
+      background: #3b82f6;
+      margin: 14px;
+      border-radius: 12px;
       padding: 16px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      box-shadow: 0 16px 40px rgba(0,0,0,0.7);
-    }
-
-    /* 상단 화이트 QR 카드 */
-    .qr-white-board {
-      background: #ffffff;
-      border-radius: 16px;
-      padding: 12px 14px 10px;
-      display: flex;
-      flex-direction: column;
       align-items: center;
-      color: #1e293b;
       position: relative;
     }
-    .qr-white-header {
+
+    .qr-blue-header {
       width: 100%;
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: #64748b;
-      margin-bottom: 6px;
+      align-items: flex-start;
+      color: #ffffff;
+      margin-bottom: 12px;
+    }
+    .qr-page-info {
+      text-align: center;
+      flex-grow: 1;
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+    .qr-page-sub {
+      font-size: 0.75rem;
+      font-weight: 400;
+      opacity: 0.9;
+      margin-top: 2px;
     }
     .qr-trash-btn {
       background: transparent;
       border: none;
-      font-size: 1.15rem;
-      cursor: pointer;
-      color: #64748b;
+      color: #ffffff;
+      font-size: 0.85rem;
       display: flex;
       align-items: center;
-      padding: 2px;
-      transition: color 0.15s;
+      gap: 4px;
+      cursor: pointer;
     }
-    .qr-trash-btn:hover { color: #ef4444; }
+
+    .qr-white-box {
+      background: #ffffff;
+      width: 100%;
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
     .qr-img-center-box {
-      width: 195px;
-      height: 195px;
+      width: 200px;
+      height: 200px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 2px 0 6px;
+      margin-bottom: 16px;
     }
     .qr-img-center-box img {
-      width: 195px !important;
-      height: 195px !important;
+      width: 200px !important;
+      height: 200px !important;
       display: block;
     }
-    .qr-page-indicator {
-      font-size: 0.82rem;
-      font-weight: 700;
+    
+    .qr-price-label {
+      font-size: 0.8rem;
+      color: #64748b;
+      margin-bottom: 4px;
+    }
+    .qr-price-value {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .qr-bottom-notice {
+      color: #ffffff;
+      font-size: 0.75rem;
+      margin-top: 16px;
+      text-align: center;
+    }
+    .qr-color-bar {
+      display: flex;
+      gap: 4px;
+      margin-top: 12px;
+      justify-content: center;
+    }
+    .qr-color-bar span {
+      width: 24px;
+      height: 6px;
+      border-radius: 2px;
+    }
+    
+    .qr-footer-info {
+      margin: 0 14px;
+      background: #e2e8f0;
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .qr-footer-text-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .qr-footer-date {
+      font-size: 0.7rem;
       color: #64748b;
     }
-
-    /* 게임 예상금액 헤더 */
-    .qr-games-info-title {
-      font-size: 0.92rem;
-      font-weight: 800;
-      color: #f8fafc;
-      padding: 0 2px;
-    }
-
-    /* A~E 게임 행 컨테이너 */
-    .qr-games-container {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .qr-game-row-box {
-      background: #172439;
-      border: 1px solid #23344e;
-      border-radius: 10px;
-      padding: 8px 12px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .qr-game-tag-col {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-width: 24px;
-    }
-    .qr-game-letter {
+    .qr-footer-game-info {
       font-size: 0.85rem;
-      font-weight: 800;
-      color: #f59e0b;
-      line-height: 1;
-    }
-    .qr-game-type {
-      font-size: 0.65rem;
       font-weight: 700;
-      color: #94a3b8;
-      margin-top: 2px;
+      color: #334155;
     }
-    .qr-game-balls-wrap {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-      flex-wrap: nowrap;
-    }
-
-    /* 하단 이동 버튼 바 */
-    .qr-nav-action-row {
+    .qr-nav-arrows {
       display: flex;
       gap: 8px;
-      margin-top: 4px;
     }
-    .qr-nav-action-btn {
-      flex: 1;
-      padding: 12px 0;
-      background: #e2e8f0;
+    .qr-nav-arrow-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #cbd5e1;
       border: none;
-      border-radius: 10px;
-      font-size: 0.85rem;
-      font-weight: 800;
-      color: #1e293b;
-      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.15s;
+      cursor: pointer;
+      color: #475569;
+      font-weight: bold;
     }
-    .qr-nav-action-btn:active { background: #cbd5e1; }
+    .qr-nav-arrow-btn:active { background: #94a3b8; color: #fff; }
+    .qr-close-main-btn {
+      margin: 10px 14px 0;
+      padding: 12px;
+      background: #1e293b;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -544,12 +580,12 @@
       </nav>
     </header>
 
-    <!-- ================= [메뉴 1] 종합 추천기 영역 ================= -->
+    <!-- [메뉴 1] 종합 추천기 영역 -->
     <main id="view-standard-panel" style="display:flex; flex-direction:column; gap:14px;">
       <section class="card">
         <div class="title-row">
           <h3>최근 당첨 번호 통계</h3>
-          <span style="font-size:0.75rem; color:var(--text-sub);" id="latest-round-title">제 1243회 기준</span>
+          <span style="font-size:0.75rem; color:var(--text-sub);" id="latest-round-title">로딩 중...</span>
         </div>
         <div class="stat-grid">
           <div class="stat-item">
@@ -716,7 +752,7 @@
       </section>
     </main>
 
-    <!-- ================= [메뉴 2] 전국 2대 명당 추출기 영역 ================= -->
+    <!-- [메뉴 2] 전국 2대 명당 추출기 영역 -->
     <main id="view-myeongdang-panel" style="display:none; flex-direction:column; gap:14px;">
       
       <!-- 로또 추첨기 챔버 -->
@@ -731,7 +767,7 @@
         </div>
       </section>
 
-      <!-- 2대 명당 상위 15수 및 조건 선택 + [적용] 버튼 -->
+      <!-- 2대 명당 상위 15수 조건 선택 -->
       <section class="card">
         <div class="title-row">
           <h3>명당 빈도 1위~15위 번호</h3>
@@ -753,7 +789,7 @@
         </div>
 
         <p style="font-size:0.75rem; color:var(--text-sub); margin-bottom:8px;">
-          * 조건을 변경하고 <b>[적용]</b> 버튼을 누르면 15개 공과 아래 순위표가 즉시 바뀝니다.
+          * 조건을 변경하고 <b>[적용]</b> 버튼을 누르면 15개 공과 아래 순위표가 동적으로 바뀝니다.
         </p>
 
         <div class="top15-grid" id="top15-balls-grid"></div>
@@ -767,7 +803,7 @@
         </div>
       </section>
 
-      <!-- 명당 번호 선택 패드 및 조합 컨트롤러 -->
+      <!-- 명당 번호 선택 패드 -->
       <section class="card pad-container">
         <div>
           <div class="title-row">
@@ -797,7 +833,6 @@
         </div>
       </section>
 
-      <!-- 명당 추출 결과 섹션 -->
       <section class="card" id="md-result-section" style="display:none;">
         <div class="title-row">
           <h3>명당 추출 결과 <span id="md-result-limit-badge" style="font-size:0.75rem; color:#10b981;"></span></h3>
@@ -812,7 +847,7 @@
       </section>
     </main>
 
-    <!-- ================= [공통 영역] 통합 보관함 ================= -->
+    <!-- [공통 영역] 통합 보관함 -->
     <section class="card">
       <div class="title-row">
         <h3>통합 보관함 <span id="storage-count-badge" style="font-size:0.75rem; color:#10b981;">(0게임)</span></h3>
@@ -828,7 +863,7 @@
     </section>
   </div>
 
-  <!-- 로또용지 OMR 모달 (1게임 상세 마킹) -->
+  <!-- OMR 모달 -->
   <div class="omr-modal-backdrop" id="omr-modal" onclick="closeOMR(event)">
     <div class="omr-card" onclick="event.stopPropagation()">
       <div class="omr-header">
@@ -844,100 +879,70 @@
     </div>
   </div>
 
-  <!-- =========================================================
-       첨부 스크린샷 100% 동일 복원: 동행복권 5게임 통합 QR 모달
-       ========================================================= -->
+  <!-- 동행복권 공식 모바일 앱 표준 전자슬립 QR 모달 -->
   <div class="qr-custom-modal-backdrop" id="qr-modal" onclick="closeQRModal(event)">
     <div class="qr-custom-card" onclick="event.stopPropagation()">
       
-      <!-- 상단 화이트보드 (작성일시 / 휴지통(닫기) / QR코드 / 페이지수) -->
-      <div class="qr-white-board">
-        <div class="qr-white-header">
-          <span id="qr-timestamp-label">2026-10-06 11:50:16 작성</span>
-          <button class="qr-trash-btn" onclick="closeQRModal()" title="닫기">🗑️</button>
+      <!-- 상단 경고 문구 -->
+      <div class="qr-top-warning-bar">
+        <span style="color:#1e3a8a; font-weight:800; border:1px solid #1e3a8a; border-radius:50%; padding:0 3px; font-size:0.6rem;">19</span>
+        <span style="color:#b91c1c; font-weight:800; border:1px solid #b91c1c; border-radius:50%; padding:0 3px; font-size:0.6rem;">10</span>
+        <span><span style="color:#b91c1c;">19세 이상만, 1회 10만원까지만</span> 구매할 수 있어요.</span>
+      </div>
+
+      <!-- 메인 블루 영역 -->
+      <div class="qr-blue-container">
+        <div class="qr-blue-header">
+          <div style="width:40px;"></div>
+          <div class="qr-page-info">
+            <div id="qr-page-indicator">1/1</div>
+            <div class="qr-page-sub" id="qr-total-price">(QR 총액 5,000원)</div>
+          </div>
+          <button class="qr-trash-btn" onclick="closeQRModal()">
+            🗑️ 삭제
+          </button>
         </div>
-        <div class="qr-img-center-box" id="qr-canvas-box"></div>
-        <div class="qr-page-indicator" id="qr-page-indicator">1 / 1</div>
+
+        <div class="qr-white-box">
+          <div class="qr-img-center-box" id="qr-canvas-box"></div>
+          
+          <div class="qr-price-label">예상 금액 (참고)</div>
+          <div class="qr-price-value" id="qr-current-sheet-price">
+            5,000원 <span style="font-size:0.9rem; font-weight:400; color:#94a3b8; border:1px solid #cbd5e1; border-radius:50%; width:18px; height:18px; display:inline-flex; align-items:center; justify-content:center;">i</span>
+          </div>
+        </div>
+
+        <div class="qr-bottom-notice">※ 본 QR은 단말기 전송용 보조 수단입니다.</div>
+        <div class="qr-color-bar">
+          <span style="background:#10b981;"></span>
+          <span style="background:#84cc16;"></span>
+          <span style="background:#eab308;"></span>
+          <span style="background:#f59e0b;"></span>
+          <span style="background:#d97706;"></span>
+          <span style="background:#3b82f6;"></span>
+        </div>
       </div>
 
-      <!-- 게임 수 및 예상금액 -->
-      <div class="qr-games-info-title" id="qr-games-info-title">
-        5 게임 (예상금액 5,000원)
+      <!-- 하단 생성 일시 및 네비게이션 -->
+      <div class="qr-footer-info">
+        <div class="qr-footer-text-group">
+          <div class="qr-footer-date" id="qr-timestamp-label">생성일시 2026-10-06 18:31</div>
+          <div class="qr-footer-game-info" id="qr-games-info-title">5게임 (총 5,000원)</div>
+        </div>
+        <div class="qr-nav-arrows">
+          <button class="qr-nav-arrow-btn" onclick="prevQRSheet()">&lt;</button>
+          <button class="qr-nav-arrow-btn" onclick="nextQRSheet()">&gt;</button>
+        </div>
       </div>
-
-      <!-- A ~ E 게임 목록 -->
-      <div class="qr-games-container" id="qr-games-list-box"></div>
-
-      <!-- 하단 네비게이션 버튼 -->
-      <div class="qr-nav-action-row">
-        <button class="qr-nav-action-btn" onclick="prevQRSheet()">&lt; 이전 5게임</button>
-        <button class="qr-nav-action-btn" onclick="nextQRSheet()">다음 5게임 &gt;</button>
-      </div>
-
+      
+      <button class="qr-close-main-btn" onclick="closeQRModal()">닫기</button>
     </div>
   </div>
 
   <script>
     const FALLBACK_HISTORY = [
-      { "round": 1243, "numbers": [9, 18, 24, 38, 43, 44], "bonus": 35 },
-      { "round": 1242, "numbers": [2, 4, 10, 16, 31, 41], "bonus": 9 },
-      { "round": 1241, "numbers": [7, 13, 16, 23, 24, 43], "bonus": 9 },
-      { "round": 1240, "numbers": [11, 13, 19, 20, 31, 44], "bonus": 27 },
-      { "round": 1239, "numbers": [11, 13, 22, 32, 33, 36], "bonus": 8 },
-      { "round": 1238, "numbers": [2, 13, 18, 32, 38, 42], "bonus": 22 },
-      { "round": 1237, "numbers": [10, 20, 23, 34, 37, 40], "bonus": 36 },
-      { "round": 1236, "numbers": [12, 18, 21, 29, 34, 38], "bonus": 10 },
-      { "round": 1235, "numbers": [6, 7, 11, 15, 39, 43], "bonus": 20 },
-      { "round": 1234, "numbers": [1, 15, 19, 31, 35, 43], "bonus": 27 }
+      { "round": 1243, "numbers": [9, 18, 24, 38, 43, 44], "bonus": 35 }
     ];
-
-    const PRECOMPUTED_MYEONGDANG = {
-      "seoul_rank1": [
-        {num: 34, count: 11}, {num: 18, count: 10}, {num: 43, count: 9}, {num: 20, count: 9}, {num: 1, count: 8},
-        {num: 10, count: 8}, {num: 13, count: 8}, {num: 16, count: 8}, {num: 21, count: 8}, {num: 23, count: 8},
-        {num: 24, count: 8}, {num: 31, count: 8}, {num: 37, count: 8}, {num: 39, count: 8}, {num: 41, count: 8}
-      ],
-      "seoul_rank2": [
-        {num: 18, count: 37}, {num: 13, count: 36}, {num: 34, count: 35}, {num: 20, count: 34}, {num: 38, count: 34},
-        {num: 27, count: 33}, {num: 10, count: 32}, {num: 16, count: 32}, {num: 17, count: 32}, {num: 30, count: 32},
-        {num: 31, count: 32}, {num: 39, count: 31}, {num: 4, count: 30}, {num: 11, count: 30}, {num: 14, count: 30}
-      ],
-      "seoul_all": [
-        {num: 18, count: 44}, {num: 13, count: 43}, {num: 34, count: 42}, {num: 20, count: 41}, {num: 38, count: 41},
-        {num: 10, count: 39}, {num: 16, count: 39}, {num: 27, count: 39}, {num: 31, count: 39}, {num: 39, count: 38},
-        {num: 17, count: 37}, {num: 21, count: 37}, {num: 24, count: 37}, {num: 30, count: 37}, {num: 4, count: 36}
-      ],
-      "busan_rank1": [
-        {num: 34, count: 9}, {num: 10, count: 8}, {num: 12, count: 8}, {num: 19, count: 8}, {num: 24, count: 8},
-        {num: 38, count: 8}, {num: 3, count: 7}, {num: 4, count: 7}, {num: 7, count: 7}, {num: 11, count: 7},
-        {num: 18, count: 7}, {num: 33, count: 7}, {num: 39, count: 7}, {num: 42, count: 7}, {num: 45, count: 7}
-      ],
-      "busan_rank2": [
-        {num: 34, count: 31}, {num: 13, count: 28}, {num: 27, count: 28}, {num: 18, count: 27}, {num: 12, count: 26},
-        {num: 33, count: 26}, {num: 45, count: 26}, {num: 37, count: 25}, {num: 40, count: 25}, {num: 3, count: 24},
-        {num: 14, count: 24}, {num: 20, count: 24}, {num: 38, count: 24}, {num: 7, count: 23}, {num: 17, count: 23}
-      ],
-      "busan_all": [
-        {num: 34, count: 39}, {num: 13, count: 33}, {num: 27, count: 33}, {num: 12, count: 33}, {num: 18, count: 33},
-        {num: 33, count: 32}, {num: 45, count: 32}, {num: 37, count: 31}, {num: 40, count: 31}, {num: 3, count: 30},
-        {num: 14, count: 30}, {num: 20, count: 30}, {num: 38, count: 30}, {num: 7, count: 29}, {num: 17, count: 29}
-      ],
-      "all_rank1": [
-        {num: 34, count: 20}, {num: 10, count: 16}, {num: 18, count: 16}, {num: 24, count: 15}, {num: 1, count: 14},
-        {num: 12, count: 14}, {num: 20, count: 14}, {num: 38, count: 14}, {num: 43, count: 14}, {num: 4, count: 13},
-        {num: 7, count: 13}, {num: 11, count: 13}, {num: 13, count: 13}, {num: 16, count: 13}, {num: 19, count: 13}
-      ],
-      "all_rank2": [
-        {num: 34, count: 66}, {num: 18, count: 64}, {num: 13, count: 64}, {num: 20, count: 58}, {num: 38, count: 58},
-        {num: 27, count: 57}, {num: 10, count: 55}, {num: 16, count: 55}, {num: 17, count: 55}, {num: 31, count: 55},
-        {num: 33, count: 55}, {num: 12, count: 54}, {num: 30, count: 54}, {num: 39, count: 54}, {num: 4, count: 52}
-      ],
-      "all_all": [
-        {num: 34, count: 79}, {num: 18, count: 75}, {num: 13, count: 74}, {num: 20, count: 70}, {num: 38, count: 70},
-        {num: 10, count: 68}, {num: 27, count: 68}, {num: 16, count: 67}, {num: 12, count: 66}, {num: 31, count: 66},
-        {num: 33, count: 66}, {num: 17, count: 65}, {num: 24, count: 65}, {num: 30, count: 65}, {num: 39, count: 65}
-      ]
-    };
 
     const STATE = {
       activeMenu: 'standard',
@@ -946,6 +951,7 @@
       engineCandidates: { AI: [], SCORE: [] },
       commonCandidates: [],
       historyDB: FALLBACK_HISTORY,
+      myeongdangData: null,
       mdTop15Pool: [],
       mdSelected: new Set(),
       mdTargetQty: 10,
@@ -977,9 +983,6 @@
       { x: 48,  y: 122 }
     ];
 
-    /* =========================================================
-       스마트폰 물리 뒤로가기 / 제스처 popstate 이벤트 가로채기
-       ========================================================= */
     window.addEventListener('popstate', (e) => {
       const qrModal = document.getElementById('qr-modal');
       const omrModal = document.getElementById('omr-modal');
@@ -999,13 +1002,6 @@
       initNumberPad();
       initMyeongdangPad();
       initSavedGames();
-      
-      calculateTargetRounds();
-      generateWeeklyCandidates();
-      analyzeRecentStatistics();
-      runFortuneAndDream();
-      updateMaxComboDisplay();
-      applyMyeongdangPrecomputed();
 
       await loadHistoryDB();
       calculateTargetRounds();
@@ -1013,6 +1009,7 @@
       analyzeRecentStatistics();
       runFortuneAndDream();
       updateMaxComboDisplay();
+      applyMyeongdangPrecomputed();
     });
 
     function switchMainMenu(menuKey) {
@@ -1088,19 +1085,56 @@
       syncMyeongdangPadUI();
     }
 
+    // data/myeongdang.json 실시간 연동 및 동적 통계 산출
     function applyMyeongdangPrecomputed() {
       const loc = document.getElementById('sel-md-location').value;
       const rank = document.getElementById('sel-md-rank').value;
-      const key = `${loc}_${rank}`;
 
       const locName = (loc === 'seoul') ? '서울 노원 스파 편의점' : ((loc === 'busan') ? '부산 동구 부일카서비스' : '전국 2대 명당 전체');
       const rankName = (rank === 'rank1') ? '역대 1등' : ((rank === 'rank2') ? '역대 2등' : '1등+2등 전체');
       document.getElementById('myeongdang-scope-tag').innerText = `${locName} (${rankName})`;
 
-      const data = PRECOMPUTED_MYEONGDANG[key] || PRECOMPUTED_MYEONGDANG['seoul_rank2'];
-      STATE.mdTop15Pool = JSON.parse(JSON.stringify(data));
-      STATE.mdSelected = new Set(STATE.mdTop15Pool.map(item => item.num));
+      if (STATE.myeongdangData && STATE.historyDB.length > 0) {
+        let targetRounds = [];
+        if (loc === 'all') {
+          ['seoul', 'busan'].forEach(l => {
+            if (STATE.myeongdangData[l]) {
+              if (rank === 'all') {
+                targetRounds = targetRounds.concat(STATE.myeongdangData[l].rank1_rounds || [], STATE.myeongdangData[l].rank2_rounds || []);
+              } else {
+                targetRounds = targetRounds.concat(STATE.myeongdangData[l][`${rank}_rounds`] || []);
+              }
+            }
+          });
+        } else if (STATE.myeongdangData[loc]) {
+          if (rank === 'all') {
+            targetRounds = (STATE.myeongdangData[loc].rank1_rounds || []).concat(STATE.myeongdangData[loc].rank2_rounds || []);
+          } else {
+            targetRounds = STATE.myeongdangData[loc][`${rank}_rounds`] || [];
+          }
+        }
 
+        const counts = Array(46).fill(0);
+        targetRounds.forEach(r => {
+          const draw = STATE.historyDB.find(d => Number(d.round || d.drwNo) === Number(r));
+          if (draw && draw.numbers) {
+            draw.numbers.forEach(n => {
+              if (n >= 1 && n <= 45) counts[n]++;
+            });
+          }
+        });
+
+        const pool = [];
+        for (let i = 1; i <= 45; i++) {
+          if (counts[i] > 0) pool.push({ num: i, count: counts[i] });
+        }
+        pool.sort((a, b) => b.count - a.count || a.num - b.num);
+        STATE.mdTop15Pool = pool.slice(0, 15);
+      } else {
+        STATE.mdTop15Pool = [];
+      }
+
+      STATE.mdSelected = new Set(STATE.mdTop15Pool.map(item => item.num));
       renderMyeongdangTop15Grid();
       setupChamberBottomBalls();
       syncMyeongdangPadUI();
@@ -1110,6 +1144,11 @@
       const grid = document.getElementById('top15-balls-grid');
       if (!grid) return;
       grid.innerHTML = '';
+
+      if (STATE.mdTop15Pool.length === 0) {
+        grid.innerHTML = '<div style="grid-column:1/-1; color:#94a3b8; font-size:0.8rem; text-align:center;">명당 데이터를 불러오는 중이거나 데이터가 없습니다.</div>';
+        return;
+      }
 
       STATE.mdTop15Pool.forEach((item, index) => {
         const wrap = document.createElement('div');
@@ -1230,8 +1269,6 @@
         btn.disabled = false;
         btn.style.opacity = '1';
         STATE.isExtractingMD = false;
-
-        alert('추첨 완료');
       }, 2000);
     }
 
@@ -1299,12 +1336,7 @@
 
       localStorage.setItem('saved_lotto_slots', JSON.stringify(STATE.savedGames));
       renderStorageList();
-
-      if (duplicateCount > 0) {
-        alert(`${addedCount}개 게임이 보관함에 저장되었습니다. (중복 ${duplicateCount}개 제외)`);
-      } else {
-        alert(`${addedCount}개 게임이 보관함에 저장되었습니다.`);
-      }
+      alert(`${addedCount}개 게임이 보관함에 저장되었습니다.` + (duplicateCount > 0 ? ` (중복 ${duplicateCount}개 제외)` : ''));
     }
 
     function openOMRFromMD(index = 0) {
@@ -1364,9 +1396,7 @@
     async function loadHistoryDB() {
       let fetchedFresh = false;
       try {
-        const resH = await fetch(`./data/lotto-history.json?nocache=${Date.now()}`, {
-          cache: 'no-store'
-        });
+        const resH = await fetch(`./data/lotto-history.json?nocache=${Date.now()}`, { cache: 'no-store' });
         if (resH.ok) {
           const freshHistory = await resH.json();
           if (Array.isArray(freshHistory) && freshHistory.length > 0) {
@@ -1387,6 +1417,16 @@
             STATE.historyDB = JSON.parse(cached).sort((a, b) => Number(b.round || 0) - Number(a.round || 0));
           } catch(e){}
         }
+      }
+
+      // data/myeongdang.json 실시간 연동
+      try {
+        const resM = await fetch(`./data/myeongdang.json?nocache=${Date.now()}`, { cache: 'no-store' });
+        if (resM.ok) {
+          STATE.myeongdangData = await resM.json();
+        }
+      } catch (err) {
+        console.warn('명당 데이터 네트워크 로드 실패:', err);
       }
     }
 
@@ -1727,7 +1767,27 @@
 
       if (fixedNums.length >= 6) {
         fixedNums.sort((a, b) => a - b);
-        const allPossibleCombos = getAllCombinations(fixedNums, 6);
+        let allPossibleCombos = [];
+        
+        // 12개 초과 시 브라우저 멈춤 방지 (랜덤 샘플링 처리)
+        if (fixedNums.length > 12) {
+          let attempts = 0;
+          const maxTries = Math.min(requested * 20, 10000);
+          const seen = new Set();
+          while (allPossibleCombos.length < requested * 3 && attempts < maxTries) {
+            attempts++;
+            const shuffled = [...fixedNums].sort(() => Math.random() - 0.5);
+            const combo = shuffled.slice(0, 6).sort((a, b) => a - b);
+            const key = combo.join(',');
+            if (!seen.has(key)) {
+              seen.add(key);
+              allPossibleCombos.push(combo);
+            }
+          }
+        } else {
+          allPossibleCombos = getAllCombinations(fixedNums, 6);
+        }
+        
         const { stats } = buildNumberStats(STATE.historyDB);
         const pair = buildPairMatrix(STATE.historyDB);
 
@@ -2093,9 +2153,6 @@
       badNums.forEach(n => badBox.appendChild(createBall(n, () => toggleFixedNumber(n))));
     }
 
-    /* =========================================================
-       OMR 모달 제어 (뒤로가기 스택 pushState 연동)
-       ========================================================= */
     function openOMRFromExtract(index = 0) {
       if (!STATE.generatedGames.length) {
         alert('추출된 게임 결과가 없습니다.');
@@ -2167,13 +2224,26 @@
       }
     }
 
-    /* =========================================================
-       첨부 스크린샷 100% 동일 복원: 동행복권 5게임 통합 QR 모달 제어
-       ========================================================= */
     function getNowFormattedString() {
       const d = new Date();
       const pad = n => String(n).padStart(2, '0');
-      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())} 작성`;
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
+    // 동행복권 표준 단말기 인식용 CRC-8 (다항식 0x07) 계산 함수
+    function calculateCRC8(dataStr) {
+      let crc = 0x00;
+      for (let i = 0; i < dataStr.length; i++) {
+        crc ^= dataStr.charCodeAt(i);
+        for (let j = 0; j < 8; j++) {
+          if ((crc & 0x80) !== 0) {
+            crc = ((crc << 1) ^ 0x07) & 0xFF;
+          } else {
+            crc = (crc << 1) & 0xFF;
+          }
+        }
+      }
+      return crc.toString(16).toUpperCase().padStart(2, '0');
     }
 
     function openQRModal(sourceType) {
@@ -2233,59 +2303,39 @@
       const startIdx = currentSheet * 5;
       const sheetGames = source.slice(startIdx, startIdx + 5);
 
-      // 상단 일시 및 페이지 번호
-      document.getElementById('qr-timestamp-label').innerText = QR_STATE.timestamp || getNowFormattedString();
-      document.getElementById('qr-page-indicator').innerText = `${currentSheet + 1} / ${totalSheets}`;
+      const totalEstimatedPrice = (source.length * 1000).toLocaleString();
+      const currentSheetPrice = (sheetGames.length * 1000).toLocaleString();
 
-      // 예상금액 바 (예: 5 게임 (예상금액 5,000원))
-      const estimatedPrice = (sheetGames.length * 1000).toLocaleString();
-      document.getElementById('qr-games-info-title').innerText = `${sheetGames.length} 게임 (예상금액 ${estimatedPrice}원)`;
+      document.getElementById('qr-timestamp-label').innerText = `생성일시 ${QR_STATE.timestamp || getNowFormattedString()}`;
+      document.getElementById('qr-page-indicator').innerText = `${currentSheet + 1}/${totalSheets}`;
+      document.getElementById('qr-total-price').innerText = `(QR 총액 ${totalEstimatedPrice}원)`;
+      
+      document.getElementById('qr-current-sheet-price').innerHTML = `${currentSheetPrice}원 <span style="font-size:0.9rem; font-weight:400; color:#94a3b8; border:1px solid #cbd5e1; border-radius:50%; width:18px; height:18px; display:inline-flex; align-items:center; justify-content:center; padding-bottom:1px;">i</span>`;
+      
+      document.getElementById('qr-games-info-title').innerText = `${sheetGames.length}게임 (총 ${currentSheetPrice}원)`;
 
-      // 동행복권 파라미터 생성
-      const roundStr = String(STATE.targetRound).padStart(4, '0');
-      const gamesParam = sheetGames.map(game => {
-        return normalizeNumbers(game)
+      // 동행복권 공식 모바일 전자 슬립(MSG_ESLIP) 표준 단말기 규격 생성
+      const gamesPayload = sheetGames.map(game => {
+        const nums = normalizeNumbers(game)
           .map(n => String(n).padStart(2, '0'))
           .join('');
-      }).join('q');
+        return `M:${nums}`;
+      }).join(',');
 
-      const qrUrl = `https://m.dhlottery.co.kr/qr.do?method=winQr&v=${roundStr}q${gamesParam}`;
+      const rawPayload = `MSG_ESLIP{10645}{(${sheetGames.length},${gamesPayload})}{}`;
+      const crc = calculateCRC8(rawPayload);
+      const qrPayload = `${rawPayload}${crc}|`;
 
       // 대형 QR 코드 렌더링
       const qrBox = document.getElementById('qr-canvas-box');
       qrBox.innerHTML = '';
       new QRCode(qrBox, {
-        text: qrUrl,
-        width: 195,
-        height: 195,
+        text: qrPayload,
+        width: 180,
+        height: 180,
         colorDark: "#000000",
         colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.M
-      });
-
-      // 스크린샷과 동일한 A ~ E 수동 게임 리스트 렌더링
-      const gameLabels = ['A', 'B', 'C', 'D', 'E'];
-      const gamesListBox = document.getElementById('qr-games-list-box');
-      gamesListBox.innerHTML = '';
-
-      sheetGames.forEach((game, idx) => {
-        const norm = normalizeNumbers(game);
-        const row = document.createElement('div');
-        row.className = 'qr-game-row-box';
-
-        const label = gameLabels[idx] || String.fromCharCode(65 + idx);
-        const ballsHtml = norm.map(n => getBallHtmlSm(n)).join('');
-
-        row.innerHTML = `
-          <div class="qr-game-tag-col">
-            <span class="qr-game-letter">${label}</span>
-            <span class="qr-game-type">수동</span>
-          </div>
-          <div class="qr-game-balls-wrap">
-            ${ballsHtml}
-          </div>
-        `;
-        gamesListBox.appendChild(row);
       });
     }
 
