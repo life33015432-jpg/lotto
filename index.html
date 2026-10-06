@@ -891,6 +891,7 @@
       { "round": 1234, "numbers": [1, 15, 19, 31, 35, 43], "bonus": 27 }
     ];
 
+    // 하드코딩된 PRECOMPUTED_MYEONGDANG 제거. myeongdang.json을 직접 불러옵니다.
     const PRECOMPUTED_MYEONGDANG = {
       "seoul_rank1": [
         {num: 34, count: 11}, {num: 18, count: 10}, {num: 43, count: 9}, {num: 20, count: 9}, {num: 1, count: 8},
@@ -946,6 +947,7 @@
       engineCandidates: { AI: [], SCORE: [] },
       commonCandidates: [],
       historyDB: FALLBACK_HISTORY,
+      myeongdangData: null,
       mdTop15Pool: [],
       mdSelected: new Set(),
       mdTargetQty: 10,
@@ -1008,11 +1010,6 @@
       applyMyeongdangPrecomputed();
 
       await loadHistoryDB();
-      calculateTargetRounds();
-      generateWeeklyCandidates();
-      analyzeRecentStatistics();
-      runFortuneAndDream();
-      updateMaxComboDisplay();
     });
 
     function switchMainMenu(menuKey) {
@@ -1091,16 +1088,50 @@
     function applyMyeongdangPrecomputed() {
       const loc = document.getElementById('sel-md-location').value;
       const rank = document.getElementById('sel-md-rank').value;
-      const key = `${loc}_${rank}`;
-
+      
       const locName = (loc === 'seoul') ? '서울 노원 스파 편의점' : ((loc === 'busan') ? '부산 동구 부일카서비스' : '전국 2대 명당 전체');
       const rankName = (rank === 'rank1') ? '역대 1등' : ((rank === 'rank2') ? '역대 2등' : '1등+2등 전체');
       document.getElementById('myeongdang-scope-tag').innerText = `${locName} (${rankName})`;
 
-      const data = PRECOMPUTED_MYEONGDANG[key] || PRECOMPUTED_MYEONGDANG['seoul_rank2'];
-      STATE.mdTop15Pool = JSON.parse(JSON.stringify(data));
-      STATE.mdSelected = new Set(STATE.mdTop15Pool.map(item => item.num));
+      if (STATE.myeongdangData && STATE.historyDB.length > 0) {
+        let rounds = [];
+        if (loc === 'all') {
+           ['seoul', 'busan'].forEach(l => {
+              if (rank === 'all') {
+                  rounds = rounds.concat(STATE.myeongdangData[l].rank1_rounds || [], STATE.myeongdangData[l].rank2_rounds || []);
+              } else {
+                  rounds = rounds.concat(STATE.myeongdangData[l][`${rank}_rounds`] || []);
+              }
+           });
+        } else {
+           if (rank === 'all') {
+              rounds = (STATE.myeongdangData[loc].rank1_rounds || []).concat(STATE.myeongdangData[loc].rank2_rounds || []);
+           } else {
+              rounds = STATE.myeongdangData[loc][`${rank}_rounds`] || [];
+           }
+        }
+        
+        const counts = Array(46).fill(0);
+        rounds.forEach(r => {
+           const draw = STATE.historyDB.find(d => Number(d.round || d.drwNo) === Number(r));
+           if(draw && draw.numbers) {
+               draw.numbers.forEach(n => counts[n]++);
+           }
+        });
+        
+        const pool = [];
+        for(let i=1; i<=45; i++) {
+            if(counts[i] > 0) pool.push({num: i, count: counts[i]});
+        }
+        pool.sort((a,b) => b.count - a.count || a.num - b.num);
+        STATE.mdTop15Pool = pool.slice(0, 15);
+      } else {
+        // Fallback
+        const key = `${loc}_${rank}`;
+        STATE.mdTop15Pool = JSON.parse(JSON.stringify(PRECOMPUTED_MYEONGDANG[key] || PRECOMPUTED_MYEONGDANG['seoul_rank2']));
+      }
 
+      STATE.mdSelected = new Set(STATE.mdTop15Pool.map(item => item.num));
       renderMyeongdangTop15Grid();
       setupChamberBottomBalls();
       syncMyeongdangPadUI();
@@ -1364,9 +1395,7 @@
     async function loadHistoryDB() {
       let fetchedFresh = false;
       try {
-        const resH = await fetch(`./data/lotto-history.json?nocache=${Date.now()}`, {
-          cache: 'no-store'
-        });
+        const resH = await fetch(`./data/lotto-history.json?nocache=${Date.now()}`, { cache: 'no-store' });
         if (resH.ok) {
           const freshHistory = await resH.json();
           if (Array.isArray(freshHistory) && freshHistory.length > 0) {
@@ -1388,6 +1417,22 @@
           } catch(e){}
         }
       }
+
+      // 명당 데이터 불러오기
+      try {
+        const resM = await fetch(`./data/myeongdang.json?nocache=${Date.now()}`, { cache: 'no-store' });
+        if (resM.ok) {
+          STATE.myeongdangData = await resM.json();
+        }
+      } catch (err) {
+        console.warn('명당 데이터 네트워크 로드 실패:', err);
+      }
+
+      // 캐시 렌더링 지연 해결을 위해 즉시 화면 최신화 강제 실행
+      calculateTargetRounds();
+      generateWeeklyCandidates();
+      analyzeRecentStatistics();
+      if (STATE.activeMenu === 'myeongdang') applyMyeongdangPrecomputed();
     }
 
     function calculateTargetRounds() {
@@ -1727,7 +1772,27 @@
 
       if (fixedNums.length >= 6) {
         fixedNums.sort((a, b) => a - b);
-        const allPossibleCombos = getAllCombinations(fixedNums, 6);
+        let allPossibleCombos = [];
+        
+        // 12개 초과 시 브라우저 멈춤 방지 (랜덤 샘플링 처리)
+        if (fixedNums.length > 12) {
+          let attempts = 0;
+          const maxTries = Math.min(requested * 20, 10000);
+          const seen = new Set();
+          while (allPossibleCombos.length < requested * 3 && attempts < maxTries) {
+            attempts++;
+            const shuffled = [...fixedNums].sort(() => Math.random() - 0.5);
+            const combo = shuffled.slice(0, 6).sort((a, b) => a - b);
+            const key = combo.join(',');
+            if (!seen.has(key)) {
+              seen.add(key);
+              allPossibleCombos.push(combo);
+            }
+          }
+        } else {
+          allPossibleCombos = getAllCombinations(fixedNums, 6);
+        }
+        
         const { stats } = buildNumberStats(STATE.historyDB);
         const pair = buildPairMatrix(STATE.historyDB);
 
@@ -2241,7 +2306,8 @@
       const estimatedPrice = (sheetGames.length * 1000).toLocaleString();
       document.getElementById('qr-games-info-title').innerText = `${sheetGames.length} 게임 (예상금액 ${estimatedPrice}원)`;
 
-      // 동행복권 파라미터 생성
+      // 동행복권 구매용 슬립 포맷 (당첨 확인 웹 링크 배제)
+      // 최신 대상 회차(STATE.targetRound)를 무조건 적용하여 구매 가능한 상태 유지
       const roundStr = String(STATE.targetRound).padStart(4, '0');
       const gamesParam = sheetGames.map(game => {
         return normalizeNumbers(game)
@@ -2249,13 +2315,14 @@
           .join('');
       }).join('q');
 
-      const qrUrl = `https://m.dhlottery.co.kr/qr.do?method=winQr&v=${roundStr}q${gamesParam}`;
+      // 구매용 단말기가 읽을 수 있는 슬립 데이터 문자열 규격
+      const qrPayload = `v=${roundStr}q${gamesParam}`;
 
       // 대형 QR 코드 렌더링
       const qrBox = document.getElementById('qr-canvas-box');
       qrBox.innerHTML = '';
       new QRCode(qrBox, {
-        text: qrUrl,
+        text: qrPayload,
         width: 195,
         height: 195,
         colorDark: "#000000",
@@ -2263,7 +2330,7 @@
         correctLevel: QRCode.CorrectLevel.M
       });
 
-      // 스크린샷과 동일한 A ~ E 수동 게임 리스트 렌더링
+      // 게임 리스트 렌더링
       const gameLabels = ['A', 'B', 'C', 'D', 'E'];
       const gamesListBox = document.getElementById('qr-games-list-box');
       gamesListBox.innerHTML = '';
