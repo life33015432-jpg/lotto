@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Aipluslotto.com</title>
   <!-- 동적 QR 코드 생성 라이브러리 (CDN) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -27,7 +27,14 @@
       --ball-gr: #10b981; 
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background-color: var(--bg-color); color: var(--text-main); display: flex; justify-content: center; min-height: 100vh; padding: 12px 8px 40px; }
+    body { 
+      background-color: var(--bg-color); 
+      color: var(--text-main); 
+      display: flex; 
+      justify-content: center; 
+      min-height: 100vh; 
+      padding: 12px 8px calc(40px + env(safe-area-inset-bottom)); 
+    }
     
     .app-container { width: 100%; max-width: 530px; display: flex; flex-direction: column; gap: 14px; margin: 0 auto; }
     .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px; position: relative; }
@@ -161,9 +168,7 @@
     .range-slider { flex: 1; accent-color: var(--primary-accent); }
     .btn-extract { width: 100%; padding: 13px; background: linear-gradient(135deg, #10b981, #059669); border: none; border-radius: 10px; color: #fff; font-size: 1rem; font-weight: 800; cursor: pointer; box-shadow: 0 3px 10px rgba(16,185,129,0.3); }
 
-    /* =========================================================
-       로또 추첨기 챔버 (하단 정렬 ➔ 2초 난류 추첨)
-       ========================================================= */
+    /* 로또 추첨기 챔버 */
     .chamber-wrapper {
       display: flex;
       flex-direction: column;
@@ -331,18 +336,39 @@
     .btn-reset:hover { color: #fff; border-color: var(--text-sub); }
 
     /* 로또용지 및 QR 모달 */
-    .omr-modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 10px; }
+    .omr-modal-backdrop { 
+      position: fixed; 
+      inset: 0; 
+      background: rgba(0,0,0,0.78); 
+      display: none; 
+      justify-content: center; 
+      align-items: center; 
+      z-index: 1000; 
+      padding: 12px; 
+      backdrop-filter: blur(2px);
+    }
     .omr-modal-backdrop.open { display: flex; }
-    .omr-card { width: 100%; max-width: 462px; background: #fafafa; border-radius: 12px; padding: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); color: #111; position: relative; border-top: 6px solid #e11d48; }
+    .omr-card { 
+      width: 100%; 
+      max-width: 462px; 
+      background: #fafafa; 
+      border-radius: 14px; 
+      padding: 16px; 
+      box-shadow: 0 12px 35px rgba(0,0,0,0.65); 
+      color: #111; 
+      position: relative; 
+      border-top: 6px solid #e11d48; 
+    }
     .omr-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed #cbd5e1; padding-bottom: 8px; margin-bottom: 12px; }
     .omr-header h4 { color: #b91c1c; font-size: 1.05rem; font-weight: 800; }
-    .omr-close-btn { background: none; border: none; font-size: 1.3rem; line-height: 1; cursor: pointer; color: #64748b; }
+    .omr-close-btn { background: none; border: none; font-size: 1.4rem; line-height: 1; cursor: pointer; color: #64748b; padding: 2px 6px; }
     .omr-grid-container { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; background: #fff; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; }
     .omr-cell { aspect-ratio: 1.1; border: 1px solid #e2e8f0; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; color: #334155; position: relative; }
     .omr-cell.marked { background: #b91c1c; color: #fff; border-color: #991b1b; }
     .omr-cell.marked::after { content: ''; position: absolute; width: 60%; height: 3px; background: #000; transform: rotate(-25deg); opacity: 0.2; }
-    .omr-nav-btn-row { display: flex; justify-content: space-between; margin-top: 10px; gap: 8px; }
-    .omr-nav-btn { flex: 1; padding: 8px; background: #e2e8f0; border: none; border-radius: 6px; font-weight: 700; color: #334155; cursor: pointer; }
+    .omr-nav-btn-row { display: flex; justify-content: space-between; margin-top: 12px; gap: 8px; }
+    .omr-nav-btn { flex: 1; padding: 10px; background: #e2e8f0; border: none; border-radius: 8px; font-weight: 700; color: #334155; cursor: pointer; font-size: 0.85rem; }
+    .omr-nav-btn:active { background: #cbd5e1; }
   </style>
 </head>
 <body>
@@ -350,7 +376,6 @@
   <div class="app-container">
     <header class="header-panel">
       <div class="brand-title">Aipluslotto.com</div>
-      <!-- 당일 접속자 및 누적 접속자 분리 표시 -->
       <div class="stat-badge-row">
         <span class="stat-badge">당일 접속 <b id="daily-visitor-count">1</b>명</span>
         <span class="stat-badge">누적 접속 <b id="total-visitor-count">1</b>명</span>
@@ -542,7 +567,7 @@
     <!-- ================= [메뉴 2] 전국 2대 명당 추출기 영역 ================= -->
     <main id="view-myeongdang-panel" style="display:none; flex-direction:column; gap:14px;">
       
-      <!-- 실제 로또 추첨기 챔버 (하단 정렬 ➔ 2초 난류 추첨) -->
+      <!-- 로또 추첨기 챔버 -->
       <section class="card chamber-wrapper">
         <div class="lotto-chamber" id="lotto-chamber">
           <div class="chamber-glass-glare"></div>
@@ -678,7 +703,6 @@
         <button class="omr-close-btn" onclick="closeQRModal()">&times;</button>
       </div>
 
-      <!-- 동행복권 모바일 연동 QR 이미지 -->
       <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:12px; margin-bottom:12px;">
         <div id="qr-canvas-box" style="width:120px; height:120px; display:flex; align-items:center; justify-content:center;"></div>
         <span style="font-size:0.72rem; color:#475569; margin-top:8px; font-weight:700; text-align:center;">
@@ -686,10 +710,8 @@
         </span>
       </div>
 
-      <!-- 5게임 번호 프리뷰 목록 -->
       <div id="qr-games-preview-list" style="display:flex; flex-direction:column; gap:6px; margin-bottom:10px;"></div>
 
-      <!-- 5게임(1장) 단위 네비게이션 버튼 -->
       <div class="omr-nav-btn-row">
         <button class="omr-nav-btn" onclick="prevQRSheet()">&lt; 이전 5게임</button>
         <button class="omr-nav-btn" onclick="nextQRSheet()">다음 5게임 &gt;</button>
@@ -698,7 +720,6 @@
   </div>
 
   <script>
-    // JSON 로딩 지연 시 화면이 비어 보이지 않도록 즉시 주입되는 최신 로또 Fallback 기준 데이터
     const FALLBACK_HISTORY = [
       { "round": 1243, "numbers": [9, 18, 24, 38, 43, 44], "bonus": 35 },
       { "round": 1242, "numbers": [2, 4, 10, 16, 31, 41], "bonus": 9 },
@@ -780,7 +801,6 @@
       isExtractingMD: false
     };
 
-    /* 5게임 단위 통합 QR 관리 상태 */
     const QR_STATE = {
       source: [],
       sheetIndex: 0
@@ -798,19 +818,21 @@
       { x: 48,  y: 122 }
     ];
 
-    /* 스마트폰 뒤로가기 버튼(popstate) 인터셉트: 다른 사이트로 이동 방지 및 모달 닫기 */
+    /* =========================================================
+       스마트폰 물리 뒤로가기 / 제스처 popstate 이벤트 가로채기
+       ========================================================= */
     window.addEventListener('popstate', (e) => {
       const qrModal = document.getElementById('qr-modal');
       const omrModal = document.getElementById('omr-modal');
 
+      let handled = false;
       if (qrModal && qrModal.classList.contains('open')) {
         qrModal.classList.remove('open');
-        return;
+        handled = true;
       }
-
       if (omrModal && omrModal.classList.contains('open')) {
         omrModal.classList.remove('open');
-        return;
+        handled = true;
       }
     });
 
@@ -820,7 +842,6 @@
       initMyeongdangPad();
       initSavedGames();
       
-      // 1. Fallback 데이터로 화면 즉시 초기 구성 (공 공백 현상 방지)
       calculateTargetRounds();
       generateWeeklyCandidates();
       analyzeRecentStatistics();
@@ -828,7 +849,6 @@
       updateMaxComboDisplay();
       applyMyeongdangPrecomputed();
 
-      // 2. 서버 파일 비동기 로드 후 화면 최신 상태로 재동기화
       await loadHistoryDB();
       calculateTargetRounds();
       generateWeeklyCandidates();
@@ -1137,11 +1157,11 @@
       STATE.omrActiveSource = STATE.mdGeneratedGames;
       STATE.omrCurrentIndex = index;
       renderOMR();
+
       history.pushState({ modal: 'omr' }, '');
       document.getElementById('omr-modal').classList.add('open');
     }
 
-    /* 방법 B: 정직한 1부터 시작 카운터 로직 (당일/누적 분리 관리) */
     function initDailyVisitors() {
       const todayKey = 'lotto_visitor_date';
       const dailyCountKey = 'lotto_visitor_daily_count';
@@ -1152,7 +1172,6 @@
       let dailyCount = parseInt(localStorage.getItem(dailyCountKey) || '0', 10);
       let totalCount = parseInt(localStorage.getItem(totalCountKey) || '0', 10);
 
-      // 날짜가 변경되었거나 과거 1,000명대 가짜 난수 데이터가 남아있는 경우 리셋
       if (storedDate !== todayStr || dailyCount > 100) {
         dailyCount = 1;
         if (!totalCount || totalCount > 500) {
@@ -1163,7 +1182,6 @@
         localStorage.setItem(todayKey, todayStr);
         sessionStorage.setItem('visited_session', 'true');
       } else {
-        // 새로고침 과다 집계 방지: 브라우저 탭 세션 첫 진입 시에만 1씩 증가
         if (!sessionStorage.getItem('visited_session')) {
           dailyCount += 1;
           totalCount += 1;
@@ -1185,7 +1203,6 @@
       return arr.map(n => parseInt(n, 10)).filter(n => !isNaN(n)).sort((a, b) => a - b);
     }
 
-    /* 최신 history JSON을 읽어와 STATE 갱신 */
     async function loadHistoryDB() {
       let fetchedFresh = false;
       try {
@@ -1918,7 +1935,9 @@
       badNums.forEach(n => badBox.appendChild(createBall(n, () => toggleFixedNumber(n))));
     }
 
-    /* OMR 모달 제어 */
+    /* =========================================================
+       OMR 모달 제어 (뒤로가기 스택 pushState 연동)
+       ========================================================= */
     function openOMRFromExtract(index = 0) {
       if (!STATE.generatedGames.length) {
         alert('추출된 게임 결과가 없습니다.');
@@ -1927,6 +1946,7 @@
       STATE.omrActiveSource = STATE.generatedGames;
       STATE.omrCurrentIndex = index;
       renderOMR();
+
       history.pushState({ modal: 'omr' }, '');
       document.getElementById('omr-modal').classList.add('open');
     }
@@ -1939,6 +1959,7 @@
       STATE.omrActiveSource = STATE.savedGames;
       STATE.omrCurrentIndex = index;
       renderOMR();
+
       history.pushState({ modal: 'omr' }, '');
       document.getElementById('omr-modal').classList.add('open');
     }
@@ -1946,7 +1967,7 @@
     function closeOMR(event) {
       if (event && event.target !== event.currentTarget) return;
       const modal = document.getElementById('omr-modal');
-      if (modal.classList.contains('open')) {
+      if (modal && modal.classList.contains('open')) {
         modal.classList.remove('open');
         if (history.state && history.state.modal === 'omr') {
           history.back();
@@ -1989,7 +2010,7 @@
     }
 
     /* =========================================================
-       5게임당 1개 동행복권 통합 QR 제어 로직
+       QR 전용 모달 제어 (뒤로가기 스택 pushState 연동)
        ========================================================= */
     function openQRModal(sourceType) {
       let list = [];
@@ -2007,6 +2028,7 @@
       QR_STATE.source = list;
       QR_STATE.sheetIndex = 0;
       renderQRSheet();
+
       history.pushState({ modal: 'qr' }, '');
       document.getElementById('qr-modal').classList.add('open');
     }
@@ -2014,7 +2036,7 @@
     function closeQRModal(event) {
       if (event && event.target !== event.currentTarget) return;
       const modal = document.getElementById('qr-modal');
-      if (modal.classList.contains('open')) {
+      if (modal && modal.classList.contains('open')) {
         modal.classList.remove('open');
         if (history.state && history.state.modal === 'qr') {
           history.back();
@@ -2055,7 +2077,6 @@
       document.getElementById('qr-modal-subtitle').innerText = 
         `제 ${STATE.targetRound}회 대상 (${sheetGames.length}게임 수록)`;
 
-      // 동행복권 모바일 규격 파라미터 조합 (v=1244q010203040506q070809101112...)
       const roundStr = String(STATE.targetRound).padStart(4, '0');
       const gamesParam = sheetGames.map(game => {
         return normalizeNumbers(game)
@@ -2065,7 +2086,6 @@
 
       const qrUrl = `https://m.dhlottery.co.kr/qr.do?method=winQr&v=${roundStr}q${gamesParam}`;
 
-      // QR 코드 렌더링
       const qrBox = document.getElementById('qr-canvas-box');
       qrBox.innerHTML = '';
       new QRCode(qrBox, {
@@ -2077,7 +2097,6 @@
         correctLevel: QRCode.CorrectLevel.M
       });
 
-      // 하단 5게임 프리뷰 리스트 렌더링
       const previewList = document.getElementById('qr-games-preview-list');
       previewList.innerHTML = '';
       sheetGames.forEach((game, gIdx) => {
