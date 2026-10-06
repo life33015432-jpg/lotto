@@ -19,7 +19,7 @@
       --text-sub: #94a3b8;
       --border-color: #26354d;
       --ball-size: 32px;
-      --ball-size-sm: 21px;
+      --ball-size-sm: 26px;
       --ball-y: #f59e0b;  
       --ball-b: #3b82f6;  
       --ball-r: #ef4444;  
@@ -103,7 +103,7 @@
       min-height: var(--ball-size-sm) !important;
       max-width: var(--ball-size-sm) !important;
       max-height: var(--ball-size-sm) !important;
-      font-size: 0.62rem !important;
+      font-size: 0.74rem !important;
       box-shadow: inset -1px -1px 2px rgba(0,0,0,0.35), 1px 1px 2px rgba(0,0,0,0.25) !important;
       cursor: default;
     }
@@ -335,7 +335,7 @@
     .btn-reset { background: rgba(148,163,184,0.15); color: var(--text-sub); border: 1px solid var(--border-color); }
     .btn-reset:hover { color: #fff; border-color: var(--text-sub); }
 
-    /* 로또용지 및 QR 모달 */
+    /* OMR 모달 */
     .omr-modal-backdrop { 
       position: fixed; 
       inset: 0; 
@@ -369,6 +369,158 @@
     .omr-nav-btn-row { display: flex; justify-content: space-between; margin-top: 12px; gap: 8px; }
     .omr-nav-btn { flex: 1; padding: 10px; background: #e2e8f0; border: none; border-radius: 8px; font-weight: 700; color: #334155; cursor: pointer; font-size: 0.85rem; }
     .omr-nav-btn:active { background: #cbd5e1; }
+
+    /* =========================================================
+       첨부 스크린샷 100% 동일 복원: 다크 테마 QR 모달 양식
+       ========================================================= */
+    .qr-custom-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 7, 18, 0.88);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 14px 12px;
+      backdrop-filter: blur(4px);
+    }
+    .qr-custom-modal-backdrop.open { display: flex; }
+    .qr-custom-card {
+      width: 100%;
+      max-width: 440px;
+      background: #111a2d;
+      border: 1px solid #23344e;
+      border-radius: 20px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.7);
+    }
+
+    /* 상단 화이트 QR 카드 */
+    .qr-white-board {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 12px 14px 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #1e293b;
+      position: relative;
+    }
+    .qr-white-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #64748b;
+      margin-bottom: 6px;
+    }
+    .qr-trash-btn {
+      background: transparent;
+      border: none;
+      font-size: 1.15rem;
+      cursor: pointer;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      padding: 2px;
+      transition: color 0.15s;
+    }
+    .qr-trash-btn:hover { color: #ef4444; }
+    .qr-img-center-box {
+      width: 195px;
+      height: 195px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 2px 0 6px;
+    }
+    .qr-img-center-box img {
+      width: 195px !important;
+      height: 195px !important;
+      display: block;
+    }
+    .qr-page-indicator {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #64748b;
+    }
+
+    /* 게임 예상금액 헤더 */
+    .qr-games-info-title {
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: #f8fafc;
+      padding: 0 2px;
+    }
+
+    /* A~E 게임 행 컨테이너 */
+    .qr-games-container {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .qr-game-row-box {
+      background: #172439;
+      border: 1px solid #23344e;
+      border-radius: 10px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .qr-game-tag-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-width: 24px;
+    }
+    .qr-game-letter {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #f59e0b;
+      line-height: 1;
+    }
+    .qr-game-type {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+    .qr-game-balls-wrap {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: nowrap;
+    }
+
+    /* 하단 이동 버튼 바 */
+    .qr-nav-action-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .qr-nav-action-btn {
+      flex: 1;
+      padding: 12px 0;
+      background: #e2e8f0;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #1e293b;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+    }
+    .qr-nav-action-btn:active { background: #cbd5e1; }
   </style>
 </head>
 <body>
@@ -692,30 +844,36 @@
     </div>
   </div>
 
-  <!-- 동행복권 5게임 통합 QR 전용 모달 (1장당 5게임 연동) -->
-  <div class="omr-modal-backdrop" id="qr-modal" onclick="closeQRModal(event)">
-    <div class="omr-card" onclick="event.stopPropagation()" style="border-top:6px solid #10b981; max-height:88vh; overflow-y:auto;">
-      <div class="omr-header" style="border-bottom:2px dashed #a7f3d0;">
-        <div>
-          <h4 id="qr-modal-title" style="color:#059669; font-size:1.05rem; font-weight:800;">[동행복권 QR] 제 1장 (A~E)</h4>
-          <span id="qr-modal-subtitle" style="font-size:0.75rem; color:#64748b; font-weight:600;">제 1244회 대상</span>
+  <!-- =========================================================
+       첨부 스크린샷 100% 동일 복원: 동행복권 5게임 통합 QR 모달
+       ========================================================= -->
+  <div class="qr-custom-modal-backdrop" id="qr-modal" onclick="closeQRModal(event)">
+    <div class="qr-custom-card" onclick="event.stopPropagation()">
+      
+      <!-- 상단 화이트보드 (작성일시 / 휴지통(닫기) / QR코드 / 페이지수) -->
+      <div class="qr-white-board">
+        <div class="qr-white-header">
+          <span id="qr-timestamp-label">2026-10-06 11:50:16 작성</span>
+          <button class="qr-trash-btn" onclick="closeQRModal()" title="닫기">🗑️</button>
         </div>
-        <button class="omr-close-btn" onclick="closeQRModal()">&times;</button>
+        <div class="qr-img-center-box" id="qr-canvas-box"></div>
+        <div class="qr-page-indicator" id="qr-page-indicator">1 / 1</div>
       </div>
 
-      <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:12px; margin-bottom:12px;">
-        <div id="qr-canvas-box" style="width:120px; height:120px; display:flex; align-items:center; justify-content:center;"></div>
-        <span style="font-size:0.72rem; color:#475569; margin-top:8px; font-weight:700; text-align:center;">
-          📷 카메라나 카카오톡 스캐너로 비추면<br>해당 용지의 모든 게임(최대 5개) 당첨조회가 열립니다
-        </span>
+      <!-- 게임 수 및 예상금액 -->
+      <div class="qr-games-info-title" id="qr-games-info-title">
+        5 게임 (예상금액 5,000원)
       </div>
 
-      <div id="qr-games-preview-list" style="display:flex; flex-direction:column; gap:6px; margin-bottom:10px;"></div>
+      <!-- A ~ E 게임 목록 -->
+      <div class="qr-games-container" id="qr-games-list-box"></div>
 
-      <div class="omr-nav-btn-row">
-        <button class="omr-nav-btn" onclick="prevQRSheet()">&lt; 이전 5게임</button>
-        <button class="omr-nav-btn" onclick="nextQRSheet()">다음 5게임 &gt;</button>
+      <!-- 하단 네비게이션 버튼 -->
+      <div class="qr-nav-action-row">
+        <button class="qr-nav-action-btn" onclick="prevQRSheet()">&lt; 이전 5게임</button>
+        <button class="qr-nav-action-btn" onclick="nextQRSheet()">다음 5게임 &gt;</button>
       </div>
+
     </div>
   </div>
 
@@ -803,7 +961,8 @@
 
     const QR_STATE = {
       source: [],
-      sheetIndex: 0
+      sheetIndex: 0,
+      timestamp: ''
     };
 
     const BOTTOM_SLOTS_15 = [
@@ -825,14 +984,13 @@
       const qrModal = document.getElementById('qr-modal');
       const omrModal = document.getElementById('omr-modal');
 
-      let handled = false;
       if (qrModal && qrModal.classList.contains('open')) {
         qrModal.classList.remove('open');
-        handled = true;
+        return;
       }
       if (omrModal && omrModal.classList.contains('open')) {
         omrModal.classList.remove('open');
-        handled = true;
+        return;
       }
     });
 
@@ -2010,8 +2168,14 @@
     }
 
     /* =========================================================
-       QR 전용 모달 제어 (뒤로가기 스택 pushState 연동)
+       첨부 스크린샷 100% 동일 복원: 동행복권 5게임 통합 QR 모달 제어
        ========================================================= */
+    function getNowFormattedString() {
+      const d = new Date();
+      const pad = n => String(n).padStart(2, '0');
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())} 작성`;
+    }
+
     function openQRModal(sourceType) {
       let list = [];
       if (sourceType === 'extract') {
@@ -2027,6 +2191,7 @@
 
       QR_STATE.source = list;
       QR_STATE.sheetIndex = 0;
+      QR_STATE.timestamp = getNowFormattedString();
       renderQRSheet();
 
       history.pushState({ modal: 'qr' }, '');
@@ -2068,15 +2233,15 @@
       const startIdx = currentSheet * 5;
       const sheetGames = source.slice(startIdx, startIdx + 5);
 
-      const gameLabels = ['A', 'B', 'C', 'D', 'E'];
-      const startLabel = gameLabels[0];
-      const endLabel = gameLabels[sheetGames.length - 1];
+      // 상단 일시 및 페이지 번호
+      document.getElementById('qr-timestamp-label').innerText = QR_STATE.timestamp || getNowFormattedString();
+      document.getElementById('qr-page-indicator').innerText = `${currentSheet + 1} / ${totalSheets}`;
 
-      document.getElementById('qr-modal-title').innerText = 
-        `[동행복권 QR] 제 ${currentSheet + 1}장 (${startLabel}~${endLabel} / 총 ${totalSheets}장)`;
-      document.getElementById('qr-modal-subtitle').innerText = 
-        `제 ${STATE.targetRound}회 대상 (${sheetGames.length}게임 수록)`;
+      // 예상금액 바 (예: 5 게임 (예상금액 5,000원))
+      const estimatedPrice = (sheetGames.length * 1000).toLocaleString();
+      document.getElementById('qr-games-info-title').innerText = `${sheetGames.length} 게임 (예상금액 ${estimatedPrice}원)`;
 
+      // 동행복권 파라미터 생성
       const roundStr = String(STATE.targetRound).padStart(4, '0');
       const gamesParam = sheetGames.map(game => {
         return normalizeNumbers(game)
@@ -2086,31 +2251,41 @@
 
       const qrUrl = `https://m.dhlottery.co.kr/qr.do?method=winQr&v=${roundStr}q${gamesParam}`;
 
+      // 대형 QR 코드 렌더링
       const qrBox = document.getElementById('qr-canvas-box');
       qrBox.innerHTML = '';
       new QRCode(qrBox, {
         text: qrUrl,
-        width: 120,
-        height: 120,
-        colorDark: "#0f172a",
+        width: 195,
+        height: 195,
+        colorDark: "#000000",
         colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.M
       });
 
-      const previewList = document.getElementById('qr-games-preview-list');
-      previewList.innerHTML = '';
-      sheetGames.forEach((game, gIdx) => {
-        const label = gameLabels[gIdx];
+      // 스크린샷과 동일한 A ~ E 수동 게임 리스트 렌더링
+      const gameLabels = ['A', 'B', 'C', 'D', 'E'];
+      const gamesListBox = document.getElementById('qr-games-list-box');
+      gamesListBox.innerHTML = '';
+
+      sheetGames.forEach((game, idx) => {
         const norm = normalizeNumbers(game);
         const row = document.createElement('div');
-        row.style.cssText = 'display:flex; justify-content:space-between; align-items:center; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:6px 10px;';
+        row.className = 'qr-game-row-box';
+
+        const label = gameLabels[idx] || String.fromCharCode(65 + idx);
+        const ballsHtml = norm.map(n => getBallHtmlSm(n)).join('');
+
         row.innerHTML = `
-          <b style="color:#059669; font-size:0.85rem; width:20px;">${label}</b>
-          <div style="display:flex; gap:3px;">
-            ${norm.map(n => getBallHtmlSm(n)).join('')}
+          <div class="qr-game-tag-col">
+            <span class="qr-game-letter">${label}</span>
+            <span class="qr-game-type">수동</span>
+          </div>
+          <div class="qr-game-balls-wrap">
+            ${ballsHtml}
           </div>
         `;
-        previewList.appendChild(row);
+        gamesListBox.appendChild(row);
       });
     }
 
