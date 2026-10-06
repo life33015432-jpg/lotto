@@ -46,36 +46,29 @@ async function fetchFromNaver(round) {
   try {
     const res = await fetchWithTimeout(url, 10000, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Linux; Android 13; SM-S918N) Chrome/119.0.0.0 Mobile Safari/537.36'
+        'User-Agent': 'Mozilla/5.0 (Linux; Android 13; SM-S918N) Chrome/119.0.0.0 Mobile Safari/537.36',
+        'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7'
       }
     });
     if (!res.ok) return null;
     const html = await res.text();
     
-    // 네이버 로또 당첨번호 정규식 (유동적인 HTML 구조 방어)
-    const winMatch = html.match(/<div class="win_num">([\s\S]*?)<\/div>/) || html.match(/<div class="num_box">([\s\S]*?)<\/div>/);
-    const bonusMatch = html.match(/<div class="bonus_num">([\s\S]*?)<\/div>/) || html.match(/<div class="num_bonus">([\s\S]*?)<\/div>/);
-    
-    if (winMatch && bonusMatch) {
-      const numRegex = />(\d+)</g;
-      const winNums = [];
-      let m;
-      while ((m = numRegex.exec(winMatch[1])) !== null) {
-        winNums.push(Number(m[1]));
-      }
-      const bonusNums = [];
-      while ((m = numRegex.exec(bonusMatch[1])) !== null) {
-        bonusNums.push(Number(m[1]));
-      }
-      
-      if (winNums.length === 6 && bonusNums.length > 0) {
-        return {
-          round: round,
-          numbers: winNums.sort((a,b)=>a-b),
-          bonus: bonusNums[0]
-        };
-      }
+    // 네이버 로또 당첨번호 정규식 파싱
+    const nums = [];
+    const regex = /<span class="num[^>]*>(\d+)<\/span>/g;
+    let match;
+    while ((match = regex.exec(html)) !== null) {
+      nums.push(Number(match[1]));
     }
+
+    if (nums.length >= 7) {
+       return {
+          round: round,
+          numbers: nums.slice(0, 6).sort((a,b)=>a-b),
+          bonus: nums[6]
+        };
+    }
+
   } catch (e) {
     console.log(`[네이버 파싱 오류] ${e.message}`);
   }
@@ -111,7 +104,7 @@ async function run() {
     let drawData = await fetchFromDhLottery(targetRound);
     
     if (!drawData) {
-      console.log(`[우회] 동행복권 API 차단 확인. 네이버 검색 결과로 우회합니다.`);
+      console.log(`[우회] 동행복권 API 데이터를 가져올 수 없습니다. 네이버 검색 결과로 우회합니다.`);
       drawData = await fetchFromNaver(targetRound);
     }
     
@@ -120,7 +113,7 @@ async function run() {
       hasNewData = true;
       console.log(`[성공] 제 ${drawData.round}회 당첨번호 수집 완료: ${drawData.numbers.join(', ')} + 보너스 ${drawData.bonus}`);
       targetRound++;
-      // 서버 과부하 및 봇 차단 방지 대기
+      // 서버 과부하 방지
       await new Promise(resolve => setTimeout(resolve, 1500));
     } else {
       console.log(`[종료] 제 ${targetRound}회차 결과를 찾을 수 없습니다. (아직 추첨 전이거나 데이터 없음)`);
@@ -131,7 +124,7 @@ async function run() {
   if (hasNewData) {
     history.sort((a, b) => Number(b.round || 0) - Number(a.round || 0));
     fs.writeFileSync(HISTORY_PATH, JSON.stringify(history, null, 4), 'utf-8');
-    console.log(`\n[완료] 새로운 회차 데이터가 성공적으로 저장되었습니다.`);
+    console.log(`\n[완료] 새로운 회차 데이터가 성공적으로 저장되었습니다. (lotto-history.json 누적 갱신 완료)`);
   } else {
     console.log(`\n[완료] 추가할 새로운 회차가 없습니다.`);
   }
