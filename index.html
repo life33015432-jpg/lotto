@@ -1352,38 +1352,49 @@
       document.getElementById('omr-modal').classList.add('open');
     }
 
-    function initDailyVisitors() {
+    // 서버 API(/api/visitor) 연동형 전역 방문자 카운터 함수
+    async function initDailyVisitors() {
+      const dailyEl = document.getElementById('daily-visitor-count');
+      const totalEl = document.getElementById('total-visitor-count');
+
+      try {
+        const hasVisited = sessionStorage.getItem('visited_session');
+        const method = hasVisited ? 'GET' : 'POST';
+
+        const response = await fetch('/api/visitor', { method: method });
+        if (response.ok) {
+          const data = await response.json();
+          if (dailyEl) dailyEl.innerText = (data.daily || 1).toLocaleString();
+          if (totalEl) totalEl.innerText = (data.total || 1).toLocaleString();
+          sessionStorage.setItem('visited_session', 'true');
+          return;
+        }
+      } catch (err) {
+        console.warn('서버 카운터 통신 실패, 로컬 폴백 사용:', err);
+      }
+
+      // [안전장치] 서버 통신 불가 시 기존 로컬 스토리지 동작 유지
       const todayKey = 'lotto_visitor_date';
       const dailyCountKey = 'lotto_visitor_daily_count';
       const totalCountKey = 'lotto_visitor_total_count';
       const todayStr = new Date().toISOString().slice(0, 10);
       
-      let storedDate = localStorage.getItem(todayKey);
-      let dailyCount = parseInt(localStorage.getItem(dailyCountKey) || '0', 10);
-      let totalCount = parseInt(localStorage.getItem(totalCountKey) || '0', 10);
+      let dailyCount = parseInt(localStorage.getItem(dailyCountKey) || '1', 10);
+      let totalCount = parseInt(localStorage.getItem(totalCountKey) || '12', 10);
 
-      if (storedDate !== todayStr || dailyCount > 100) {
+      if (localStorage.getItem(todayKey) !== todayStr) {
         dailyCount = 1;
-        if (!totalCount || totalCount > 500) {
-          totalCount = 1;
-        } else {
-          totalCount += 1;
-        }
+        totalCount += 1;
         localStorage.setItem(todayKey, todayStr);
+      } else if (!sessionStorage.getItem('visited_session')) {
+        dailyCount += 1;
+        totalCount += 1;
         sessionStorage.setItem('visited_session', 'true');
-      } else {
-        if (!sessionStorage.getItem('visited_session')) {
-          dailyCount += 1;
-          totalCount += 1;
-          sessionStorage.setItem('visited_session', 'true');
-        }
       }
 
       localStorage.setItem(dailyCountKey, dailyCount);
       localStorage.setItem(totalCountKey, totalCount);
 
-      const dailyEl = document.getElementById('daily-visitor-count');
-      const totalEl = document.getElementById('total-visitor-count');
       if (dailyEl) dailyEl.innerText = dailyCount.toLocaleString();
       if (totalEl) totalEl.innerText = totalCount.toLocaleString();
     }
@@ -1393,10 +1404,10 @@
       return arr.map(n => parseInt(n, 10)).filter(n => !isNaN(n)).sort((a, b) => a - b);
     }
 
-async function loadHistoryDB() {
+    // 절대 경로 및 강력한 캐시 무효화가 적용된 데이터 로더 함수
+    async function loadHistoryDB() {
       let fetchedFresh = false;
       
-      // 1. lotto-history.json 최신 파일 로드 (절대 경로 및 캐시 완전 차단 적용)
       try {
         const resH = await fetch(`/data/lotto-history.json?t=${Date.now()}`, { 
           cache: 'no-store',
@@ -1419,7 +1430,6 @@ async function loadHistoryDB() {
         console.warn('로또 히스토리 데이터 로드 실패, 로컬 캐시 사용:', err);
       }
 
-      // 네트워크 로드 실패 시 로컬 스토리지 캐시 폴백 사용
       if (!fetchedFresh) {
         const cached = localStorage.getItem('cached_lotto_history');
         if (cached) {
@@ -1429,7 +1439,6 @@ async function loadHistoryDB() {
         }
       }
 
-      // 2. myeongdang.json 최신 파일 로드 (절대 경로 및 캐시 완전 차단 적용)
       try {
         const resM = await fetch(`/data/myeongdang.json?t=${Date.now()}`, { 
           cache: 'no-store',
@@ -1786,7 +1795,6 @@ async function loadHistoryDB() {
         fixedNums.sort((a, b) => a - b);
         let allPossibleCombos = [];
         
-        // 12개 초과 시 브라우저 멈춤 방지 (랜덤 샘플링 처리)
         if (fixedNums.length > 12) {
           let attempts = 0;
           const maxTries = Math.min(requested * 20, 10000);
