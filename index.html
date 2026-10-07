@@ -1393,10 +1393,19 @@
       return arr.map(n => parseInt(n, 10)).filter(n => !isNaN(n)).sort((a, b) => a - b);
     }
 
-    async function loadHistoryDB() {
+   async function loadHistoryDB() {
       let fetchedFresh = false;
+      
+      // 1. lotto-history.json 최신 파일 로드 (절대 경로 및 캐시 완전 차단 적용)
       try {
-        const resH = await fetch(`./data/lotto-history.json?nocache=${Date.now()}`, { cache: 'no-store' });
+        const resH = await fetch(`/data/lotto-history.json?t=${Date.now()}`, { 
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache'
+          }
+        });
+        
         if (resH.ok) {
           const freshHistory = await resH.json();
           if (Array.isArray(freshHistory) && freshHistory.length > 0) {
@@ -1407,26 +1416,34 @@
           }
         }
       } catch (err) {
-        console.warn('최신 로또 데이터 네트워크 로드 실패:', err);
+        console.warn('로또 히스토리 데이터 로드 실패, 로컬 캐시 사용:', err);
       }
 
+      // 네트워크 로드 실패 시 로컬 스토리지 캐시 폴백 사용
       if (!fetchedFresh) {
         const cached = localStorage.getItem('cached_lotto_history');
         if (cached) {
           try {
             STATE.historyDB = JSON.parse(cached).sort((a, b) => Number(b.round || 0) - Number(a.round || 0));
-          } catch(e){}
+          } catch (e) {}
         }
       }
 
-      // data/myeongdang.json 실시간 연동
+      // 2. myeongdang.json 최신 파일 로드 (절대 경로 및 캐시 완전 차단 적용)
       try {
-        const resM = await fetch(`./data/myeongdang.json?nocache=${Date.now()}`, { cache: 'no-store' });
+        const resM = await fetch(`/data/myeongdang.json?t=${Date.now()}`, { 
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache'
+          }
+        });
+        
         if (resM.ok) {
           STATE.myeongdangData = await resM.json();
         }
       } catch (err) {
-        console.warn('명당 데이터 네트워크 로드 실패:', err);
+        console.warn('명당 데이터 로드 실패:', err);
       }
     }
 
