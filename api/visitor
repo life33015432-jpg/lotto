@@ -1,0 +1,39 @@
+// Cloudflare Workers 메인 스크립트 예시
+export default {
+  async fetch(request, env, ctx) {
+    const url = new URL(request.url);
+
+    // 1. 방문자 카운터 API 처리
+    if (url.pathname === '/api/visitor') {
+      try {
+        const todayKey = new Date().toISOString().slice(0, 10);
+        const dailyKey = `daily_${todayKey}`;
+        const totalKey = 'total_visitors';
+
+        // KV에서 현재 값 조회 (없으면 0)
+        let dailyCount = parseInt(await env.VISITOR_KV.get(dailyKey) || '0', 10);
+        let totalCount = parseInt(await env.VISITOR_KV.get(totalKey) || '0', 10);
+
+        // 세션 중복 카운팅 방지 (클라이언트에서 전송한 헤더 또는 쿠키 체크 가능)
+        dailyCount += 1;
+        totalCount += 1;
+
+        // KV에 업데이트된 값 저장
+        await env.VISITOR_KV.put(dailyKey, dailyCount.toString());
+        await env.VISITOR_KV.put(totalKey, totalCount.toString());
+
+        return new Response(JSON.stringify({ daily: dailyCount, total: totalCount }), {
+          headers: { 
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*' 
+          }
+        });
+      } catch (err) {
+        return new Response(JSON.stringify({ error: err.message }), { status: 500 });
+      }
+    }
+
+    // 2. 기존 정적 파일(index.html, json 등) 서빙 로직...
+    return new Response('Not Found', { status: 404 });
+  }
+};
