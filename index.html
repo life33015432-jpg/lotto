@@ -1393,7 +1393,7 @@
       return arr.map(n => parseInt(n, 10)).filter(n => !isNaN(n)).sort((a, b) => a - b);
     }
 
-   async function loadHistoryDB() {
+async function loadHistoryDB() {
       let fetchedFresh = false;
       
       // 1. lotto-history.json 최신 파일 로드 (절대 경로 및 캐시 완전 차단 적용)
@@ -1446,7 +1446,7 @@
         console.warn('명당 데이터 로드 실패:', err);
       }
     }
-
+    
     function calculateTargetRounds() {
       if (STATE.historyDB && STATE.historyDB.length > 0) {
         const latestDbRound = Number(STATE.historyDB[0].round || 0);
