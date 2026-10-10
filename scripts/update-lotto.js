@@ -16,13 +16,13 @@ async function fetchWithTimeout(url, timeoutMs = 9000, options = {}) {
   }
 }
 
-// 1차: 동행복권 공식 API (헤더 최적화)
+// 1차: 동행복권 공식 데이터 채널 (해외 러너 IP 차단 방지 헤더 세팅)
 async function fetchFromOfficialApi(round) {
   const url = `https://www.dhlottery.co.kr/common.do?method=getLottoNumber&drwNo=${round}`;
   try {
     const res = await fetchWithTimeout(url, 7000, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
         'Referer': 'https://www.dhlottery.co.kr/'
       }
     });
@@ -34,22 +34,24 @@ async function fetchFromOfficialApi(round) {
         data.drwtNo4, data.drwtNo5, data.drwtNo6
       ].map(Number).sort((a, b) => a - b);
       const bonus = Number(data.bnusNo);
-      return { round: Number(data.drwNo), numbers, bonus };
+      if (numbers.length === 6 && bonus >= 1 && bonus <= 45) {
+        return { round: Number(data.drwNo), numbers, bonus };
+      }
     }
   } catch (e) {
-    console.log(`[공식 API 실패] 제 ${round}회:`, e.message);
+    console.log(`[공식 API 조회 실패] 제 ${round}회:`, e.message);
   }
   return null;
 }
 
-// 2차: 네이버 검색 ("로또 최신당첨회차" 및 회차 검색)
+// 2차: 네이버 모바일 검색 ("로또 최신당첨회차")
 async function fetchFromNaver(round) {
   const query = encodeURIComponent(`로또 최신당첨회차 ${round}회`);
   const url = `https://m.search.naver.com/search.naver?query=${query}`;
   try {
     const res = await fetchWithTimeout(url, 8000, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+        'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/604.1',
         'Accept-Language': 'ko-KR,ko;q=0.9'
       }
     });
@@ -59,7 +61,6 @@ async function fetchFromNaver(round) {
     const roundRegex = new RegExp(`(?:제\\s*)?${round}\\s*회`);
     if (!roundRegex.test(html)) return null;
 
-    // 네이버 당첨번호 span 추출 (class="num" 또는 "ball")
     const spanRegex = /<span class="(?:num|ball)[^>]*>(\d+)<\/span>/g;
     const allNums = [];
     let match;
@@ -75,19 +76,19 @@ async function fetchFromNaver(round) {
       }
     }
   } catch (e) {
-    console.log(`[네이버 검색 실패] 제 ${round}회:`, e.message);
+    console.log(`[네이버 조회 실패] 제 ${round}회:`, e.message);
   }
   return null;
 }
 
-// 3차: 구글 검색 fallback
+// 3차: 구글 검색 보조 fallback
 async function fetchFromGoogle(round) {
   const query = encodeURIComponent(`로또 최신당첨회차 ${round}회 당첨번호`);
   const url = `https://www.google.com/search?q=${query}&hl=ko`;
   try {
     const res = await fetchWithTimeout(url, 8000, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36'
       }
     });
     if (!res.ok) return null;
@@ -101,16 +102,16 @@ async function fetchFromGoogle(round) {
       const bonusMatch = html.match(/보너스\D{0,10}(\d{1,2})/);
       const bonus = bonusMatch ? Number(bonusMatch[1]) : null;
       if (nums.length === 6 && bonus && nums.every(n => n >= 1 && n <= 45)) {
-        return { round: Number(round), numbers: nums, bonus };
+        return { round: Number(round), numbers, bonus };
       }
     }
   } catch (e) {
-    console.log(`[구글 검색 실패] 제 ${round}회:`, e.message);
+    console.log(`[구글 조회 실패] 제 ${round}회:`, e.message);
   }
   return null;
 }
 
-// index.html 내의 FALLBACK_HISTORY 및 기본 회차 자동 갱신
+// index.html의 FALLBACK_HISTORY 및 기본 STATE 회차 자동 갱신
 function updateIndexHtml(latestItem) {
   if (!fs.existsSync(HTML_PATH)) return;
   let html = fs.readFileSync(HTML_PATH, 'utf-8');
@@ -123,7 +124,7 @@ function updateIndexHtml(latestItem) {
   html = html.replace(/prevRound:\s*\d+/, `prevRound: ${latestItem.round}`);
 
   fs.writeFileSync(HTML_PATH, html, 'utf-8');
-  console.log(`[HTML 갱신] index.html 최신 회차가 제 ${latestItem.round}회로 동기화되었습니다.`);
+  console.log(`[HTML 갱신] index.html 최신 회차가 제 ${latestItem.round}회로 자동 동기화되었습니다.`);
 }
 
 async function run() {
@@ -148,9 +149,9 @@ async function run() {
   console.log(`[현재 DB 최신회차]: 제 ${latestRecordedRound}회`);
 
   while (true) {
-    console.log(`\n[확인] 제 ${targetRound}회 (+1 회차) 당첨 데이터 조회 중...`);
+    console.log(`\n[확인] 제 ${targetRound}회 (+1 회차) 데이터 조회 시도...`);
     
-    // 1차 공식 API -> 2차 네이버 검색 -> 3차 구글 검색 순차 확인
+    // 1차 공식 채널 -> 2차 네이버 모바일 -> 3차 구글 검색 순차 확인
     let drawData = await fetchFromOfficialApi(targetRound);
 
     if (!drawData) {
@@ -170,7 +171,7 @@ async function run() {
       targetRound++;
       await new Promise(r => setTimeout(r, 1000));
     } else {
-      console.log(`[결과] 제 ${targetRound}회는 아직 추첨 전이거나 데이터가 없습니다.`);
+      console.log(`[종료] 제 ${targetRound}회 결과는 아직 추첨 전이거나 데이터가 없습니다.`);
       break;
     }
   }
@@ -178,10 +179,10 @@ async function run() {
   if (hasNewData) {
     history.sort((a, b) => Number(b.round || 0) - Number(a.round || 0));
     fs.writeFileSync(HISTORY_PATH, JSON.stringify(history, null, 4), 'utf-8');
-    console.log(`[완료] lotto-history.json 저장 완료.`);
+    console.log(`[완료] lotto-history.json 업데이트 완료.`);
     updateIndexHtml(history[0]);
   } else {
-    console.log(`[완료] 변경 사항 없음 (최신 회차 유지 중).`);
+    console.log(`[완료] 이미 최신 상태입니다.`);
   }
   console.log('==================================================');
 }
