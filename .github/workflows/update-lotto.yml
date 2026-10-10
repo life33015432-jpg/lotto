@@ -34,5 +34,10 @@ jobs:
         run: |
           git config --global user.name 'Aipluslotto-Bot'
           git config --global user.email 'bot@aipluslotto.com'
-          git add data/*.json index.html
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto update lotto history & index.html" && git push)
+          git add data/lotto-history.json index.html
+          if git diff --staged --quiet; then
+            echo "갱신할 새 회차 데이터가 없습니다."
+          else
+            git commit -m "Auto update lotto history & index.html"
+            git push
+          fi
