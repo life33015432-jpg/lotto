@@ -2,14 +2,14 @@ name: Auto Lotto Update
 
 on:
   schedule:
-    # 토요일 21:00 KST (UTC 12:00)
-    - cron: '0 12 * * 6'
-    # 토요일 21:30 KST (UTC 12:30)
-    - cron: '30 12 * * 6'
-    # 토요일 22:00 KST (UTC 13:00)
-    - cron: '0 13 * * 6'
-    # 토요일 23:59 KST (UTC 14:59)
-    - cron: '59 14 * * 6'
+    # 매주 토요일 21:00부터 10~15분 간격 자동 실행 (KST = UTC + 9)
+    - cron: '5 12 * * 6'    # 21:05 KST
+    - cron: '15 12 * * 6'   # 21:15 KST
+    - cron: '30 12 * * 6'   # 21:30 KST
+    - cron: '45 12 * * 6'   # 21:45 KST
+    - cron: '0 13 * * 6'    # 22:00 KST
+    - cron: '30 13 * * 6'   # 22:30 KST
+    - cron: '0 14 * * 6'    # 23:00 KST
   workflow_dispatch:
 
 permissions:
@@ -22,17 +22,17 @@ jobs:
       - name: 저장소 체크아웃
         uses: actions/checkout@v4
 
-      - name: Node.js 22 환경 세팅
+      - name: Node.js 22 세팅
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      - name: 최신 당첨 번호 스크래핑 및 JSON 갱신
+      - name: 최신 당첨 번호 스크래핑 및 JSON/HTML 갱신
         run: node scripts/update-lotto.js
 
-      - name: 변경 사항 Git Commit & Push
+      - name: Git Commit & Push (Cloudflare Pages 자동 배포)
         run: |
           git config --global user.name 'Aipluslotto-Bot'
           git config --global user.email 'bot@aipluslotto.com'
-          git add data/*.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto update lotto history" && git push)
+          git add data/*.json index.html
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto update lotto history & index.html" && git push)
