@@ -8,8 +8,8 @@ on:
     - cron: '30 12 * * 6'   # 21:30 KST
     - cron: '45 12 * * 6'   # 21:45 KST
     - cron: '0 13 * * 6'    # 22:00 KST
-    - cron: '30 13 * * 6'   # 22:30 KST
-    - cron: '0 14 * * 6'    # 23:00 KST
+    - cron: '30 14 * * 6'   # 23:30 KST
+    - cron: '0 15 * * 6'    # 24:00 KST
   workflow_dispatch:
 
 permissions:
@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   update:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: 저장소 체크아웃
         uses: actions/checkout@v4
