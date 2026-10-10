@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Aipluslotto.com</title>
+  <title>Aipluslotto.com - 스마트 로또 번호 분석 시스템</title>
   <!-- 동적 QR 코드 생성 라이브러리 (CDN) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
@@ -41,6 +41,29 @@
     .title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .title-row h3 { font-size: 0.95rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 6px; }
     
+    /* 상단 공지사항 배너 */
+    .notice-ticker-bar {
+      background: rgba(59, 130, 246, 0.12);
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 0.76rem;
+      color: #93c5fd;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      line-height: 1.4;
+    }
+    .notice-badge {
+      background: var(--secondary-accent);
+      color: #fff;
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
     /* 상단 메뉴 네비게이션 */
     .main-nav-tabs {
       display: flex;
@@ -142,7 +165,6 @@
     
     .fortune-controls { display: grid; grid-template-columns: 1.2fr 0.9fr 1.1fr; gap: 6px; margin-bottom: 8px; }
     .select-input, .text-input { width: 100%; background: #0f172a; border: 1px solid var(--border-color); border-radius: 6px; color: #fff; padding: 6px; font-size: 0.78rem; outline: none; }
-    .text-input::placeholder { color: #64748b; }
     .couple-container { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; padding: 8px; background: #131d2e; border-radius: 8px; border: 1px solid #23334d; }
     .couple-title { font-size: 0.75rem; font-weight: 700; color: var(--primary-accent); margin-bottom: 4px; }
     .fortune-score-badge { display: inline-block; background: rgba(16,185,129,0.2); color: #10b981; padding: 2px 8px; border-radius: 10px; font-weight: 700; margin-bottom: 6px; }
@@ -298,31 +320,12 @@
       gap: 6px;
       min-height: 44px;
     }
-    .result-left-group {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-shrink: 0;
-    }
+    .result-left-group { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
     .result-game-label { font-size: 0.82rem; font-weight: 800; color: var(--primary-accent); min-width: 20px; text-align: center; }
     .result-balls-group { display: flex; gap: 3px; align-items: center; }
     
-    .result-right-group {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      justify-content: flex-end;
-      flex-grow: 1;
-      overflow: hidden;
-    }
-    .result-history-summary {
-      font-size: 0.74rem;
-      color: var(--text-sub);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      text-align: right;
-    }
+    .result-right-group { display: flex; align-items: center; gap: 8px; justify-content: flex-end; flex-grow: 1; overflow: hidden; }
+    .result-history-summary { font-size: 0.74rem; color: var(--text-sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: right; }
     .result-history-summary b { color: var(--primary-accent); }
 
     .action-btn-group { display: flex; gap: 6px; align-items: center; }
@@ -330,10 +333,8 @@
     .btn-del { background: rgba(239,68,68,0.2); color: var(--danger-accent); }
     .btn-omr { background: rgba(59,130,246,0.2); color: var(--secondary-accent); }
     .btn-qr { background: rgba(16,185,129,0.2); color: var(--success-accent); border: 1px solid rgba(16,185,129,0.4); }
-    .btn-qr:active { background: var(--success-accent); color: #fff; }
     .btn-save-all { background: var(--secondary-accent); color: #fff; }
     .btn-reset { background: rgba(148,163,184,0.15); color: var(--text-sub); border: 1px solid var(--border-color); }
-    .btn-reset:hover { color: #fff; border-color: var(--text-sub); }
 
     /* OMR 모달 */
     .omr-modal-backdrop { 
@@ -368,11 +369,8 @@
     .omr-cell.marked::after { content: ''; position: absolute; width: 60%; height: 3px; background: #000; transform: rotate(-25deg); opacity: 0.2; }
     .omr-nav-btn-row { display: flex; justify-content: space-between; margin-top: 12px; gap: 8px; }
     .omr-nav-btn { flex: 1; padding: 10px; background: #e2e8f0; border: none; border-radius: 8px; font-weight: 700; color: #334155; cursor: pointer; font-size: 0.85rem; }
-    .omr-nav-btn:active { background: #cbd5e1; }
 
-    /* =========================================================
-       동행복권 공식 모바일 앱 표준 전자슬립 QR 모달 스타일
-       ========================================================= */
+    /* 동행복권 표준 QR 모달 */
     .qr-custom-modal-backdrop {
       position: fixed;
       inset: 0;
@@ -395,7 +393,6 @@
       overflow: hidden;
       box-shadow: 0 10px 25px rgba(0,0,0,0.25);
     }
-    
     .qr-top-warning-bar {
       background: #ffffff;
       padding: 12px;
@@ -406,7 +403,6 @@
       color: #64748b;
       border-bottom: 1px solid #e2e8f0;
     }
-
     .qr-blue-container {
       background: #3b82f6;
       margin: 14px;
@@ -417,7 +413,6 @@
       align-items: center;
       position: relative;
     }
-
     .qr-blue-header {
       width: 100%;
       display: flex;
@@ -426,29 +421,9 @@
       color: #ffffff;
       margin-bottom: 12px;
     }
-    .qr-page-info {
-      text-align: center;
-      flex-grow: 1;
-      font-size: 0.95rem;
-      font-weight: 700;
-    }
-    .qr-page-sub {
-      font-size: 0.75rem;
-      font-weight: 400;
-      opacity: 0.9;
-      margin-top: 2px;
-    }
-    .qr-trash-btn {
-      background: transparent;
-      border: none;
-      color: #ffffff;
-      font-size: 0.85rem;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      cursor: pointer;
-    }
-
+    .qr-page-info { text-align: center; flex-grow: 1; font-size: 0.95rem; font-weight: 700; }
+    .qr-page-sub { font-size: 0.75rem; font-weight: 400; opacity: 0.9; margin-top: 2px; }
+    .qr-trash-btn { background: transparent; border: none; color: #ffffff; font-size: 0.85rem; cursor: pointer; }
     .qr-white-box {
       background: #ffffff;
       width: 100%;
@@ -459,53 +434,13 @@
       align-items: center;
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
-    
-    .qr-img-center-box {
-      width: 200px;
-      height: 200px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 16px;
-    }
-    .qr-img-center-box img {
-      width: 200px !important;
-      height: 200px !important;
-      display: block;
-    }
-    
-    .qr-price-label {
-      font-size: 0.8rem;
-      color: #64748b;
-      margin-bottom: 4px;
-    }
-    .qr-price-value {
-      font-size: 1.6rem;
-      font-weight: 900;
-      color: #1e293b;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    
-    .qr-bottom-notice {
-      color: #ffffff;
-      font-size: 0.75rem;
-      margin-top: 16px;
-      text-align: center;
-    }
-    .qr-color-bar {
-      display: flex;
-      gap: 4px;
-      margin-top: 12px;
-      justify-content: center;
-    }
-    .qr-color-bar span {
-      width: 24px;
-      height: 6px;
-      border-radius: 2px;
-    }
-    
+    .qr-img-center-box { width: 200px; height: 200px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+    .qr-img-center-box img { width: 200px !important; height: 200px !important; display: block; }
+    .qr-price-label { font-size: 0.8rem; color: #64748b; margin-bottom: 4px; }
+    .qr-price-value { font-size: 1.6rem; font-weight: 900; color: #1e293b; display: flex; align-items: center; gap: 4px; }
+    .qr-bottom-notice { color: #ffffff; font-size: 0.75rem; margin-top: 16px; text-align: center; }
+    .qr-color-bar { display: flex; gap: 4px; margin-top: 12px; justify-content: center; }
+    .qr-color-bar span { width: 24px; height: 6px; border-radius: 2px; }
     .qr-footer-info {
       margin: 0 14px;
       background: #e2e8f0;
@@ -515,53 +450,73 @@
       justify-content: space-between;
       align-items: center;
     }
-    .qr-footer-text-group {
+    .qr-footer-text-group { display: flex; flex-direction: column; gap: 4px; }
+    .qr-footer-date { font-size: 0.7rem; color: #64748b; }
+    .qr-footer-game-info { font-size: 0.85rem; font-weight: 700; color: #334155; }
+    .qr-nav-arrows { display: flex; gap: 8px; }
+    .qr-nav-arrow-btn { width: 32px; height: 32px; border-radius: 50%; background: #cbd5e1; border: none; cursor: pointer; color: #475569; font-weight: bold; }
+    .qr-close-main-btn { margin: 10px 14px 0; padding: 12px; background: #1e293b; color: #fff; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
+
+    /* 공식 법적 고지사항 및 푸터 */
+    .legal-footer-panel {
+      background: #0d1522;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px 14px;
+      font-size: 0.74rem;
+      color: #64748b;
+      line-height: 1.55;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 10px;
     }
-    .qr-footer-date {
-      font-size: 0.7rem;
-      color: #64748b;
-    }
-    .qr-footer-game-info {
-      font-size: 0.85rem;
+    .legal-footer-title {
+      color: var(--text-sub);
       font-weight: 700;
-      color: #334155;
-    }
-    .qr-nav-arrows {
-      display: flex;
-      gap: 8px;
-    }
-    .qr-nav-arrow-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: #cbd5e1;
-      border: none;
+      font-size: 0.8rem;
       display: flex;
       align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      color: #475569;
-      font-weight: bold;
+      gap: 6px;
     }
-    .qr-nav-arrow-btn:active { background: #94a3b8; color: #fff; }
-    .qr-close-main-btn {
-      margin: 10px 14px 0;
-      padding: 12px;
-      background: #1e293b;
-      color: #fff;
-      border: none;
+    .legal-clause-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      padding-left: 2px;
+    }
+    .legal-clause-list li { position: relative; padding-left: 14px; }
+    .legal-clause-list li::before {
+      content: '•';
+      position: absolute;
+      left: 2px;
+      color: #475569;
+    }
+    .legal-helpline-box {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px dashed rgba(16, 185, 129, 0.3);
       border-radius: 8px;
-      font-weight: 700;
-      cursor: pointer;
+      padding: 8px 10px;
+      color: #34d399;
+      font-size: 0.72rem;
+    }
+    .copyright-line {
+      text-align: center;
+      font-size: 0.7rem;
+      color: #475569;
+      margin-top: 4px;
     }
   </style>
 </head>
 <body>
 
   <div class="app-container">
+    <!-- 상단 공지사항 바 -->
+    <div class="notice-ticker-bar">
+      <span class="notice-badge">공지</span>
+      <span id="header-notice-text">매주 토요일 21:00 이후 최신 당첨 번호가 포털(네이버/구글)과 동기화되어 실시간 자동 업데이트됩니다.</span>
+    </div>
+
     <header class="header-panel">
       <div class="brand-title">Aipluslotto.com</div>
       <div class="stat-badge-row">
@@ -611,7 +566,7 @@
 
         <div class="engine-toggle-group">
           <button class="engine-tab-btn active engine-ai" id="tab-engine-ai" onclick="switchEngine('AI')">🤖 AI 딥러닝 통합 엔진</button>
-          <button class="engine-tab-btn engine-score" id="tab-engine-score" onclick="switchEngine('SCORE')">🎯 924 통계 스코어링 엔진</button>
+          <button class="engine-tab-btn engine-score" id="tab-engine-score" onclick="switchEngine('SCORE')">🎯 통계 스코어링 엔진</button>
         </div>
 
         <div class="ai-ball-grid" id="engine-candidates-grid"></div>
@@ -861,6 +816,25 @@
         <div style="font-size:0.8rem; color:var(--text-sub); text-align:center; padding:12px 0;">보관된 게임이 없습니다.</div>
       </div>
     </section>
+
+    <!-- 공식 법적 고지사항 및 복권 건전문화 안내 푸터 -->
+    <footer class="legal-footer-panel">
+      <div class="legal-footer-title">
+        <span>⚖️ 법적 고지 및 서비스 이용 안내 (Disclaimer)</span>
+      </div>
+      <ul class="legal-clause-list">
+        <li><b>비영리 통계 분석 도구</b>: Aipluslotto.com은 수학적 확률 모델과 역대 당첨 통계 데이터를 기반으로 한 분석 및 시뮬레이션 서비스이며, 당첨을 보장하지 않습니다.</li>
+        <li><b>공식 확인 의무</b>: 최종 당첨 여부 및 당첨금 수령 기준은 (주)동행복권 공식 복권 발매 단말기 및 동행복권 공식 홈페이지 공고를 기준으로 확인하셔야 합니다.</li>
+        <li><b>청소년 보호법 준수</b>: 복권 및 복권기금법 제5조에 의거하여 <b>만 19세 미만 청소년은 복권을 구매하거나 당첨금을 수령할 수 없습니다.</b></li>
+        <li><b>구매 한도 규정</b>: 복권은 1인 1회 10만 원을 초과하여 구매할 수 없으며, 과도한 몰입은 삶을 해칠 수 있습니다.</li>
+      </ul>
+      <div class="legal-helpline-box">
+        📞 <b>도박문제 전문상담 헬프라인 (연중무휴 무료)</b>: <b>국번없이 1336</b> | 넷라인(Netline) 온라인 상담 지원
+      </div>
+      <div class="copyright-line">
+        Copyright © 2026 Aipluslotto.com All Rights Reserved.
+      </div>
+    </footer>
   </div>
 
   <!-- OMR 모달 -->
@@ -882,15 +856,12 @@
   <!-- 동행복권 공식 모바일 앱 표준 전자슬립 QR 모달 -->
   <div class="qr-custom-modal-backdrop" id="qr-modal" onclick="closeQRModal(event)">
     <div class="qr-custom-card" onclick="event.stopPropagation()">
-      
-      <!-- 상단 경고 문구 -->
       <div class="qr-top-warning-bar">
         <span style="color:#1e3a8a; font-weight:800; border:1px solid #1e3a8a; border-radius:50%; padding:0 3px; font-size:0.6rem;">19</span>
         <span style="color:#b91c1c; font-weight:800; border:1px solid #b91c1c; border-radius:50%; padding:0 3px; font-size:0.6rem;">10</span>
         <span><span style="color:#b91c1c;">19세 이상만, 1회 10만원까지만</span> 구매할 수 있어요.</span>
       </div>
 
-      <!-- 메인 블루 영역 -->
       <div class="qr-blue-container">
         <div class="qr-blue-header">
           <div style="width:40px;"></div>
@@ -923,10 +894,9 @@
         </div>
       </div>
 
-      <!-- 하단 생성 일시 및 네비게이션 -->
       <div class="qr-footer-info">
         <div class="qr-footer-text-group">
-          <div class="qr-footer-date" id="qr-timestamp-label">생성일시 2026-10-06 18:31</div>
+          <div class="qr-footer-date" id="qr-timestamp-label">생성일시 2026-10-10 21:30</div>
           <div class="qr-footer-game-info" id="qr-games-info-title">5게임 (총 5,000원)</div>
         </div>
         <div class="qr-nav-arrows">
@@ -1085,7 +1055,6 @@
       syncMyeongdangPadUI();
     }
 
-    // data/myeongdang.json 실시간 연동 및 동적 통계 산출
     function applyMyeongdangPrecomputed() {
       const loc = document.getElementById('sel-md-location').value;
       const rank = document.getElementById('sel-md-rank').value;
@@ -1352,49 +1321,38 @@
       document.getElementById('omr-modal').classList.add('open');
     }
 
-    // 서버 API(/api/visitor) 연동형 전역 방문자 카운터 함수
-    async function initDailyVisitors() {
-      const dailyEl = document.getElementById('daily-visitor-count');
-      const totalEl = document.getElementById('total-visitor-count');
-
-      try {
-        const hasVisited = sessionStorage.getItem('visited_session');
-        const method = hasVisited ? 'GET' : 'POST';
-
-        const response = await fetch('/api/visitor', { method: method });
-        if (response.ok) {
-          const data = await response.json();
-          if (dailyEl) dailyEl.innerText = (data.daily || 1).toLocaleString();
-          if (totalEl) totalEl.innerText = (data.total || 1).toLocaleString();
-          sessionStorage.setItem('visited_session', 'true');
-          return;
-        }
-      } catch (err) {
-        console.warn('서버 카운터 통신 실패, 로컬 폴백 사용:', err);
-      }
-
-      // [안전장치] 서버 통신 불가 시 기존 로컬 스토리지 동작 유지
+    function initDailyVisitors() {
       const todayKey = 'lotto_visitor_date';
       const dailyCountKey = 'lotto_visitor_daily_count';
       const totalCountKey = 'lotto_visitor_total_count';
       const todayStr = new Date().toISOString().slice(0, 10);
       
-      let dailyCount = parseInt(localStorage.getItem(dailyCountKey) || '1', 10);
-      let totalCount = parseInt(localStorage.getItem(totalCountKey) || '12', 10);
+      let storedDate = localStorage.getItem(todayKey);
+      let dailyCount = parseInt(localStorage.getItem(dailyCountKey) || '0', 10);
+      let totalCount = parseInt(localStorage.getItem(totalCountKey) || '0', 10);
 
-      if (localStorage.getItem(todayKey) !== todayStr) {
+      if (storedDate !== todayStr || dailyCount > 100) {
         dailyCount = 1;
-        totalCount += 1;
+        if (!totalCount || totalCount > 500) {
+          totalCount = 1;
+        } else {
+          totalCount += 1;
+        }
         localStorage.setItem(todayKey, todayStr);
-      } else if (!sessionStorage.getItem('visited_session')) {
-        dailyCount += 1;
-        totalCount += 1;
         sessionStorage.setItem('visited_session', 'true');
+      } else {
+        if (!sessionStorage.getItem('visited_session')) {
+          dailyCount += 1;
+          totalCount += 1;
+          sessionStorage.setItem('visited_session', 'true');
+        }
       }
 
       localStorage.setItem(dailyCountKey, dailyCount);
       localStorage.setItem(totalCountKey, totalCount);
 
+      const dailyEl = document.getElementById('daily-visitor-count');
+      const totalEl = document.getElementById('total-visitor-count');
       if (dailyEl) dailyEl.innerText = dailyCount.toLocaleString();
       if (totalEl) totalEl.innerText = totalCount.toLocaleString();
     }
@@ -1404,19 +1362,13 @@
       return arr.map(n => parseInt(n, 10)).filter(n => !isNaN(n)).sort((a, b) => a - b);
     }
 
-    // 절대 경로 및 강력한 캐시 무효화가 적용된 데이터 로더 함수
     async function loadHistoryDB() {
       let fetchedFresh = false;
-      
       try {
         const resH = await fetch(`/data/lotto-history.json?t=${Date.now()}`, { 
           cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache'
-          }
+          headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' }
         });
-        
         if (resH.ok) {
           const freshHistory = await resH.json();
           if (Array.isArray(freshHistory) && freshHistory.length > 0) {
@@ -1427,27 +1379,21 @@
           }
         }
       } catch (err) {
-        console.warn('로또 히스토리 데이터 로드 실패, 로컬 캐시 사용:', err);
+        console.warn('로또 히스토리 데이터 로드 실패, 캐시 사용:', err);
       }
 
       if (!fetchedFresh) {
         const cached = localStorage.getItem('cached_lotto_history');
         if (cached) {
-          try {
-            STATE.historyDB = JSON.parse(cached).sort((a, b) => Number(b.round || 0) - Number(a.round || 0));
-          } catch (e) {}
+          try { STATE.historyDB = JSON.parse(cached).sort((a, b) => Number(b.round || 0) - Number(a.round || 0)); } catch (e) {}
         }
       }
 
       try {
         const resM = await fetch(`/data/myeongdang.json?t=${Date.now()}`, { 
           cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache'
-          }
+          headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' }
         });
-        
         if (resM.ok) {
           STATE.myeongdangData = await resM.json();
         }
@@ -2159,7 +2105,7 @@
 
       const descEl = document.getElementById('fortune-analysis-desc');
       if (mode === 'couple') {
-        descEl.innerText = `[2인 궁합 분석] 두 사람의 오행 상생(相生) 조화를 바탕으로 상호 결핍된 기운을 채워주는 맞춤 길수 조합입니다.`;
+        descEl.innerText = `[2인 궁합 분석] 두 사람의 오행 상생 조화를 바탕으로 상호 결핍된 기운을 채워주는 맞춤 길수 조합입니다.`;
         descEl.style.display = 'block';
       } else if (dream) {
         descEl.innerText = `[사주 + 꿈: "${dream}"] 꿈의 형상 에너지와 사주 일주를 조화롭게 융합한 맞춤 행운수입니다.`;
@@ -2255,7 +2201,6 @@
       return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
     }
 
-    // 동행복권 표준 단말기 인식용 CRC-8 (다항식 0x07) 계산 함수
     function calculateCRC8(dataStr) {
       let crc = 0x00;
       for (let i = 0; i < dataStr.length; i++) {
@@ -2339,7 +2284,6 @@
       
       document.getElementById('qr-games-info-title').innerText = `${sheetGames.length}게임 (총 ${currentSheetPrice}원)`;
 
-      // 동행복권 공식 모바일 전자 슬립(MSG_ESLIP) 표준 단말기 규격 생성
       const gamesPayload = sheetGames.map(game => {
         const nums = normalizeNumbers(game)
           .map(n => String(n).padStart(2, '0'))
@@ -2351,7 +2295,6 @@
       const crc = calculateCRC8(rawPayload);
       const qrPayload = `${rawPayload}${crc}|`;
 
-      // 대형 QR 코드 렌더링
       const qrBox = document.getElementById('qr-canvas-box');
       qrBox.innerHTML = '';
       new QRCode(qrBox, {
