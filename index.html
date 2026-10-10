@@ -40,6 +40,27 @@
     .title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .title-row h3 { font-size: 0.95rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 6px; }
 
+    .header-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+    }
+    .brand-title { font-size: 1.45rem; font-weight: 900; letter-spacing: -0.5px; color: var(--primary-accent); margin: 0 auto; }
+    .btn-notice-open {
+      position: absolute;
+      right: 0;
+      top: 2px;
+      background: var(--card-inner);
+      border: 1px solid var(--border-color);
+      color: var(--primary-accent);
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
     .main-nav-tabs {
       display: flex;
       gap: 6px;
@@ -47,7 +68,7 @@
       padding: 5px;
       border-radius: 12px;
       border: 1px solid var(--border-color);
-      margin-top: 6px;
+      margin-top: 10px;
     }
     .main-nav-btn {
       flex: 1;
@@ -115,7 +136,6 @@
     .ball.selected-ring { outline: 2.5px solid #fff; outline-offset: 1px; }
 
     .header-panel { text-align: center; padding: 6px 0; }
-    .brand-title { font-size: 1.4rem; font-weight: 900; letter-spacing: -0.5px; color: var(--primary-accent); }
     .stat-badge-row { display: flex; justify-content: center; gap: 8px; margin-top: 6px; font-size: 0.8rem; color: var(--text-sub); }
     .stat-badge { background: var(--card-inner); padding: 3px 12px; border-radius: 20px; border: 1px solid var(--border-color); }
     .stat-badge b { color: var(--secondary-accent); font-weight: 700; }
@@ -310,7 +330,7 @@
     .btn-save-all { background: var(--secondary-accent); color: #fff; }
     .btn-reset { background: rgba(148,163,184,0.15); color: var(--text-sub); border: 1px solid var(--border-color); }
 
-    /* 접속 시 법적 고지 팝업 모달 */
+    /* 별도 창 공지사항 모달 */
     .notice-modal-backdrop {
       position: fixed;
       inset: 0;
@@ -338,8 +358,8 @@
     }
     .notice-header {
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 8px;
       font-size: 1.05rem;
       font-weight: 800;
       color: var(--primary-accent);
@@ -347,7 +367,7 @@
       padding-bottom: 10px;
     }
     .notice-body {
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       color: #cbd5e1;
       line-height: 1.6;
       display: flex;
@@ -359,24 +379,11 @@
       border: 1px solid #334155;
       border-radius: 8px;
       padding: 10px;
-      font-size: 0.75rem;
+      font-size: 0.77rem;
       color: #94a3b8;
     }
-    .notice-footer-options {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 0.78rem;
-      color: var(--text-sub);
-      padding-top: 6px;
-    }
-    .notice-btn-row {
-      display: flex;
-      gap: 8px;
-      margin-top: 4px;
-    }
     .notice-btn-confirm {
-      flex: 1.4;
+      width: 100%;
       padding: 11px;
       background: var(--primary-accent);
       color: #1e1100;
@@ -385,17 +392,6 @@
       border-radius: 8px;
       cursor: pointer;
       font-size: 0.88rem;
-    }
-    .notice-btn-reject {
-      flex: 1;
-      padding: 11px;
-      background: #334155;
-      color: #e2e8f0;
-      font-weight: 700;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 0.84rem;
     }
 
     /* OMR 모달 */
@@ -432,7 +428,7 @@
     .omr-nav-btn-row { display: flex; justify-content: space-between; margin-top: 12px; gap: 8px; }
     .omr-nav-btn { flex: 1; padding: 10px; background: #e2e8f0; border: none; border-radius: 8px; font-weight: 700; color: #334155; cursor: pointer; font-size: 0.85rem; }
 
-    /* 다크 회색 QR 모달 */
+    /* QR 모달 */
     .qr-custom-modal-backdrop {
       position: fixed;
       inset: 0;
@@ -520,88 +516,50 @@
     .qr-nav-arrow-btn { width: 32px; height: 32px; border-radius: 50%; background: #cbd5e1; border: none; cursor: pointer; color: #475569; font-weight: bold; }
     .qr-close-main-btn { margin: 10px 14px 0; padding: 12px; background: #1e293b; color: #fff; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
 
-    .legal-footer-panel {
-      background: #0d1522;
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 16px 14px;
-      font-size: 0.74rem;
-      color: #64748b;
-      line-height: 1.55;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .legal-footer-title {
-      color: var(--text-sub);
-      font-weight: 700;
-      font-size: 0.8rem;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .legal-clause-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      padding-left: 2px;
-    }
-    .legal-clause-list li { position: relative; padding-left: 14px; }
-    .legal-clause-list li::before {
-      content: '•';
-      position: absolute;
-      left: 2px;
-      color: #475569;
-    }
-    .legal-helpline-box {
-      background: rgba(16, 185, 129, 0.08);
-      border: 1px dashed rgba(16, 185, 129, 0.3);
-      border-radius: 8px;
-      padding: 8px 10px;
-      color: #34d399;
-      font-size: 0.72rem;
-    }
-    .copyright-line {
+    .simple-footer-panel {
       text-align: center;
-      font-size: 0.7rem;
-      color: #475569;
-      margin-top: 4px;
+      padding: 10px 0;
+      font-size: 0.72rem;
+      color: #64748b;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .simple-footer-panel a {
+      color: var(--primary-accent);
+      text-decoration: underline;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
 
-  <!-- 1. 접속 시 별도 팝업창 (법적 고지 및 1주일간 보지 않기 모달) -->
+  <!-- 별도 창: 공지사항 및 법적 고지 모달 -->
   <div class="notice-modal-backdrop" id="legal-notice-modal">
     <div class="notice-card">
       <div class="notice-header">
-        <span>⚖️ 법적 고지 및 서비스 이용 안내</span>
+        <span>📢 공지사항 및 이용 안내</span>
+        <button onclick="closeNoticeModal()" style="background:none; border:none; color:#94a3b8; font-size:1.3rem; cursor:pointer;">&times;</button>
       </div>
       <div class="notice-body">
-        <p><b>Aipluslotto.com</b>은 통계 시뮬레이션 기반 번호 분석 시스템이며, 당첨을 보장하지 않습니다.</p>
+        <p><b>Aipluslotto.com</b>은 수학적 확률 모델과 역대 당첨 통계 시뮬레이션을 제공하는 보조 서비스이며, <b>당첨을 보장하지 않습니다.</b></p>
         <div class="notice-box">
-          • <b>공식 확인 의무</b>: 최종 당첨 확인 및 복권 구매는 공식 수탁사업자의 복권 발매 단말기와 공식 웹사이트 공고를 기준으로 확인하셔야 합니다.<br/>
-          • <b>청소년 보호법 준수</b>: 복권 및 복권기금법 제5조에 의거하여 <b>만 19세 미만 청소년은 복권 구매 및 당첨금 수령이 불가</b>합니다.<br/>
-          • <b>구매 한도 규정</b>: 복권은 1인 1회 10만 원을 초과하여 구매할 수 없으며 과도한 몰입을 방지합니다.
+          • <b>공식 확인 의무</b>: 최종 당첨 확인 및 복권 구매는 동행복권 발매 단말기 및 공식 웹사이트 공고를 기준으로 확인하셔야 합니다.<br/><br/>
+          • <b>청소년 보호법 준수</b>: 복권 및 복권기금법 제5조에 의거하여 <b>만 19세 미만 청소년은 복권 구매 및 당첨금 수령이 불가</b>합니다.<br/><br/>
+          • <b>구매 한도 규정</b>: 복권은 1인 1회 10만 원을 초과하여 구매할 수 없으며 과도한 몰입을 방지합니다.<br/><br/>
+          • <b>도박문제 무료 상담</b>: <b>국번없이 1336</b> (한국도박문제예방치유원 24시간 무료 지원)
         </div>
       </div>
-      <div class="notice-footer-options">
-        <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
-          <input type="checkbox" id="chk-hide-1week" style="accent-color:var(--primary-accent);" />
-          <span>1주일간 보지 않기</span>
-        </label>
-      </div>
-      <div class="notice-btn-row">
-        <button class="notice-btn-confirm" onclick="confirmLegalNotice()">동의하고 이용하기</button>
-        <button class="notice-btn-reject" onclick="rejectLegalNotice()">미동의 (나가기)</button>
-      </div>
+      <button class="notice-btn-confirm" onclick="closeNoticeModal()">확인 및 닫기</button>
     </div>
   </div>
 
   <div class="app-container">
     <header class="header-panel">
-      <div class="brand-title">Aipluslotto.com</div>
+      <div class="header-top-row">
+        <div class="brand-title">Aipluslotto.com</div>
+        <button class="btn-notice-open" onclick="openNoticeModal()">📢 공지사항</button>
+      </div>
       <div class="stat-badge-row">
         <span class="stat-badge">당일 접속 <b id="daily-visitor-count">1</b>명</span>
         <span class="stat-badge">누적 접속 <b id="total-visitor-count">1</b>명</span>
@@ -895,23 +853,11 @@
       </div>
     </section>
 
-    <!-- 법적 고지사항 및 푸터 -->
-    <footer class="legal-footer-panel">
-      <div class="legal-footer-title">
-        <span>⚖️ 법적 고지 및 서비스 이용 안내 (Disclaimer)</span>
-      </div>
-      <ul class="legal-clause-list">
-        <li><b>비영리 통계 분석 도구</b>: Aipluslotto.com은 수학적 확률 모델과 역대 당첨 통계 데이터를 기반으로 한 분석 및 시뮬레이션 서비스이며 당첨을 보장하지 않습니다.</li>
-        <li><b>공식 확인 의무</b>: 최종 당첨 여부 및 당첨금 수령 기준은 공식 복권 수탁사업자의 복권 발매 단말기 및 공식 홈페이지 공고를 기준으로 확인하셔야 합니다.</li>
-        <li><b>청소년 보호법 준수</b>: 복권 및 복권기금법 제5조에 의거하여 <b>만 19세 미만 청소년은 복권을 구매하거나 당첨금을 수령할 수 없습니다.</b></li>
-        <li><b>구매 한도 규정</b>: 복권은 1인 1회 10만 원을 초과하여 구매할 수 없으며 과도한 몰입은 삶을 해칠 수 있습니다.</li>
-      </ul>
-      <div class="legal-helpline-box">
-        📞 <b>도박문제 전문상담 헬프라인 (연중무휴 무료)</b>: <b>국번없이 1336</b> | 넷라인(Netline) 온라인 상담 지원
-      </div>
-      <div class="copyright-line">
-        Copyright © 2026 Aipluslotto.com All Rights Reserved.
-      </div>
+    <!-- 푸터 (깔끔한 간이 공지 링크) -->
+    <footer class="simple-footer-panel">
+      <div>Aipluslotto.com 통계 분석 서비스 | <a onclick="openNoticeModal()">이용안내 및 법적고지</a></div>
+      <div>도박문제 상담: 국번없이 1336 (무료) | 만 19세 미만 청소년 구매 불가</div>
+      <div>Copyright © 2026 Aipluslotto.com All Rights Reserved.</div>
     </footer>
   </div>
 
@@ -990,7 +936,7 @@
   <script>
     // GitHub Actions 스크립트에 의해 자동 갱신되는 Fallback 배열
     const FALLBACK_HISTORY = [
-      { "round": 1245, "numbers": [4, 5, 25, 28, 32, 42], "bonus": 12 }
+      { "round": 1244, "numbers": [1, 13, 18, 26, 34, 38], "bonus": 25 }
     ];
 
     const STATE = {
@@ -1005,8 +951,8 @@
       mdSelected: new Set(),
       mdTargetQty: 10,
       mdGeneratedGames: [],
-      targetRound: 1246,
-      prevRound: 1245,
+      targetRound: 1245,
+      prevRound: 1244,
       generatedGames: [],
       omrCurrentIndex: 0,
       omrActiveSource: [],
@@ -1032,36 +978,23 @@
       { x: 48,  y: 122 }
     ];
 
-    function checkLegalNoticePopup() {
-      const hideUntil = localStorage.getItem('hide_legal_notice_until');
-      const now = Date.now();
-      if (!hideUntil || now > parseInt(hideUntil, 10)) {
-        document.getElementById('legal-notice-modal').classList.add('open');
-      }
+    function openNoticeModal() {
+      document.getElementById('legal-notice-modal').classList.add('open');
     }
 
-    function confirmLegalNotice() {
-      const chk = document.getElementById('chk-hide-1week');
-      if (chk && chk.checked) {
-        const oneWeekLater = Date.now() + (7 * 24 * 60 * 60 * 1000);
-        localStorage.setItem('hide_legal_notice_until', oneWeekLater.toString());
-      }
+    function closeNoticeModal() {
       document.getElementById('legal-notice-modal').classList.remove('open');
-    }
-
-    function rejectLegalNotice() {
-      alert('법적 고지 및 이용 안내에 동의하지 않으시면 서비스를 이용하실 수 없습니다.');
-      if (window.history.length > 1) {
-        window.history.back();
-      } else {
-        window.location.href = 'https://www.google.com';
-      }
     }
 
     window.addEventListener('popstate', (e) => {
       const qrModal = document.getElementById('qr-modal');
       const omrModal = document.getElementById('omr-modal');
+      const noticeModal = document.getElementById('legal-notice-modal');
 
+      if (noticeModal && noticeModal.classList.contains('open')) {
+        noticeModal.classList.remove('open');
+        return;
+      }
       if (qrModal && qrModal.classList.contains('open')) {
         qrModal.classList.remove('open');
         return;
@@ -1073,7 +1006,6 @@
     });
 
     window.addEventListener('DOMContentLoaded', async () => {
-      checkLegalNoticePopup();
       initDailyVisitors();
       initNumberPad();
       initMyeongdangPad();
@@ -2127,7 +2059,7 @@
       if (!STATE.historyDB || STATE.historyDB.length === 0) return;
       
       const latest = STATE.historyDB[0];
-      const latestRoundNum = Number(latest.round || 1245);
+      const latestRoundNum = Number(latest.round || 1244);
       
       document.getElementById('latest-round-title').innerText = `제 ${latestRoundNum}회 기준`;
 
