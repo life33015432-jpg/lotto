@@ -40,29 +40,6 @@
     .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px; position: relative; }
     .title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .title-row h3 { font-size: 0.95rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 6px; }
-    
-    /* 상단 공지사항 배너 */
-    .notice-ticker-bar {
-      background: rgba(59, 130, 246, 0.12);
-      border: 1px solid rgba(59, 130, 246, 0.35);
-      border-radius: 10px;
-      padding: 8px 12px;
-      font-size: 0.76rem;
-      color: #93c5fd;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      line-height: 1.4;
-    }
-    .notice-badge {
-      background: var(--secondary-accent);
-      color: #fff;
-      font-size: 0.68rem;
-      font-weight: 800;
-      padding: 2px 6px;
-      border-radius: 4px;
-      flex-shrink: 0;
-    }
 
     /* 상단 메뉴 네비게이션 */
     .main-nav-tabs {
@@ -336,6 +313,94 @@
     .btn-save-all { background: var(--secondary-accent); color: #fff; }
     .btn-reset { background: rgba(148,163,184,0.15); color: var(--text-sub); border: 1px solid var(--border-color); }
 
+    /* 접속 시 팝업 모달 */
+    .notice-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.82);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      padding: 16px;
+      backdrop-filter: blur(4px);
+    }
+    .notice-modal-backdrop.open { display: flex; }
+    .notice-card {
+      width: 100%;
+      max-width: 440px;
+      background: #162032;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px;
+      color: var(--text-main);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .notice-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--primary-accent);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 10px;
+    }
+    .notice-body {
+      font-size: 0.8rem;
+      color: #cbd5e1;
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .notice-box {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 0.75rem;
+      color: #94a3b8;
+    }
+    .notice-footer-options {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: var(--text-sub);
+      padding-top: 6px;
+    }
+    .notice-btn-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .notice-btn-confirm {
+      flex: 1.4;
+      padding: 11px;
+      background: var(--primary-accent);
+      color: #1e1100;
+      font-weight: 800;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.88rem;
+    }
+    .notice-btn-reject {
+      flex: 1;
+      padding: 11px;
+      background: #334155;
+      color: #e2e8f0;
+      font-weight: 700;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.84rem;
+    }
+
     /* OMR 모달 */
     .omr-modal-backdrop { 
       position: fixed; 
@@ -370,7 +435,7 @@
     .omr-nav-btn-row { display: flex; justify-content: space-between; margin-top: 12px; gap: 8px; }
     .omr-nav-btn { flex: 1; padding: 10px; background: #e2e8f0; border: none; border-radius: 8px; font-weight: 700; color: #334155; cursor: pointer; font-size: 0.85rem; }
 
-    /* 동행복권 표준 QR 모달 */
+    /* 표준 QR 모달 (회색 모던 디자인) */
     .qr-custom-modal-backdrop {
       position: fixed;
       inset: 0;
@@ -403,8 +468,8 @@
       color: #64748b;
       border-bottom: 1px solid #e2e8f0;
     }
-    .qr-blue-container {
-      background: #3b82f6;
+    .qr-gray-container {
+      background: #334155;
       margin: 14px;
       border-radius: 12px;
       padding: 16px;
@@ -413,7 +478,7 @@
       align-items: center;
       position: relative;
     }
-    .qr-blue-header {
+    .qr-gray-header {
       width: 100%;
       display: flex;
       justify-content: space-between;
@@ -438,48 +503,23 @@
     .qr-img-center-box img { width: 200px !important; height: 200px !important; display: block; }
     .qr-price-label { font-size: 0.8rem; color: #64748b; margin-bottom: 4px; }
     .qr-price-value { font-size: 1.6rem; font-weight: 900; color: #1e293b; display: flex; align-items: center; gap: 4px; }
-    .qr-bottom-notice { color: #ffffff; font-size: 0.75rem; margin-top: 16px; text-align: center; }
+    .qr-bottom-notice { color: #cbd5e1; font-size: 0.75rem; margin-top: 16px; text-align: center; }
     .qr-color-bar { display: flex; gap: 4px; margin-top: 12px; justify-content: center; }
     .qr-color-bar span { width: 24px; height: 6px; border-radius: 2px; }
-
-    /* [개선] 푸터 레이아웃 높이 및 정렬 안정화 */
     .qr-footer-info {
       margin: 0 14px;
       background: #e2e8f0;
       border-radius: 8px;
-      padding: 10px 14px;
+      padding: 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      min-height: 64px;
     }
     .qr-footer-text-group { display: flex; flex-direction: column; gap: 4px; }
     .qr-footer-date { font-size: 0.7rem; color: #64748b; }
     .qr-footer-game-info { font-size: 0.85rem; font-weight: 700; color: #334155; }
-    
-    /* [개선] QR 용지 이동 화살표 버튼 150% 확대 (32px -> 48px, 터치 감도 개선) */
-    .qr-nav-arrows { display: flex; gap: 12px; align-items: center; }
-    .qr-nav-arrow-btn { 
-      width: 48px; 
-      height: 48px; 
-      border-radius: 50%; 
-      background: #cbd5e1; 
-      border: none; 
-      cursor: pointer; 
-      color: #334155; 
-      font-weight: 900; 
-      font-size: 1.25rem; 
-      display: inline-flex; 
-      align-items: center; 
-      justify-content: center; 
-      transition: transform 0.1s ease, background-color 0.2s;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-    }
-    .qr-nav-arrow-btn:active {
-      transform: scale(0.92);
-      background: #94a3b8;
-    }
-
+    .qr-nav-arrows { display: flex; gap: 8px; }
+    .qr-nav-arrow-btn { width: 32px; height: 32px; border-radius: 50%; background: #cbd5e1; border: none; cursor: pointer; color: #475569; font-weight: bold; }
     .qr-close-main-btn { margin: 10px 14px 0; padding: 12px; background: #1e293b; color: #fff; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
 
     /* 공식 법적 고지사항 및 푸터 */
@@ -535,13 +575,34 @@
 </head>
 <body>
 
-  <div class="app-container">
-    <!-- 상단 공지사항 바 -->
-    <div class="notice-ticker-bar">
-      <span class="notice-badge">공지</span>
-      <span id="header-notice-text">매주 토요일 21:00 이후 최신 당첨 번호가 포털(네이버/구글)과 동기화되어 실시간 자동 업데이트됩니다.</span>
+  <!-- 1. 접속 시 별도 팝업창 (법적 고지 및 동의 모달) -->
+  <div class="notice-modal-backdrop" id="legal-notice-modal">
+    <div class="notice-card">
+      <div class="notice-header">
+        <span>⚖️ 법적 고지 및 서비스 이용 안내</span>
+      </div>
+      <div class="notice-body">
+        <p><b>Aipluslotto.com</b>은 확률 통계 시뮬레이션 및 데이터 기반의 비영리 번호 생성 도구이며, 당첨을 보장하지 않습니다.</p>
+        <div class="notice-box">
+          • <b>공식 확인 의무</b>: 최종 당첨 확인 및 복권 구매는 공식 수탁사업자의 단말기와 공식 웹사이트를 기준으로 합니다.<br/>
+          • <b>청소년 보호법 준수</b>: 복권 및 복권기금법 제5조에 의거하여 <b>만 19세 미만 청소년은 복권 구매 및 당첨금 수령이 불가</b>합니다.<br/>
+          • <b>구매 한도</b>: 복권은 1인 1회 10만 원을 초과하여 구매할 수 없으며 과도한 몰입을 지양합니다.
+        </div>
+      </div>
+      <div class="notice-footer-options">
+        <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+          <input type="checkbox" id="chk-hide-1week" style="accent-color:var(--primary-accent);" />
+          <span>1주일간 보지 않기</span>
+        </label>
+      </div>
+      <div class="notice-btn-row">
+        <button class="notice-btn-confirm" onclick="confirmLegalNotice()">동의하고 이용하기</button>
+        <button class="notice-btn-reject" onclick="rejectLegalNotice()">미동의 (나가기)</button>
+      </div>
     </div>
+  </div>
 
+  <div class="app-container">
     <header class="header-panel">
       <div class="brand-title">Aipluslotto.com</div>
       <div class="stat-badge-row">
@@ -732,7 +793,7 @@
       </section>
     </main>
 
-    <!-- [메뉴 2] 전국 2대 명당 추출기 영역 -->
+    <!-- [메뉴 2] 전국 2대 명당 추출기 영역 (명칭 중립화) -->
     <main id="view-myeongdang-panel" style="display:none; flex-direction:column; gap:14px;">
       
       <!-- 로또 추첨기 챔버 -->
@@ -751,13 +812,13 @@
       <section class="card">
         <div class="title-row">
           <h3>명당 빈도 1위~15위 번호</h3>
-          <span style="font-size:0.75rem; color:var(--primary-accent);" id="myeongdang-scope-tag">서울 노원 스파 편의점 (역대 2등)</span>
+          <span style="font-size:0.75rem; color:var(--primary-accent);" id="myeongdang-scope-tag">서울 노원 1등 최다 배출점 (역대 2등)</span>
         </div>
 
         <div style="display:flex; gap:6px; margin-bottom:10px; align-items:center;">
           <select class="select-input" id="sel-md-location" style="flex:1.3;">
-            <option value="seoul">서울 노원 스파 편의점</option>
-            <option value="busan">부산 동구 부일카서비스</option>
+            <option value="seoul">서울 노원 1등 최다 배출점</option>
+            <option value="busan">부산 동구 1등 최다 배출점</option>
             <option value="all">전국 2대 명당 전체 (서울+부산)</option>
           </select>
           <select class="select-input" id="sel-md-rank" style="flex:1.1;">
@@ -842,14 +903,14 @@
       </div>
     </section>
 
-    <!-- 공식 법적 고지사항 및 복권 건전문화 안내 푸터 -->
+    <!-- 법적 고지사항 및 복권 건전문화 안내 푸터 (상표/특정 사명 삭제) -->
     <footer class="legal-footer-panel">
       <div class="legal-footer-title">
         <span>⚖️ 법적 고지 및 서비스 이용 안내 (Disclaimer)</span>
       </div>
       <ul class="legal-clause-list">
         <li><b>비영리 통계 분석 도구</b>: Aipluslotto.com은 수학적 확률 모델과 역대 당첨 통계 데이터를 기반으로 한 분석 및 시뮬레이션 서비스이며, 당첨을 보장하지 않습니다.</li>
-        <li><b>공식 확인 의무</b>: 최종 당첨 여부 및 당첨금 수령 기준은 (주)동행복권 공식 복권 발매 단말기 및 동행복권 공식 홈페이지 공고를 기준으로 확인하셔야 합니다.</li>
+        <li><b>공식 확인 의무</b>: 최종 당첨 여부 및 당첨금 수령 기준은 공식 복권 수탁사업자의 복권 발매 단말기 및 공식 홈페이지 공고를 기준으로 확인하셔야 합니다.</li>
         <li><b>청소년 보호법 준수</b>: 복권 및 복권기금법 제5조에 의거하여 <b>만 19세 미만 청소년은 복권을 구매하거나 당첨금을 수령할 수 없습니다.</b></li>
         <li><b>구매 한도 규정</b>: 복권은 1인 1회 10만 원을 초과하여 구매할 수 없으며, 과도한 몰입은 삶을 해칠 수 있습니다.</li>
       </ul>
@@ -878,7 +939,7 @@
     </div>
   </div>
 
-  <!-- 동행복권 공식 모바일 앱 표준 전자슬립 QR 모달 -->
+  <!-- 모던 그레이(회색) 전자슬립 QR 모달 -->
   <div class="qr-custom-modal-backdrop" id="qr-modal" onclick="closeQRModal(event)">
     <div class="qr-custom-card" onclick="event.stopPropagation()">
       <div class="qr-top-warning-bar">
@@ -887,8 +948,9 @@
         <span><span style="color:#b91c1c;">19세 이상만, 1회 10만원까지만</span> 구매할 수 있어요.</span>
       </div>
 
-      <div class="qr-blue-container">
-        <div class="qr-blue-header">
+      <!-- 파랑색 -> 회색(#334155)으로 변경된 컨테이너 -->
+      <div class="qr-gray-container">
+        <div class="qr-gray-header">
           <div style="width:40px;"></div>
           <div class="qr-page-info">
             <div id="qr-page-indicator">1/1</div>
@@ -915,7 +977,7 @@
           <span style="background:#eab308;"></span>
           <span style="background:#f59e0b;"></span>
           <span style="background:#d97706;"></span>
-          <span style="background:#3b82f6;"></span>
+          <span style="background:#64748b;"></span>
         </div>
       </div>
 
@@ -978,6 +1040,34 @@
       { x: 48,  y: 122 }
     ];
 
+    /* 팝업 공지 및 1주일간 보지 않기 로직 */
+    function checkLegalNoticePopup() {
+      const hideUntil = localStorage.getItem('hide_legal_notice_until');
+      const now = Date.now();
+      if (!hideUntil || now > parseInt(hideUntil, 10)) {
+        document.getElementById('legal-notice-modal').classList.add('open');
+      }
+    }
+
+    function confirmLegalNotice() {
+      const chk = document.getElementById('chk-hide-1week');
+      if (chk && chk.checked) {
+        const oneWeekLater = Date.now() + (7 * 24 * 60 * 60 * 1000);
+        localStorage.setItem('hide_legal_notice_until', oneWeekLater.toString());
+      }
+      document.getElementById('legal-notice-modal').classList.remove('open');
+    }
+
+    function rejectLegalNotice() {
+      alert('법적 고지 및 이용 안내에 동의하지 않으시면 서비스를 이용하실 수 없습니다.');
+      // 이전 페이지로 돌아가거나 포털로 이동
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = 'https://www.google.com';
+      }
+    }
+
     window.addEventListener('popstate', (e) => {
       const qrModal = document.getElementById('qr-modal');
       const omrModal = document.getElementById('omr-modal');
@@ -993,6 +1083,7 @@
     });
 
     window.addEventListener('DOMContentLoaded', async () => {
+      checkLegalNoticePopup();
       initDailyVisitors();
       initNumberPad();
       initMyeongdangPad();
@@ -1084,7 +1175,7 @@
       const loc = document.getElementById('sel-md-location').value;
       const rank = document.getElementById('sel-md-rank').value;
 
-      const locName = (loc === 'seoul') ? '서울 노원 스파 편의점' : ((loc === 'busan') ? '부산 동구 부일카서비스' : '전국 2대 명당 전체');
+      const locName = (loc === 'seoul') ? '서울 노원 1등 최다 배출점' : ((loc === 'busan') ? '부산 동구 1등 최다 배출점' : '전국 2대 명당 전체');
       const rankName = (rank === 'rank1') ? '역대 1등' : ((rank === 'rank2') ? '역대 2등' : '1등+2등 전체');
       document.getElementById('myeongdang-scope-tag').innerText = `${locName} (${rankName})`;
 
