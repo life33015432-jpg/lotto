@@ -3,7 +3,6 @@ const fs = require('fs');
 const path = require('path');
 
 const HISTORY_PATH = path.join(__dirname, '../data/lotto-history.json');
-const HTML_PATH = path.join(__dirname, '../index.html');
 
 async function fetchWithTimeout(url, timeoutMs = 9000, options = {}) {
   const controller = new AbortController();
@@ -16,7 +15,7 @@ async function fetchWithTimeout(url, timeoutMs = 9000, options = {}) {
   }
 }
 
-// 1차: 동행복권 공식 데이터 채널 (해외 러너 IP 차단 방지 헤더 세팅)
+// 1차: 동행복권 공식 데이터 채널 (해외 Actions 러너 IP 차단 방지 헤더 세팅)
 async function fetchFromOfficialApi(round) {
   const url = `https://www.dhlottery.co.kr/common.do?method=getLottoNumber&drwNo=${round}`;
   try {
@@ -111,22 +110,6 @@ async function fetchFromGoogle(round) {
   return null;
 }
 
-// index.html의 FALLBACK_HISTORY 및 기본 STATE 회차 자동 갱신
-function updateIndexHtml(latestItem) {
-  if (!fs.existsSync(HTML_PATH)) return;
-  let html = fs.readFileSync(HTML_PATH, 'utf-8');
-
-  const fallbackRegex = /const\s+FALLBACK_HISTORY\s*=\s*\[[\s\S]*?\];/;
-  const newFallbackCode = `const FALLBACK_HISTORY = [\n      ${JSON.stringify(latestItem)}\n    ];`;
-  html = html.replace(fallbackRegex, newFallbackCode);
-
-  html = html.replace(/targetRound:\s*\d+/, `targetRound: ${latestItem.round + 1}`);
-  html = html.replace(/prevRound:\s*\d+/, `prevRound: ${latestItem.round}`);
-
-  fs.writeFileSync(HTML_PATH, html, 'utf-8');
-  console.log(`[HTML 갱신] index.html 최신 회차가 제 ${latestItem.round}회로 자동 동기화되었습니다.`);
-}
-
 async function run() {
   console.log('==================================================');
   console.log('[작업 시작] 로또 최신당첨회차 검증 및 자동 수집');
@@ -179,10 +162,9 @@ async function run() {
   if (hasNewData) {
     history.sort((a, b) => Number(b.round || 0) - Number(a.round || 0));
     fs.writeFileSync(HISTORY_PATH, JSON.stringify(history, null, 4), 'utf-8');
-    console.log(`[완료] lotto-history.json 업데이트 완료.`);
-    updateIndexHtml(history[0]);
+    console.log(`[완료] lotto-history.json 파일이 성공적으로 갱신되었습니다.`);
   } else {
-    console.log(`[완료] 이미 최신 상태입니다.`);
+    console.log(`[완료] 이미 최신 상태입니다. (추가 갱신 없음)`);
   }
   console.log('==================================================');
 }
