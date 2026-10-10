@@ -441,20 +441,45 @@
     .qr-bottom-notice { color: #ffffff; font-size: 0.75rem; margin-top: 16px; text-align: center; }
     .qr-color-bar { display: flex; gap: 4px; margin-top: 12px; justify-content: center; }
     .qr-color-bar span { width: 24px; height: 6px; border-radius: 2px; }
+
+    /* [개선] 푸터 레이아웃 높이 및 정렬 안정화 */
     .qr-footer-info {
       margin: 0 14px;
       background: #e2e8f0;
       border-radius: 8px;
-      padding: 12px;
+      padding: 10px 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      min-height: 64px;
     }
     .qr-footer-text-group { display: flex; flex-direction: column; gap: 4px; }
     .qr-footer-date { font-size: 0.7rem; color: #64748b; }
     .qr-footer-game-info { font-size: 0.85rem; font-weight: 700; color: #334155; }
-    .qr-nav-arrows { display: flex; gap: 8px; }
-    .qr-nav-arrow-btn { width: 32px; height: 32px; border-radius: 50%; background: #cbd5e1; border: none; cursor: pointer; color: #475569; font-weight: bold; }
+    
+    /* [개선] QR 용지 이동 화살표 버튼 150% 확대 (32px -> 48px, 터치 감도 개선) */
+    .qr-nav-arrows { display: flex; gap: 12px; align-items: center; }
+    .qr-nav-arrow-btn { 
+      width: 48px; 
+      height: 48px; 
+      border-radius: 50%; 
+      background: #cbd5e1; 
+      border: none; 
+      cursor: pointer; 
+      color: #334155; 
+      font-weight: 900; 
+      font-size: 1.25rem; 
+      display: inline-flex; 
+      align-items: center; 
+      justify-content: center; 
+      transition: transform 0.1s ease, background-color 0.2s;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    }
+    .qr-nav-arrow-btn:active {
+      transform: scale(0.92);
+      background: #94a3b8;
+    }
+
     .qr-close-main-btn { margin: 10px 14px 0; padding: 12px; background: #1e293b; color: #fff; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
 
     /* 공식 법적 고지사항 및 푸터 */
