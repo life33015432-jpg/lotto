@@ -8,8 +8,8 @@ on:
     - cron: '30 12 * * 6'   # 21:30 KST
     - cron: '45 12 * * 6'   # 21:45 KST
     - cron: '0 13 * * 6'    # 22:00 KST
-    - cron: '30 14 * * 6'   # 23:30 KST
-    - cron: '0 15 * * 6'    # 24:00 KST
+    - cron: '30 13 * * 6'   # 22:30 KST
+    - cron: '59 13 * * 6'    # 23:00 KST
   workflow_dispatch:
 
 permissions:
@@ -27,17 +27,17 @@ jobs:
         with:
           node-version: 22
 
-      - name: 최신 당첨 번호 스크래핑 및 JSON/HTML 갱신
+      - name: 최신 당첨 번호 스크래핑 및 JSON 갱신
         run: node scripts/update-lotto.js
 
       - name: Git Commit & Push (Cloudflare Pages 자동 배포)
         run: |
           git config --global user.name 'Aipluslotto-Bot'
           git config --global user.email 'bot@aipluslotto.com'
-          git add data/lotto-history.json index.html
+          git add data/lotto-history.json
           if git diff --staged --quiet; then
             echo "갱신할 새 회차 데이터가 없습니다."
           else
-            git commit -m "Auto update lotto history & index.html"
+            git commit -m "Auto update lotto-history.json"
             git push
           fi
