@@ -1030,7 +1030,7 @@
     });
 
     window.addEventListener('DOMContentLoaded', async () => {
-      await initDailyVisitors();
+      initDailyVisitors();
       initNumberPad();
       initMyeongdangPad();
       initSavedGames();
@@ -1383,51 +1383,72 @@
       document.getElementById('omr-modal').classList.add('open');
     }
 
-    // Cloudflare Workers KV API 연동 실시간 방문자 카운터
+    // [해결 옵션 2] Cloudflare 설정 없이 브라우저/기기간 100% 동기화되는 글로벌 카운터 연동
     async function initDailyVisitors() {
       const dailyEl = document.getElementById('daily-visitor-count');
       const totalEl = document.getElementById('total-visitor-count');
+      
+      const todayStr = new Date().toISOString().slice(0, 10);
+      const sessionKey = 'aipluslotto_counted_' + todayStr;
+      const isNewSession = !sessionStorage.getItem(sessionKey);
+
+      // 네임스페이스 및 키 식별자
+      const domainNamespace = 'aipluslotto_service';
+      const totalKey = 'total_visitors';
+      const dailyKey = 'daily_' + todayStr.replace(/-/g, '');
 
       try {
-        const response = await fetch('/api/visitor', {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json'
-          }
-        });
+        const action = isNewSession ? 'up' : 'get';
+        const urlTotal = `https://api.counterapi.dev/v1/${domainNamespace}/${totalKey}/${action}`;
+        const urlDaily = `https://api.counterapi.dev/v1/${domainNamespace}/${dailyKey}/${action}`;
 
-        if (!response.ok) {
-          throw new Error(`Visitor API 응답 오류: ${response.status}`);
+        const [resTotal, resDaily] = await Promise.allSettled([
+          fetch(urlTotal, { method: 'GET' }).then(r => r.json()),
+          fetch(urlDaily, { method: 'GET' }).then(r => r.json())
+        ]);
+
+        let totalVal = null;
+        let dailyVal = null;
+
+        if (resTotal.status === 'fulfilled' && typeof resTotal.value.count !== 'undefined') {
+          totalVal = resTotal.value.count;
+        }
+        if (resDaily.status === 'fulfilled' && typeof resDaily.value.count !== 'undefined') {
+          dailyVal = resDaily.value.count;
         }
 
-        const data = await response.json();
+        if (totalVal !== null || dailyVal !== null) {
+          if (isNewSession) sessionStorage.setItem(sessionKey, '1');
 
-        if (dailyEl && typeof data.daily !== 'undefined') {
-          dailyEl.innerText = Number(data.daily).toLocaleString();
+          if (dailyEl && dailyVal !== null) dailyEl.innerText = Number(dailyVal).toLocaleString();
+          if (totalEl && totalVal !== null) totalEl.innerText = Number(totalVal).toLocaleString();
+          return;
         }
-        if (totalEl && typeof data.total !== 'undefined') {
-          totalEl.innerText = Number(data.total).toLocaleString();
-        }
+        throw new Error('글로벌 카운터 응답 없음');
       } catch (err) {
-        console.warn('방문자 카운터 동기화 실패 (오프라인/로컬 Fallback):', err);
-        // 통신 오류 시 로컬 스토리지 Fallback 유지
-        const todayKey = 'lotto_visitor_date';
-        const dailyCountKey = 'lotto_visitor_daily_count';
-        const totalCountKey = 'lotto_visitor_total_count';
-        const todayStr = new Date().toISOString().slice(0, 10);
+        console.warn('글로벌 카운터 호출 실패, 로컬 백업 실행:', err);
         
-        let storedDate = localStorage.getItem(todayKey);
-        let dailyCount = parseInt(localStorage.getItem(dailyCountKey) || '1', 10);
-        let totalCount = parseInt(localStorage.getItem(totalCountKey) || '1', 10);
+        // 통신 오류 시 로컬 스토리지 Fallback
+        const lTodayKey = 'lotto_visitor_date';
+        const lDailyKey = 'lotto_visitor_daily_count';
+        const lTotalKey = 'lotto_visitor_total_count';
+
+        let storedDate = localStorage.getItem(lTodayKey);
+        let dailyCount = parseInt(localStorage.getItem(lDailyKey) || '1', 10);
+        let totalCount = parseInt(localStorage.getItem(lTotalKey) || '1', 10);
 
         if (storedDate !== todayStr) {
           dailyCount = 1;
           totalCount += 1;
-          localStorage.setItem(todayKey, todayStr);
+          localStorage.setItem(lTodayKey, todayStr);
+        } else if (isNewSession) {
+          dailyCount += 1;
+          totalCount += 1;
+          sessionStorage.setItem(sessionKey, '1');
         }
 
-        localStorage.setItem(dailyCountKey, dailyCount);
-        localStorage.setItem(totalCountKey, totalCount);
+        localStorage.setItem(lDailyKey, dailyCount);
+        localStorage.setItem(lTotalKey, totalCount);
 
         if (dailyEl) dailyEl.innerText = dailyCount.toLocaleString();
         if (totalEl) totalEl.innerText = totalCount.toLocaleString();
