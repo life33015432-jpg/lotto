@@ -1030,7 +1030,7 @@
     });
 
     window.addEventListener('DOMContentLoaded', async () => {
-      initDailyVisitors();
+      await initDailyVisitors();
       initNumberPad();
       initMyeongdangPad();
       initSavedGames();
@@ -1383,64 +1383,71 @@
       document.getElementById('omr-modal').classList.add('open');
     }
 
-    // [해결 옵션 2] Cloudflare 설정 없이 브라우저/기기간 100% 동기화되는 글로벌 카운터 연동
+    // [Firebase Realtime Database REST API 연동] 전 기기/인앱 브라우저 100% 실시간 공유 카운터
     async function initDailyVisitors() {
       const dailyEl = document.getElementById('daily-visitor-count');
       const totalEl = document.getElementById('total-visitor-count');
-      
-      const todayStr = new Date().toISOString().slice(0, 10);
-      const sessionKey = 'aipluslotto_counted_' + todayStr;
+
+      // Firebase Realtime Database 엔드포인트 URL
+      const DB_BASE = 'https://aipluslotto-default-rtdb.asia-southeast1.firebasedatabase.app';
+      const todayStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+      const sessionKey = 'firebase_counted_' + todayStr;
       const isNewSession = !sessionStorage.getItem(sessionKey);
 
-      // 네임스페이스 및 키 식별자
-      const domainNamespace = 'aipluslotto_service';
-      const totalKey = 'total_visitors';
-      const dailyKey = 'daily_' + todayStr.replace(/-/g, '');
-
       try {
-        const action = isNewSession ? 'up' : 'get';
-        const urlTotal = `https://api.counterapi.dev/v1/${domainNamespace}/${totalKey}/${action}`;
-        const urlDaily = `https://api.counterapi.dev/v1/${domainNamespace}/${dailyKey}/${action}`;
+        if (isNewSession) {
+          // 1. 새 방문자: 누적 카운트 조회 및 1 증가
+          const totalRes = await fetch(`${DB_BASE}/visitors/total.json`);
+          let currentTotal = await totalRes.json();
+          currentTotal = (typeof currentTotal === 'number') ? currentTotal + 1 : 1;
+          await fetch(`${DB_BASE}/visitors/total.json`, {
+            method: 'PUT',
+            body: JSON.stringify(currentTotal)
+          });
 
-        const [resTotal, resDaily] = await Promise.allSettled([
-          fetch(urlTotal, { method: 'GET' }).then(r => r.json()),
-          fetch(urlDaily, { method: 'GET' }).then(r => r.json())
-        ]);
+          // 2. 새 방문자: 당일 카운트 조회 및 1 증가
+          const dailyRes = await fetch(`${DB_BASE}/visitors/daily/${todayStr}.json`);
+          let currentDaily = await dailyRes.json();
+          currentDaily = (typeof currentDaily === 'number') ? currentDaily + 1 : 1;
+          await fetch(`${DB_BASE}/visitors/daily/${todayStr}.json`, {
+            method: 'PUT',
+            body: JSON.stringify(currentDaily)
+          });
 
-        let totalVal = null;
-        let dailyVal = null;
+          sessionStorage.setItem(sessionKey, '1');
 
-        if (resTotal.status === 'fulfilled' && typeof resTotal.value.count !== 'undefined') {
-          totalVal = resTotal.value.count;
+          if (dailyEl) dailyEl.innerText = Number(currentDaily).toLocaleString();
+          if (totalEl) totalEl.innerText = Number(currentTotal).toLocaleString();
+        } else {
+          // 기존 방문자(새로고침): 숫자 증가 없이 현재 서버의 공용 값만 GET 조회
+          const [totalRes, dailyRes] = await Promise.all([
+            fetch(`${DB_BASE}/visitors/total.json`),
+            fetch(`${DB_BASE}/visitors/daily/${todayStr}.json`)
+          ]);
+
+          const tVal = await totalRes.json();
+          const dVal = await dailyRes.json();
+
+          if (dailyEl && dVal !== null) dailyEl.innerText = Number(dVal || 1).toLocaleString();
+          if (totalEl && tVal !== null) totalEl.innerText = Number(tVal || 1).toLocaleString();
         }
-        if (resDaily.status === 'fulfilled' && typeof resDaily.value.count !== 'undefined') {
-          dailyVal = resDaily.value.count;
-        }
-
-        if (totalVal !== null || dailyVal !== null) {
-          if (isNewSession) sessionStorage.setItem(sessionKey, '1');
-
-          if (dailyEl && dailyVal !== null) dailyEl.innerText = Number(dailyVal).toLocaleString();
-          if (totalEl && totalVal !== null) totalEl.innerText = Number(totalVal).toLocaleString();
-          return;
-        }
-        throw new Error('글로벌 카운터 응답 없음');
       } catch (err) {
-        console.warn('글로벌 카운터 호출 실패, 로컬 백업 실행:', err);
+        console.warn('Firebase 카운터 연동 실패 (오프라인 로컬 Fallback 실행):', err);
         
-        // 통신 오류 시 로컬 스토리지 Fallback
+        // 통신 일시 장애 시 로컬 브라우저 Fallback
         const lTodayKey = 'lotto_visitor_date';
         const lDailyKey = 'lotto_visitor_daily_count';
         const lTotalKey = 'lotto_visitor_total_count';
+        const todayIso = new Date().toISOString().slice(0, 10);
 
         let storedDate = localStorage.getItem(lTodayKey);
         let dailyCount = parseInt(localStorage.getItem(lDailyKey) || '1', 10);
         let totalCount = parseInt(localStorage.getItem(lTotalKey) || '1', 10);
 
-        if (storedDate !== todayStr) {
+        if (storedDate !== todayIso) {
           dailyCount = 1;
           totalCount += 1;
-          localStorage.setItem(lTodayKey, todayStr);
+          localStorage.setItem(lTodayKey, todayIso);
         } else if (isNewSession) {
           dailyCount += 1;
           totalCount += 1;
