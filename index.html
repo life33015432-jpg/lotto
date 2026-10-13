@@ -512,8 +512,31 @@
     .qr-footer-text-group { display: flex; flex-direction: column; gap: 4px; }
     .qr-footer-date { font-size: 0.7rem; color: #64748b; }
     .qr-footer-game-info { font-size: 0.85rem; font-weight: 700; color: #334155; }
-    .qr-nav-arrows { display: flex; gap: 8px; }
-    .qr-nav-arrow-btn { width: 64px; height: 64px; font-size: 1.6rem; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: #cbd5e1; border: none; cursor: pointer; color: #475569; font-weight: bold;}
+    .qr-nav-arrows { display: flex; gap: 10px; align-items: center; }
+    
+    /* QR 모달 네비게이션 화살표 버튼: 200% 크기로 확대 (직경 64px, 폰트 1.6rem) */
+    .qr-nav-arrow-btn { 
+      width: 64px; 
+      height: 64px; 
+      font-size: 1.6rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%; 
+      background: #cbd5e1; 
+      border: none; 
+      cursor: pointer; 
+      color: #475569; 
+      font-weight: 900; 
+      transition: background 0.2s ease, transform 0.1s ease;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+      user-select: none;
+    }
+    .qr-nav-arrow-btn:active {
+      transform: scale(0.93);
+      background: #94a3b8;
+    }
+
     .qr-close-main-btn { margin: 10px 14px 0; padding: 12px; background: #1e293b; color: #fff; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
 
     .simple-footer-panel {
@@ -561,8 +584,8 @@
         <button class="btn-notice-open" onclick="openNoticeModal()">📢 공지사항</button>
       </div>
       <div class="stat-badge-row">
-        <span class="stat-badge">당일 접속 <b id="daily-visitor-count">1</b>명</span>
-        <span class="stat-badge">누적 접속 <b id="total-visitor-count">1</b>명</span>
+        <span class="stat-badge">당일 접속 <b id="daily-visitor-count">-</b>명</span>
+        <span class="stat-badge">누적 접속 <b id="total-visitor-count">-</b>명</span>
       </div>
 
       <nav class="main-nav-tabs">
@@ -924,8 +947,8 @@
           <div class="qr-footer-game-info" id="qr-games-info-title">5게임 (총 5,000원)</div>
         </div>
         <div class="qr-nav-arrows">
-          <button class="qr-nav-arrow-btn" onclick="prevQRSheet()">&lt;</button>
-          <button class="qr-nav-arrow-btn" onclick="nextQRSheet()">&gt;</button>
+          <button class="qr-nav-arrow-btn" onclick="prevQRSheet()" aria-label="이전 QR">&lt;</button>
+          <button class="qr-nav-arrow-btn" onclick="nextQRSheet()" aria-label="다음 QR">&gt;</button>
         </div>
       </div>
       
@@ -934,8 +957,9 @@
   </div>
 
   <script>
-    // 현재 저장소 기본값(제 1244회 기준) - 하드코딩 눈속임 없이 lotto-history.json을 동적 우선 로드
+    // 현재 저장소 기본값(제 1245회 기준) - lotto-history.json을 동적 우선 로드
     const FALLBACK_HISTORY = [
+      { "round": 1245, "numbers": [4, 5, 25, 28, 32, 42], "bonus": 12 },
       { "round": 1244, "numbers": [1, 13, 18, 26, 34, 38], "bonus": 25 }
     ];
 
@@ -951,8 +975,8 @@
       mdSelected: new Set(),
       mdTargetQty: 10,
       mdGeneratedGames: [],
-      targetRound: 1245,
-      prevRound: 1244,
+      targetRound: 1246,
+      prevRound: 1245,
       generatedGames: [],
       omrCurrentIndex: 0,
       omrActiveSource: [],
@@ -1006,7 +1030,7 @@
     });
 
     window.addEventListener('DOMContentLoaded', async () => {
-      initDailyVisitors();
+      await initDailyVisitors();
       initNumberPad();
       initMyeongdangPad();
       initSavedGames();
@@ -1359,40 +1383,55 @@
       document.getElementById('omr-modal').classList.add('open');
     }
 
-    function initDailyVisitors() {
-      const todayKey = 'lotto_visitor_date';
-      const dailyCountKey = 'lotto_visitor_daily_count';
-      const totalCountKey = 'lotto_visitor_total_count';
-      const todayStr = new Date().toISOString().slice(0, 10);
-      
-      let storedDate = localStorage.getItem(todayKey);
-      let dailyCount = parseInt(localStorage.getItem(dailyCountKey) || '0', 10);
-      let totalCount = parseInt(localStorage.getItem(totalCountKey) || '0', 10);
-
-      if (storedDate !== todayStr || dailyCount > 100) {
-        dailyCount = 1;
-        if (!totalCount || totalCount > 500) {
-          totalCount = 1;
-        } else {
-          totalCount += 1;
-        }
-        localStorage.setItem(todayKey, todayStr);
-        sessionStorage.setItem('visited_session', 'true');
-      } else {
-        if (!sessionStorage.getItem('visited_session')) {
-          dailyCount += 1;
-          totalCount += 1;
-          sessionStorage.setItem('visited_session', 'true');
-        }
-      }
-
-      localStorage.setItem(dailyCountKey, dailyCount);
-      localStorage.setItem(totalCountKey, totalCount);
-
+    // Cloudflare Workers KV API 연동 실시간 방문자 카운터
+    async function initDailyVisitors() {
       const dailyEl = document.getElementById('daily-visitor-count');
       const totalEl = document.getElementById('total-visitor-count');
-      if (dailyEl) dailyEl.innerText = dailyCount.toLocaleString();
-      if (totalEl) totalEl.innerText = totalCount.toLocaleString();
+
+      try {
+        const response = await fetch('/api/visitor', {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`Visitor API 응답 오류: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (dailyEl && typeof data.daily !== 'undefined') {
+          dailyEl.innerText = Number(data.daily).toLocaleString();
+        }
+        if (totalEl && typeof data.total !== 'undefined') {
+          totalEl.innerText = Number(data.total).toLocaleString();
+        }
+      } catch (err) {
+        console.warn('방문자 카운터 동기화 실패 (오프라인/로컬 Fallback):', err);
+        // 통신 오류 시 로컬 스토리지 Fallback 유지
+        const todayKey = 'lotto_visitor_date';
+        const dailyCountKey = 'lotto_visitor_daily_count';
+        const totalCountKey = 'lotto_visitor_total_count';
+        const todayStr = new Date().toISOString().slice(0, 10);
+        
+        let storedDate = localStorage.getItem(todayKey);
+        let dailyCount = parseInt(localStorage.getItem(dailyCountKey) || '1', 10);
+        let totalCount = parseInt(localStorage.getItem(totalCountKey) || '1', 10);
+
+        if (storedDate !== todayStr) {
+          dailyCount = 1;
+          totalCount += 1;
+          localStorage.setItem(todayKey, todayStr);
+        }
+
+        localStorage.setItem(dailyCountKey, dailyCount);
+        localStorage.setItem(totalCountKey, totalCount);
+
+        if (dailyEl) dailyEl.innerText = dailyCount.toLocaleString();
+        if (totalEl) totalEl.innerText = totalCount.toLocaleString();
+      }
     }
 
     function normalizeNumbers(arr) {
@@ -1403,7 +1442,6 @@
     async function loadHistoryDB() {
       let fetchedFresh = false;
       try {
-        // 캐시 없이 실시간 최신 JSON 파일을 불러옴
         const resH = await fetch(`/data/lotto-history.json?t=${Date.now()}`, { 
           cache: 'no-store',
           headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' }
@@ -2060,7 +2098,7 @@
       if (!STATE.historyDB || STATE.historyDB.length === 0) return;
       
       const latest = STATE.historyDB[0];
-      const latestRoundNum = Number(latest.round || 1244);
+      const latestRoundNum = Number(latest.round || 1245);
       
       document.getElementById('latest-round-title').innerText = `제 ${latestRoundNum}회 기준`;
 
