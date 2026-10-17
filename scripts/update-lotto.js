@@ -4,7 +4,7 @@ const path = require('path');
 
 const HISTORY_PATH = path.join(__dirname, '../data/lotto-history.json');
 
-async function fetchWithTimeout(url, timeoutMs = 8000, options = {}) {
+async function fetchWithTimeout(url, timeoutMs = 10000, options = {}) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
@@ -14,8 +14,8 @@ async function fetchWithTimeout(url, timeoutMs = 8000, options = {}) {
   }
 }
 
-// 1차: 동행복권 공식 API
-async function fetchFromOfficial(round) {
+// 1차: 동행복권 공식 API 직통
+async function fetchFromOfficialApi(round) {
   const url = `https://www.dhlottery.co.kr/common.do?method=getLottoNumber&drwNo=${round}`;
   try {
     const res = await fetchWithTimeout(url, 6000, {
@@ -37,20 +37,19 @@ async function fetchFromOfficial(round) {
       }
     }
   } catch (e) {
-    // 해외 IP 차단 시 무시하고 다음 단계로 진행
+    // 해외 IP 차단 시 무시
   }
   return null;
 }
 
-// 2차: 해외 IP 차단 우회 프록시 (allorigins 프록시 경유 동행복권 API)
-async function fetchFromProxyOfficial(round) {
+// 2차: CodeTabs CORS 프록시 경유 동행복권 API (안정적인 해외 IP 우회)
+async function fetchFromCodeTabsProxy(round) {
   const target = encodeURIComponent(`https://www.dhlottery.co.kr/common.do?method=getLottoNumber&drwNo=${round}`);
-  const url = `https://api.allorigins.win/raw?url=${target}`;
+  const url = `https://api.codetabs.com/v1/proxy?quest=${target}`;
   try {
     const res = await fetchWithTimeout(url, 9000);
     if (!res.ok) return null;
-    const text = await res.text();
-    const data = JSON.parse(text);
+    const data = await res.json();
     if (data && data.returnValue === 'success') {
       const numbers = [
         data.drwtNo1, data.drwtNo2, data.drwtNo3,
@@ -62,27 +61,58 @@ async function fetchFromProxyOfficial(round) {
       }
     }
   } catch (e) {
-    // 프록시 지연 또는 오류 시 폴백 이동
+    // 실패 시 다음 폴백으로 이동
   }
   return null;
 }
 
-// 3차: 공공 포털 / 오픈 API 백업 (한국 로또 데이터 미러 채널)
-async function fetchFromOpenApi(round) {
-  const url = `https://api.allorigins.win/get?url=${encodeURIComponent(`https://search.daum.net/search?w=tot&q=${round}회로또`)}`;
+// 3차: 동행복권 모바일 결과 페이지 스크래핑
+async function fetchFromOfficialMobile(round) {
+  const target = encodeURIComponent(`https://m.dhlottery.co.kr/gameResult.do?method=byWin&drwNo=${round}`);
+  const url = `https://api.codetabs.com/v1/proxy?quest=${target}`;
   try {
     const res = await fetchWithTimeout(url, 9000);
     if (!res.ok) return null;
-    const json = await res.json();
-    const html = json.contents;
+    const html = await res.text();
 
-    if (!html || !html.includes(`${round}회`)) return null;
+    if (!html.includes(`${round}회`)) return null;
 
-    // 다음/카카오 검색 결과 로또 공 번호 패턴 추출
-    const ballRegex = /<span class="(?:img_ball\d|ball|num)[^>]*>(\d{1,2})<\/span>/g;
+    // ball_645 클래스 내 번호 추출
+    const ballRegex = /<span class="ball_645[^"]*">(\d{1,2})<\/span>/g;
+    const numbers = [];
+    let match;
+    while ((match = ballRegex.exec(html)) !== null) {
+      numbers.push(Number(match[1]));
+    }
+
+    if (numbers.length >= 7) {
+      const mainNumbers = numbers.slice(0, 6).sort((a, b) => a - b);
+      const bonus = numbers[6];
+      if (mainNumbers.every(n => n >= 1 && n <= 45) && bonus >= 1 && bonus <= 45) {
+        return { round: Number(round), numbers: mainNumbers, bonus };
+      }
+    }
+  } catch (e) {
+    // 실패 시 통과
+  }
+  return null;
+}
+
+// 4차: 다음 포털 검색 결과 추출
+async function fetchFromDaumSearch(round) {
+  const target = encodeURIComponent(`https://search.daum.net/search?w=tot&q=${round}회로또`);
+  const url = `https://api.allorigins.win/raw?url=${target}`;
+  try {
+    const res = await fetchWithTimeout(url, 9000);
+    if (!res.ok) return null;
+    const html = await res.text();
+
+    if (!html.includes(`${round}회`)) return null;
+
+    const regex = /<span class="(?:img_ball\d|ball|num)[^>]*>(\d{1,2})<\/span>/g;
     const matches = [];
     let m;
-    while ((m = ballRegex.exec(html)) !== null) {
+    while ((m = regex.exec(html)) !== null) {
       matches.push(Number(m[1]));
     }
 
@@ -94,7 +124,7 @@ async function fetchFromOpenApi(round) {
       }
     }
   } catch (e) {
-    // 무시
+    // 실패 시 통과
   }
   return null;
 }
@@ -123,21 +153,28 @@ async function run() {
   while (true) {
     console.log(`\n[확인] 제 ${targetRound}회 데이터 수집 시도...`);
 
-    // 1차: 공식 직통 -> 2차: 프록시 경유 공식 -> 3차: 포털 미러
-    let drawData = await fetchFromOfficial(targetRound);
+    // 1차: 공식 직통
+    let drawData = await fetchFromOfficialApi(targetRound);
 
+    // 2차: CodeTabs 프록시 공식 API
     if (!drawData) {
-      console.log(`[알림] 1차 공식 직통 실패 (IP 제한 가능성). 2차 프록시 우회 시도...`);
-      drawData = await fetchFromProxyOfficial(targetRound);
+      console.log(`[알림] 1차 직통 차단/실패. 2차 CodeTabs 프록시 API 시도...`);
+      drawData = await fetchFromCodeTabsProxy(targetRound);
     }
 
+    // 3차: 모바일 공식 페이지 스크래핑
     if (!drawData) {
-      console.log(`[알림] 2차 프록시 실패. 3차 포털 오픈 채널 확인 시도...`);
-      drawData = await fetchFromOpenApi(targetRound);
+      console.log(`[알림] 2차 프록시 API 실패. 3차 동행복권 모바일 페이지 시도...`);
+      drawData = await fetchFromOfficialMobile(targetRound);
+    }
+
+    // 4차: 포털 검색 미러
+    if (!drawData) {
+      console.log(`[알림] 3차 모바일 실패. 4차 다음 포털 채널 시도...`);
+      drawData = await fetchFromDaumSearch(targetRound);
     }
 
     if (drawData && drawData.numbers && drawData.numbers.length === 6) {
-      // 기존에 동일 회차가 있으면 교체, 없으면 추가
       const existsIndex = history.findIndex(item => Number(item.round) === Number(drawData.round));
       if (existsIndex >= 0) {
         history[existsIndex] = drawData;
@@ -150,7 +187,7 @@ async function run() {
       targetRound++;
       await new Promise(r => setTimeout(r, 1500));
     } else {
-      console.log(`[종료] 제 ${targetRound}회는 아직 미추첨 상태이거나 갱신 데이터가 없습니다.`);
+      console.log(`[종료] 제 ${targetRound}회는 아직 미추첨 상태이거나 데이터를 가져올 수 없습니다.`);
       break;
     }
   }
