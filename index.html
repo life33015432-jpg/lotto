@@ -838,18 +838,20 @@
           <span style="font-size:0.75rem; color:var(--primary-accent);" id="myeongdang-scope-tag">서울 노원 1등 최다 배출점 (역대 2등)</span>
         </div>
 
-        <div style="display:flex; gap:6px; margin-bottom:10px; align-items:center;">
-          <select class="select-input" id="sel-md-location" style="flex:1.3; background:#0f172a; border:1px solid var(--border-color); border-radius:6px; color:#fff; padding:6px; font-size:0.78rem;">
-            <option value="seoul">서울 노원 1등 최다 배출점</option>
-            <option value="busan">부산 동구 1등 최다 배출점</option>
-            <option value="all">전국 2대 명당 전체 (서울+부산)</option>
-          </select>
-          <select class="select-input" id="sel-md-rank" style="flex:1.1; background:#0f172a; border:1px solid var(--border-color); border-radius:6px; color:#fff; padding:6px; font-size:0.78rem;">
-            <option value="rank2" selected>역대 2등 당첨 회차만</option>
-            <option value="rank1">역대 1등 당첨 회차만</option>
-            <option value="all">1등 + 2등 배출 회차 전체</option>
-          </select>
-          <button class="btn-sm" style="background:var(--primary-accent); color:#1e1100; font-weight:800; padding:8px 14px; font-size:0.82rem; height:36px;" onclick="applyMyeongdangPrecomputed()">적용</button>
+        <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:10px;">
+          <div style="display:flex; gap:6px;">
+            <select class="select-input" id="sel-md-location" style="flex:1; background:#0f172a; border:1px solid var(--border-color); border-radius:6px; color:#fff; padding:8px 6px; font-size:0.78rem;">
+              <option value="seoul">서울 노원 1등 최다 배출점</option>
+              <option value="busan">부산 동구 1등 최다 배출점</option>
+              <option value="all">전국 2대 명당 전체 (서울+부산)</option>
+            </select>
+            <select class="select-input" id="sel-md-rank" style="flex:1; background:#0f172a; border:1px solid var(--border-color); border-radius:6px; color:#fff; padding:8px 6px; font-size:0.78rem;">
+              <option value="rank2" selected>역대 2등 당첨 회차만</option>
+              <option value="rank1">역대 1등 당첨 회차만</option>
+              <option value="all">1등 + 2등 배출 회차 전체</option>
+            </select>
+          </div>
+          <button class="btn-sm" style="width:100%; background:var(--primary-accent); color:#1e1100; font-weight:800; padding:9px; font-size:0.85rem; border-radius:8px;" onclick="applyMyeongdangPrecomputed()">적용</button>
         </div>
 
         <p style="font-size:0.75rem; color:var(--text-sub); margin-bottom:8px;">
