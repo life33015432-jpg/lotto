@@ -2,18 +2,22 @@ name: Auto Lotto Update
 
 on:
   schedule:
-    # 매주 토요일 21:00부터 10~15분 간격 자동 실행 (KST = UTC + 9)
-    - cron: '5 12 * * 6'    # 21:05 KST
-    - cron: '15 12 * * 6'   # 21:15 KST
-    - cron: '30 12 * * 6'   # 21:30 KST
-    - cron: '45 12 * * 6'   # 21:45 KST
-    - cron: '0 13 * * 6'    # 22:00 KST
-    - cron: '30 13 * * 6'   # 22:30 KST
-    - cron: '59 13 * * 6'    # 23:00 KST
+    # 한국시간(KST) 매주 토요일 20:50 ~ 22:50 사이 10분 간격 실행
+    # KST = UTC + 9
+    # 11:50 UTC = 20:50 KST
+    # 12:00 ~ 12:50 UTC = 21:00 ~ 21:50 KST (10분 간격)
+    # 13:00 ~ 13:50 UTC = 22:00 ~ 22:50 KST (10분 간격)
+    - cron: '50 11 * * 6'
+    - cron: '*/10 12,13 * * 6'
   workflow_dispatch:
 
 permissions:
   contents: write
+
+# 중복 실행 방지 (이전 작업이 지연 중일 때 새 작업 큐 대기 또는 단일화)
+concurrency:
+  group: lotto-update-group
+  cancel-in-progress: false
 
 jobs:
   update:
@@ -27,6 +31,11 @@ jobs:
         with:
           node-version: 22
 
+      - name: 의존성 설치 (선택 사항)
+        # axios, cheerio 등 별도 패키지를 사용하는 경우 주석을 해제합니다.
+        # run: npm install
+        run: echo "환경 준비 완료"
+
       - name: 최신 당첨 번호 스크래핑 및 JSON 갱신
         run: node scripts/update-lotto.js
 
@@ -35,9 +44,12 @@ jobs:
           git config --global user.name 'Aipluslotto-Bot'
           git config --global user.email 'bot@aipluslotto.com'
           git add data/lotto-history.json
+          
+          # 변경사항이 존재할 때만 커밋 및 푸시
           if git diff --staged --quiet; then
-            echo "갱신할 새 회차 데이터가 없습니다."
+            echo "갱신할 새 회차 데이터가 없습니다. (이미 최신이거나 미발표)"
           else
             git commit -m "Auto update lotto-history.json"
             git push
+            echo "새 회차 데이터 업데이트 및 Push 완료"
           fi
