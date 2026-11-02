@@ -1080,21 +1080,17 @@
       }
     });
 
-    // 화면 렌더링 블로킹 방지: DOM 완성 즉시 UI를 먼저 렌더링하고 비동기 통신 분리
     window.addEventListener('DOMContentLoaded', () => {
-      // 1. 필수 UI 동기 렌더링 (블로킹 없이 즉시 화면 생성)
       initNumberPad();
       initMyeongdangPad();
       initSavedGames();
 
-      // 2. 초기 기본값 기반 분석 및 엔진 가동
       calculateTargetRounds();
       generateWeeklyCandidates();
       analyzeRecentStatistics();
       updateMaxComboDisplay();
       applyMyeongdangPrecomputed();
 
-      // 3. 외부 비동기 데이터 로드 (실패하거나 지연되어도 메인 화면에 지장 없음)
       initDailyVisitors().catch(e => console.warn('Visitor init error:', e));
       loadHistoryDB().then(() => {
         calculateTargetRounds();
@@ -1222,7 +1218,6 @@
         pool.sort((a, b) => b.count - a.count || a.num - b.num);
         STATE.mdTop15Pool = pool.slice(0, 15);
       } else {
-        // 명당 데이터가 아직 없거나 로드 전일 때의 기본 상위 15수 풀
         const defaultPool = [1, 2, 3, 10, 12, 13, 17, 20, 26, 31, 34, 38, 40, 43, 45];
         STATE.mdTop15Pool = defaultPool.map((n, i) => ({ num: n, count: 20 - i }));
       }
@@ -1489,7 +1484,6 @@
           if (totalEl && tVal !== null) totalEl.innerText = Number(tVal || 1).toLocaleString();
         }
       } catch (err) {
-        // 오프라인 로컬 Fallback 처리
         const lTodayKey = 'lotto_visitor_date';
         const lDailyKey = 'lotto_visitor_daily_count';
         const lTotalKey = 'lotto_visitor_total_count';
@@ -2230,7 +2224,9 @@
     }
 
     /* =========================================================
-       드래곤볼 7성구 융합 소환 로직 (AI 12 + 통계 12 + 명당 15)
+       드래곤볼 7성구 융합 소환 로직:
+       추천번호 풀(AI, 통계, 명당) 가중치 2, 그 외 1~45번 가중치 1 적용
+       전체 45개 번호가 비복원 가중치 확률 추첨을 통해 골고루 등장
        ========================================================= */
     async function summonDragonBalls() {
       if (STATE.isDragonSummoning) return;
@@ -2238,7 +2234,7 @@
 
       const btn = document.getElementById('btn-dragon-summon');
       btn.disabled = true;
-      btn.innerHTML = '<span>⚡</span> <span>3대 통합 풀 연산 및 패드 소환 중...</span>';
+      btn.innerHTML = '<span>⚡</span> <span>45개 전수 가중치(2:1) 확률 연산 및 소환 중...</span>';
 
       const orbs = document.querySelectorAll('#dragon-ball-track .dragon-orb');
       orbs.forEach(orb => {
@@ -2247,7 +2243,7 @@
         orb.querySelector('.orb-number').textContent = '?';
       });
 
-      // 1. 세 가지 고유 풀 확보
+      // 1. 추천 번호 후보군 확보 (AI 12 + 통계 12 + 명당 15)
       const aiPool = STATE.engineCandidates.AI && STATE.engineCandidates.AI.length === 12
         ? STATE.engineCandidates.AI
         : derive12CandidatesByIntegratedAI(STATE.targetRound);
@@ -2260,36 +2256,44 @@
         ? STATE.mdTop15Pool.map(i => i.num)
         : [2, 4, 10, 13, 17, 20, 23, 26, 30, 34, 36, 39, 41, 43, 45];
 
-      // 2. 3대 풀에서 매 요청마다 독립적으로 무작위 7개 비복원 추출
-      const selected = new Set();
-      const shuffle = arr => [...arr].sort(() => 0.5 - Math.random());
+      // 추천 번호 합집합 (Set)
+      const recommendedSet = new Set([...aiPool, ...statPool, ...topSpotPool]);
 
-      const sAi = shuffle(aiPool);
-      const sStat = shuffle(statPool);
-      const sSpot = shuffle(topSpotPool);
-
-      // 각 풀에서 2개씩 골고루 선별
-      selected.add(sAi[0]); selected.add(sAi[1]);
-      selected.add(sStat[0]); selected.add(sStat[1]);
-      selected.add(sSpot[0]); selected.add(sSpot[1]);
-
-      // 7번째는 3대 통합 합집합 풀에서 무작위 보충
-      const unifiedUnion = shuffle(Array.from(new Set([...aiPool, ...statPool, ...topSpotPool])));
-      for (const num of unifiedUnion) {
-        if (selected.size >= 7) break;
-        selected.add(num);
+      // 2. 1~45번 전체 가중치 테이블 구성 (추천번호: 2, 일반번호: 1)
+      const candidates = [];
+      for (let num = 1; num <= 45; num++) {
+        candidates.push({
+          num: num,
+          weight: recommendedSet.has(num) ? 2 : 1
+        });
       }
 
-      const list7 = Array.from(selected);
-      const mainSix = list7.slice(0, 6).sort((a, b) => a - b);
-      const luckySeventh = list7[6];
+      // 3. 비복원 가중치 무작위 추출 (7개 번호 선별)
+      const selected = [];
+      while (selected.length < 7 && candidates.length > 0) {
+        const totalWeight = candidates.reduce((sum, item) => sum + item.weight, 0);
+        let randomVal = Math.random() * totalWeight;
+
+        for (let i = 0; i < candidates.length; i++) {
+          randomVal -= candidates[i].weight;
+          if (randomVal <= 0) {
+            selected.push(candidates[i].num);
+            candidates.splice(i, 1);
+            break;
+          }
+        }
+      }
+
+      // 1~6번째는 오름차순 정렬, 7번째는 럭키 보너스 번호로 배치
+      const mainSix = selected.slice(0, 6).sort((a, b) => a - b);
+      const luckySeventh = selected[6];
       const final7 = [...mainSix, luckySeventh];
 
-      // 3. 기존 번호 패드 선택값 리셋
+      // 4. 기존 패드 선택값 리셋
       STATE.fixedNumbers.clear();
       syncPadUI();
 
-      // 4. 0.22초 간격으로 구슬 팝업 및 패드에 실시간 주입
+      // 5. 0.22초 간격으로 구슬 팝업 애니메이션 및 패드에 즉시 주입
       for (let i = 0; i < orbs.length; i++) {
         await new Promise(r => setTimeout(r, 220));
         const num = final7[i];
@@ -2298,7 +2302,6 @@
         orbs[i].classList.add('revealed');
         orbs[i].querySelector('.orb-number').textContent = num;
 
-        // 번호 선택 패드에 즉시 체크 연동
         STATE.fixedNumbers.add(num);
         syncPadUI();
         updateMaxComboDisplay();
@@ -2307,7 +2310,7 @@
       renderEngineCandidates();
 
       btn.disabled = false;
-      btn.innerHTML = '<span>✨</span> <span>다시 7성구 소환 및 패드 주입</span>';
+      btn.innerHTML = '<span>✨</span> <span>신룡이여! 7성구를 소환하라</span>';
       STATE.isDragonSummoning = false;
     }
 
@@ -2490,7 +2493,7 @@
         height: 180,
         colorDark: "#000000",
         colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.M
+        correctLevel: QRCode.Level.M
       });
     }
 
