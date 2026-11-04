@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Aipluslotto.com - 스마트 로또 번호 분석 시스템</title>
-  <!-- 데이터 길이 오버플로우를 자동 확장으로 해결하는 안정적인 QR 라이브러리 탑재 -->
+  <!-- 5게임 전문(E-Slip) 및 긴 데이터도 오버플로우 없이 40버전까지 자동 확장하는 안정적 표준 라이브러리 탑재 -->
   <script src="https://cdn.jsdelivr.net/npm/easyqrcodejs@4.4.13/dist/easy.qrcode.min.js"></script>
   <style>
     :root {
@@ -527,7 +527,7 @@
     .omr-nav-btn-row { display: flex; justify-content: space-between; margin-top: 12px; gap: 8px; }
     .omr-nav-btn { flex: 1; padding: 10px; background: #e2e8f0; border: none; border-radius: 8px; font-weight: 700; color: #334155; cursor: pointer; font-size: 0.85rem; }
 
-    /* QR 모달 */
+    /* 다크 그레이 QR 모달 */
     .qr-custom-modal-backdrop {
       position: fixed;
       inset: 0;
@@ -593,7 +593,7 @@
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
     .qr-img-center-box { width: 200px; height: 200px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
-    .qr-img-center-box img { width: 200px !important; height: 200px !important; display: block; }
+    .qr-img-center-box canvas, .qr-img-center-box img { width: 180px !important; height: 180px !important; display: block; }
     .qr-price-label { font-size: 0.8rem; color: #64748b; margin-bottom: 4px; }
     .qr-price-value { font-size: 1.6rem; font-weight: 900; color: #1e293b; display: flex; align-items: center; gap: 4px; }
     .qr-bottom-notice { color: #cbd5e1; font-size: 0.75rem; margin-top: 16px; text-align: center; }
@@ -982,7 +982,7 @@
           </div>
         </div>
 
-        <div class="qr-bottom-notice">※ 본 QR은 동행복권 표준 확인 및 단말기 전송 보조용입니다.</div>
+        <div class="qr-bottom-notice">※ 본 QR은 단말기 전송용 보조 수단입니다.</div>
         <div class="qr-color-bar">
           <span style="background:#10b981;"></span>
           <span style="background:#84cc16;"></span>
@@ -1863,6 +1863,25 @@
       }
     }
 
+    function setQuickQty(qty, btnEl) {
+      const slider = document.getElementById('extract-range');
+      if (slider) slider.value = qty;
+      updateRangeFromSlider(qty, btnEl);
+    }
+
+    function updateRangeFromSlider(val, btnEl) {
+      const intVal = parseInt(val, 10);
+      const badge = document.getElementById('range-val-badge');
+      if (badge) badge.innerText = `${intVal}G`;
+      
+      const parent = btnEl ? (btnEl.classList.contains('btn-qty') ? btnEl.parentElement : btnEl.closest('.range-control').previousElementSibling) : document.querySelector('#view-standard-panel .quick-qty-group');
+      if (parent) {
+        parent.querySelectorAll('.btn-qty').forEach(btn => {
+          btn.classList.toggle('active', parseInt(btn.innerText, 10) === intVal);
+        });
+      }
+    }
+
     function combinationsCount(n, r) {
       if (r < 0 || r > n) return 0;
       if (r === 0 || r === n) return 1;
@@ -2334,7 +2353,7 @@
       renderEngineCandidates();
 
       btn.disabled = false;
-      btn.innerHTML = '<span>✨</span> <span>신룡이여! 7성구를 소환하라</span>';
+      btn.innerHTML = '<span>✨</span> <span>다시 7성구 소환 및 패드 주입</span>';
       STATE.isDragonSummoning = false;
     }
 
@@ -2488,9 +2507,8 @@
     }
 
     /* =========================================================
-       QR 코드 렌더링:
-       동행복권 단말기용 전문(E-Slip)과 모바일 표준 규격 모두 지원하며
-       오버플로우 없이 고속 자동 확장 인코딩
+       QR 코드 렌더링 (동행복권 단말기 모바일 슬립지 E-Slip 규격)
+       40버전 자동 확장 지원 엔진을 통해 5게임 전체 데이터도 오류 없이 선명하게 생성
        ========================================================= */
     function renderQRSheet() {
       const source = QR_STATE.source;
@@ -2525,7 +2543,7 @@
         return;
       }
 
-      // 동행복권 단말기 및 표준 스캐너용 페이로드 생성
+      // 동행복권 모바일 슬립지 단말기 표준 전문 페이로드 조립
       const gamesPayload = sheetGames.map(game => {
         const nums = normalizeNumbers(game)
           .map(n => String(n).padStart(2, '0'))
@@ -2538,31 +2556,22 @@
       const qrPayload = `${rawPayload}${crc}|`;
 
       try {
+        // easyqrcodejs 규격: text 및 기본 옵션
         new QRCode(qrBox, {
           text: qrPayload,
           width: 180,
           height: 180,
           colorDark: "#000000",
           colorLight: "#ffffff",
-          correctLevel: QRCode.CorrectLevel ? QRCode.CorrectLevel.L : 1
+          correctLevel: (typeof QRCode.CorrectLevel !== 'undefined') ? QRCode.CorrectLevel.L : 1
         });
       } catch (err) {
-        console.warn('QR 생성 Fallback 모드 작동:', err);
+        console.warn('QR 1차 생성 재시도:', err);
         try {
-          // 대체 모바일 웹 표준 링크 포맷
-          const urlPayload = `http://m.dhlottery.co.kr/?v=${STATE.targetRound || 1246}` + 
-            sheetGames.map(g => 'm' + normalizeNumbers(g).map(n => String(n).padStart(2, '0')).join('')).join('');
-          
-          new QRCode(qrBox, {
-            text: urlPayload,
-            width: 180,
-            height: 180,
-            colorDark: "#000000",
-            colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel ? QRCode.CorrectLevel.L : 1
-          });
+          // 백업 옵션
+          new QRCode(qrBox, qrPayload);
         } catch (e2) {
-          qrBox.innerHTML = '<span style="color:#ef4444; font-size:0.8rem;">QR 생성 실패 (데이터 초과)</span>';
+          qrBox.innerHTML = '<span style="color:#ef4444; font-size:0.8rem;">QR 생성 실패</span>';
         }
       }
     }
