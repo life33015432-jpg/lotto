@@ -4,7 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Aipluslotto.com - 스마트 로또 번호 분석 시스템</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <!-- 데이터 길이 오버플로우를 자동 확장으로 해결하는 안정적인 QR 라이브러리 탑재 -->
+  <script src="https://cdn.jsdelivr.net/npm/easyqrcodejs@4.4.13/dist/easy.qrcode.min.js"></script>
   <style>
     :root {
       --bg-color: #0b111e;
@@ -981,7 +982,7 @@
           </div>
         </div>
 
-        <div class="qr-bottom-notice">※ 본 QR은 단말기 전송용 보조 수단입니다.</div>
+        <div class="qr-bottom-notice">※ 본 QR은 동행복권 표준 확인 및 단말기 전송 보조용입니다.</div>
         <div class="qr-color-bar">
           <span style="background:#10b981;"></span>
           <span style="background:#84cc16;"></span>
@@ -1301,6 +1302,25 @@
       }
       renderMyeongdangTop15Grid();
       syncMyeongdangPadUI();
+    }
+
+    function setQuickQty(qty, btnEl) {
+      const slider = document.getElementById('extract-range');
+      if (slider) slider.value = qty;
+      updateRangeFromSlider(qty, btnEl);
+    }
+
+    function updateRangeFromSlider(val, btnEl) {
+      const intVal = parseInt(val, 10);
+      const badge = document.getElementById('range-val-badge');
+      if (badge) badge.innerText = `${intVal}G`;
+      
+      const parent = btnEl ? (btnEl.classList.contains('btn-qty') ? btnEl.parentElement : btnEl.closest('.range-control').previousElementSibling) : document.querySelector('#view-standard-panel .quick-qty-group');
+      if (parent) {
+        parent.querySelectorAll('.btn-qty').forEach(btn => {
+          btn.classList.toggle('active', parseInt(btn.innerText, 10) === intVal);
+        });
+      }
     }
 
     function setMyeongdangQty(qty, btnEl) {
@@ -1843,27 +1863,6 @@
       }
     }
 
-    function setQuickQty(qty, btnEl) {
-      const rangeEl = document.getElementById('extract-range');
-      if (rangeEl) {
-        rangeEl.value = qty;
-        updateRangeFromSlider(qty, btnEl);
-      }
-    }
-
-    function updateRangeFromSlider(val, targetEl) {
-      const intVal = parseInt(val, 10);
-      const badge = document.getElementById('range-val-badge');
-      if (badge) badge.innerText = `${intVal}G`;
-
-      const parentGroup = targetEl ? (targetEl.classList.contains('btn-qty') ? targetEl.parentElement : targetEl.closest('.range-control').previousElementSibling) : document.querySelector('#view-standard-panel .quick-qty-group');
-      if (parentGroup) {
-        parentGroup.querySelectorAll('.btn-qty').forEach(btn => {
-          btn.classList.toggle('active', parseInt(btn.innerText, 10) === intVal);
-        });
-      }
-    }
-
     function combinationsCount(n, r) {
       if (r < 0 || r > n) return 0;
       if (r === 0 || r === n) return 1;
@@ -2265,25 +2264,21 @@
     }
 
     /* =========================================================
-       드래곤볼 7성구 융합 소환 로직:
-       추천번호 풀(AI, 통계, 명당) 가중치 2, 그 외 1~45번 가중치 1 적용
+       드래곤볼 7성구 융합 소환 로직 (AI 12 + 통계 12 + 명당 15)
        ========================================================= */
     async function summonDragonBalls() {
       if (STATE.isDragonSummoning) return;
       STATE.isDragonSummoning = true;
 
       const btn = document.getElementById('btn-dragon-summon');
-      if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = '<span>⚡</span> <span>45개 전수 가중치(2:1) 확률 연산 및 소환 중...</span>';
-      }
+      btn.disabled = true;
+      btn.innerHTML = '<span>⚡</span> <span>3대 통합 풀 연산 및 패드 소환 중...</span>';
 
       const orbs = document.querySelectorAll('#dragon-ball-track .dragon-orb');
       orbs.forEach(orb => {
         orb.classList.remove('revealed');
         orb.classList.add('generating');
-        const numEl = orb.querySelector('.orb-number');
-        if (numEl) numEl.textContent = '?';
+        orb.querySelector('.orb-number').textContent = '?';
       });
 
       const aiPool = STATE.engineCandidates.AI && STATE.engineCandidates.AI.length === 12
@@ -2298,33 +2293,26 @@
         ? STATE.mdTop15Pool.map(i => i.num)
         : [2, 4, 10, 13, 17, 20, 23, 26, 30, 34, 36, 39, 41, 43, 45];
 
-      const recommendedSet = new Set([...aiPool, ...statPool, ...topSpotPool]);
+      const selected = new Set();
+      const shuffle = arr => [...arr].sort(() => 0.5 - Math.random());
 
-      const candidates = [];
-      for (let num = 1; num <= 45; num++) {
-        candidates.push({
-          num: num,
-          weight: recommendedSet.has(num) ? 2 : 1
-        });
+      const sAi = shuffle(aiPool);
+      const sStat = shuffle(statPool);
+      const sSpot = shuffle(topSpotPool);
+
+      selected.add(sAi[0]); selected.add(sAi[1]);
+      selected.add(sStat[0]); selected.add(sStat[1]);
+      selected.add(sSpot[0]); selected.add(sSpot[1]);
+
+      const unifiedUnion = shuffle(Array.from(new Set([...aiPool, ...statPool, ...topSpotPool])));
+      for (const num of unifiedUnion) {
+        if (selected.size >= 7) break;
+        selected.add(num);
       }
 
-      const selected = [];
-      while (selected.length < 7 && candidates.length > 0) {
-        const totalWeight = candidates.reduce((sum, item) => sum + item.weight, 0);
-        let randomVal = Math.random() * totalWeight;
-
-        for (let i = 0; i < candidates.length; i++) {
-          randomVal -= candidates[i].weight;
-          if (randomVal <= 0) {
-            selected.push(candidates[i].num);
-            candidates.splice(i, 1);
-            break;
-          }
-        }
-      }
-
-      const mainSix = selected.slice(0, 6).sort((a, b) => a - b);
-      const luckySeventh = selected[6];
+      const list7 = Array.from(selected);
+      const mainSix = list7.slice(0, 6).sort((a, b) => a - b);
+      const luckySeventh = list7[6];
       const final7 = [...mainSix, luckySeventh];
 
       STATE.fixedNumbers.clear();
@@ -2336,8 +2324,7 @@
 
         orbs[i].classList.remove('generating');
         orbs[i].classList.add('revealed');
-        const numEl = orbs[i].querySelector('.orb-number');
-        if (numEl) numEl.textContent = num;
+        orbs[i].querySelector('.orb-number').textContent = num;
 
         STATE.fixedNumbers.add(num);
         syncPadUI();
@@ -2346,10 +2333,8 @@
 
       renderEngineCandidates();
 
-      if (btn) {
-        btn.disabled = false;
-        btn.innerHTML = '<span>✨</span> <span>신룡이여! 7성구를 소환하라</span>';
-      }
+      btn.disabled = false;
+      btn.innerHTML = '<span>✨</span> <span>신룡이여! 7성구를 소환하라</span>';
       STATE.isDragonSummoning = false;
     }
 
@@ -2502,6 +2487,11 @@
       }
     }
 
+    /* =========================================================
+       QR 코드 렌더링:
+       동행복권 단말기용 전문(E-Slip)과 모바일 표준 규격 모두 지원하며
+       오버플로우 없이 고속 자동 확장 인코딩
+       ========================================================= */
     function renderQRSheet() {
       const source = QR_STATE.source;
       if (!source || !source.length) return;
@@ -2535,6 +2525,7 @@
         return;
       }
 
+      // 동행복권 단말기 및 표준 스캐너용 페이로드 생성
       const gamesPayload = sheetGames.map(game => {
         const nums = normalizeNumbers(game)
           .map(n => String(n).padStart(2, '0'))
@@ -2553,20 +2544,22 @@
           height: 180,
           colorDark: "#000000",
           colorLight: "#ffffff",
-          correctLevel: QRCode.Level.L
+          correctLevel: QRCode.CorrectLevel ? QRCode.CorrectLevel.L : 1
         });
       } catch (err) {
-        console.warn('E-Slip 오버플로우 대체 모드 가동:', err);
+        console.warn('QR 생성 Fallback 모드 작동:', err);
         try {
+          // 대체 모바일 웹 표준 링크 포맷
           const urlPayload = `http://m.dhlottery.co.kr/?v=${STATE.targetRound || 1246}` + 
             sheetGames.map(g => 'm' + normalizeNumbers(g).map(n => String(n).padStart(2, '0')).join('')).join('');
+          
           new QRCode(qrBox, {
             text: urlPayload,
             width: 180,
             height: 180,
             colorDark: "#000000",
             colorLight: "#ffffff",
-            correctLevel: QRCode.Level.L
+            correctLevel: QRCode.CorrectLevel ? QRCode.CorrectLevel.L : 1
           });
         } catch (e2) {
           qrBox.innerHTML = '<span style="color:#ef4444; font-size:0.8rem;">QR 생성 실패 (데이터 초과)</span>';
