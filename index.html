@@ -790,11 +790,11 @@
 
         <div>
           <div class="quick-qty-group">
-            <button class="btn-qty" onclick="setQuickQty(5)">5개</button>
-            <button class="btn-qty active" onclick="setQuickQty(10)">10개</button>
-            <button class="btn-qty" onclick="setQuickQty(20)">20개</button>
-            <button class="btn-qty" onclick="setQuickQty(50)">50개</button>
-            <button class="btn-qty" onclick="setQuickQty(100)">100개</button>
+            <button class="btn-qty" onclick="setQuickQty(5, this)">5개</button>
+            <button class="btn-qty active" onclick="setQuickQty(10, this)">10개</button>
+            <button class="btn-qty" onclick="setQuickQty(20, this)">20개</button>
+            <button class="btn-qty" onclick="setQuickQty(50, this)">50개</button>
+            <button class="btn-qty" onclick="setQuickQty(100, this)">100개</button>
           </div>
           <div class="range-control">
             <span style="font-size:0.8rem; color:var(--text-sub);">추출 수량:</span>
@@ -888,11 +888,11 @@
         <div style="border-top:1px solid var(--border-color); padding-top:10px; margin-top:10px;">
           <span style="font-size:0.8rem; color:var(--text-sub);">추출할 게임 수량 선택:</span>
           <div class="quick-qty-group">
-            <button class="btn-qty" onclick="setMyeongdangQty(5)">5개</button>
-            <button class="btn-qty active" onclick="setMyeongdangQty(10)">10개</button>
-            <button class="btn-qty" onclick="setMyeongdangQty(20)">20개</button>
-            <button class="btn-qty" onclick="setMyeongdangQty(50)">50개</button>
-            <button class="btn-qty" onclick="setMyeongdangQty(100)">100개</button>
+            <button class="btn-qty" onclick="setMyeongdangQty(5, this)">5개</button>
+            <button class="btn-qty active" onclick="setMyeongdangQty(10, this)">10개</button>
+            <button class="btn-qty" onclick="setMyeongdangQty(20, this)">20개</button>
+            <button class="btn-qty" onclick="setMyeongdangQty(50, this)">50개</button>
+            <button class="btn-qty" onclick="setMyeongdangQty(100, this)">100개</button>
           </div>
           <button class="btn-extract" id="btn-extract-myeongdang" style="margin-top:10px;" onclick="generateMyeongdangGames()">선택 번호로 조합 추출</button>
         </div>
@@ -981,7 +981,7 @@
           </div>
         </div>
 
-        <div class="qr-bottom-notice">※ 본 QR은 단말기 전송용 보조 수단입니다.</div>
+        <div class="qr-bottom-notice">※ 본 QR은 동행복권 표준 확인 및 단말기 전송 보조용입니다.</div>
         <div class="qr-color-bar">
           <span style="background:#10b981;"></span>
           <span style="background:#84cc16;"></span>
@@ -1054,11 +1054,13 @@
     ];
 
     function openNoticeModal() {
-      document.getElementById('legal-notice-modal').classList.add('open');
+      const modal = document.getElementById('legal-notice-modal');
+      if (modal) modal.classList.add('open');
     }
 
     function closeNoticeModal() {
-      document.getElementById('legal-notice-modal').classList.remove('open');
+      const modal = document.getElementById('legal-notice-modal');
+      if (modal) modal.classList.remove('open');
     }
 
     window.addEventListener('popstate', (e) => {
@@ -1104,11 +1106,15 @@
       STATE.activeMenu = menuKey;
       const isStd = (menuKey === 'standard');
 
-      document.getElementById('view-standard-panel').style.display = isStd ? 'flex' : 'none';
-      document.getElementById('view-myeongdang-panel').style.display = isStd ? 'none' : 'flex';
+      const stdPanel = document.getElementById('view-standard-panel');
+      const mdPanel = document.getElementById('view-myeongdang-panel');
+      if (stdPanel) stdPanel.style.display = isStd ? 'flex' : 'none';
+      if (mdPanel) mdPanel.style.display = isStd ? 'none' : 'flex';
 
-      document.getElementById('menu-btn-standard').classList.toggle('active', isStd);
-      document.getElementById('menu-btn-myeongdang').classList.toggle('active', !isStd);
+      const btnStd = document.getElementById('menu-btn-standard');
+      const btnMd = document.getElementById('menu-btn-myeongdang');
+      if (btnStd) btnStd.classList.toggle('active', isStd);
+      if (btnMd) btnMd.classList.toggle('active', !isStd);
 
       if (!isStd) {
         applyMyeongdangPrecomputed();
@@ -1137,7 +1143,8 @@
           ball.className = `ball ball-unselected`;
         }
       }
-      document.getElementById('md-pad-count').innerText = STATE.mdSelected.size;
+      const countEl = document.getElementById('md-pad-count');
+      if (countEl) countEl.innerText = STATE.mdSelected.size;
       updateMyeongdangMaxComboDisplay();
     }
 
@@ -1174,12 +1181,15 @@
     }
 
     function applyMyeongdangPrecomputed() {
-      const loc = document.getElementById('sel-md-location').value;
-      const rank = document.getElementById('sel-md-rank').value;
+      const locEl = document.getElementById('sel-md-location');
+      const rankEl = document.getElementById('sel-md-rank');
+      const loc = locEl ? locEl.value : 'seoul';
+      const rank = rankEl ? rankEl.value : 'rank2';
 
       const locName = (loc === 'seoul') ? '서울 노원 1등 최다 배출점' : ((loc === 'busan') ? '부산 동구 1등 최다 배출점' : '전국 2대 명당 전체');
       const rankName = (rank === 'rank1') ? '역대 1등' : ((rank === 'rank2') ? '역대 2등' : '1등+2등 전체');
-      document.getElementById('myeongdang-scope-tag').innerText = `${locName} (${rankName})`;
+      const scopeTag = document.getElementById('myeongdang-scope-tag');
+      if (scopeTag) scopeTag.innerText = `${locName} (${rankName})`;
 
       if (STATE.myeongdangData && STATE.historyDB.length > 0) {
         let targetRounds = [];
@@ -1258,7 +1268,8 @@
         grid.appendChild(wrap);
       });
 
-      document.getElementById('selected-md-count').innerText = STATE.mdSelected.size;
+      const countEl = document.getElementById('selected-md-count');
+      if (countEl) countEl.innerText = STATE.mdSelected.size;
     }
 
     function setupChamberBottomBalls() {
@@ -1292,12 +1303,33 @@
       syncMyeongdangPadUI();
     }
 
-    function setMyeongdangQty(qty) {
+    function setQuickQty(qty, btnEl) {
+      const slider = document.getElementById('extract-range');
+      if (slider) slider.value = qty;
+      updateRangeFromSlider(qty, btnEl);
+    }
+
+    function updateRangeFromSlider(val, btnEl) {
+      const intVal = parseInt(val, 10);
+      const badge = document.getElementById('range-val-badge');
+      if (badge) badge.innerText = `${intVal}G`;
+      
+      const parent = btnEl ? btnEl.parentElement : document.querySelector('#view-standard-panel .quick-qty-group');
+      if (parent) {
+        parent.querySelectorAll('.btn-qty').forEach(btn => {
+          btn.classList.toggle('active', parseInt(btn.innerText, 10) === intVal);
+        });
+      }
+    }
+
+    function setMyeongdangQty(qty, btnEl) {
       STATE.mdTargetQty = qty;
-      const parent = event.target.parentElement;
-      parent.querySelectorAll('.btn-qty').forEach(btn => {
-        btn.classList.toggle('active', parseInt(btn.innerText, 10) === qty);
-      });
+      const parent = btnEl ? btnEl.parentElement : document.querySelector('#view-myeongdang-panel .quick-qty-group');
+      if (parent) {
+        parent.querySelectorAll('.btn-qty').forEach(btn => {
+          btn.classList.toggle('active', parseInt(btn.innerText, 10) === qty);
+        });
+      }
     }
 
     function generateMyeongdangGames() {
@@ -1313,10 +1345,14 @@
       const statusLabel = document.getElementById('chamber-status-label');
 
       STATE.isExtractingMD = true;
-      btn.disabled = true;
-      btn.style.opacity = '0.7';
+      if (btn) {
+        btn.disabled = true;
+        btn.style.opacity = '0.7';
+      }
 
-      statusLabel.innerHTML = '🔥 <b style="color:var(--primary-accent);">로또 기계 가동 중! 공들이 튀어 오릅니다... (2초)</b>';
+      if (statusLabel) {
+        statusLabel.innerHTML = '🔥 <b style="color:var(--primary-accent);">로또 기계 가동 중! 공들이 튀어 오릅니다... (2초)</b>';
+      }
       
       const animClasses = ['anim-blow-1', 'anim-blow-2', 'anim-blow-3'];
       const balls = document.querySelectorAll('.physics-ball');
@@ -1334,7 +1370,9 @@
           }
         });
 
-        statusLabel.innerHTML = '✅ <b style="color:#10b981;">추첨 완료</b>';
+        if (statusLabel) {
+          statusLabel.innerHTML = '✅ <b style="color:#10b981;">추첨 완료</b>';
+        }
 
         const generated = [];
         const seen = new Set();
@@ -1354,8 +1392,10 @@
         STATE.mdGeneratedGames = generated;
         renderMDExtractedResults();
 
-        btn.disabled = false;
-        btn.style.opacity = '1';
+        if (btn) {
+          btn.disabled = false;
+          btn.style.opacity = '1';
+        }
         STATE.isExtractingMD = false;
       }, 2000);
     }
@@ -1365,9 +1405,10 @@
       const badge = document.getElementById('md-result-limit-badge');
       const list = document.getElementById('md-extracted-games-list');
       
+      if (!section || !list) return;
       section.style.display = 'block';
       list.innerHTML = '';
-      badge.innerText = `(${STATE.mdGeneratedGames.length}게임)`;
+      if (badge) badge.innerText = `(${STATE.mdGeneratedGames.length}게임)`;
 
       STATE.mdGeneratedGames.forEach((game, idx) => {
         const row = document.createElement('div');
@@ -1394,8 +1435,10 @@
 
     function resetMDExtractedResults() {
       STATE.mdGeneratedGames = [];
-      document.getElementById('md-extracted-games-list').innerHTML = '';
-      document.getElementById('md-result-section').style.display = 'none';
+      const list = document.getElementById('md-extracted-games-list');
+      const section = document.getElementById('md-result-section');
+      if (list) list.innerHTML = '';
+      if (section) section.style.display = 'none';
     }
 
     function saveAllMDResults() {
@@ -1437,7 +1480,8 @@
       renderOMR();
 
       history.pushState({ modal: 'omr' }, '');
-      document.getElementById('omr-modal').classList.add('open');
+      const modal = document.getElementById('omr-modal');
+      if (modal) modal.classList.add('open');
     }
 
     async function initDailyVisitors() {
@@ -1717,8 +1761,10 @@
 
     function switchEngine(engineKey) {
       STATE.activeEngineTab = engineKey;
-      document.getElementById('tab-engine-ai').classList.toggle('active', engineKey === 'AI');
-      document.getElementById('tab-engine-score').classList.toggle('active', engineKey === 'SCORE');
+      const tabAi = document.getElementById('tab-engine-ai');
+      const tabScore = document.getElementById('tab-engine-score');
+      if (tabAi) tabAi.classList.toggle('active', engineKey === 'AI');
+      if (tabScore) tabScore.classList.toggle('active', engineKey === 'SCORE');
       renderEngineCandidates();
     }
 
@@ -1816,19 +1862,6 @@
       }
     }
 
-    function setQuickQty(qty) {
-      document.getElementById('extract-range').value = qty;
-      updateRangeFromSlider(qty);
-    }
-
-    function updateRangeFromSlider(val) {
-      const intVal = parseInt(val, 10);
-      document.getElementById('range-val-badge').innerText = `${intVal}G`;
-      document.querySelectorAll('#view-standard-panel .btn-qty').forEach(btn => {
-        btn.classList.toggle('active', parseInt(btn.innerText, 10) === intVal);
-      });
-    }
-
     function combinationsCount(n, r) {
       if (r < 0 || r > n) return 0;
       if (r === 0 || r === n) return 1;
@@ -1889,7 +1922,8 @@
         return;
       }
 
-      const requested = parseInt(document.getElementById('extract-range').value, 10) || 10;
+      const rangeInput = document.getElementById('extract-range');
+      const requested = rangeInput ? (parseInt(rangeInput.value, 10) || 10) : 10;
       const fixedSet = new Set(fixedNums);
 
       if (fixedNums.length >= 6) {
@@ -1984,18 +2018,22 @@
 
     function resetExtractedResults() {
       STATE.generatedGames = [];
-      document.getElementById('extracted-games-list').innerHTML = '';
-      document.getElementById('result-section').style.display = 'none';
+      const list = document.getElementById('extracted-games-list');
+      const section = document.getElementById('result-section');
+      if (list) list.innerHTML = '';
+      if (section) section.style.display = 'none';
     }
 
     function renderExtractedResults(isCapped, count) {
       const section = document.getElementById('result-section');
       const badge = document.getElementById('result-limit-badge');
       const list = document.getElementById('extracted-games-list');
+      if (!section || !list) return;
+      
       section.style.display = 'block';
       list.innerHTML = '';
 
-      badge.innerText = `(${count}게임)`;
+      if (badge) badge.innerText = `(${count}게임)`;
 
       STATE.generatedGames.forEach((game, idx) => {
         const row = document.createElement('div');
@@ -2203,7 +2241,8 @@
       const freq5Box = document.getElementById('stat-freq-5');
       if (freq5Box) {
         freq5Box.innerHTML = '';
-        document.getElementById('stat-freq-count').innerText = `${freq5.length}개`;
+        const freqCount = document.getElementById('stat-freq-count');
+        if (freqCount) freqCount.innerText = `${freq5.length}개`;
         freq5.forEach(n => freq5Box.appendChild(createBall(n, () => toggleFixedNumber(n))));
       }
 
@@ -2226,24 +2265,25 @@
     /* =========================================================
        드래곤볼 7성구 융합 소환 로직:
        추천번호 풀(AI, 통계, 명당) 가중치 2, 그 외 1~45번 가중치 1 적용
-       전체 45개 번호가 비복원 가중치 확률 추첨을 통해 골고루 등장
        ========================================================= */
     async function summonDragonBalls() {
       if (STATE.isDragonSummoning) return;
       STATE.isDragonSummoning = true;
 
       const btn = document.getElementById('btn-dragon-summon');
-      btn.disabled = true;
-      btn.innerHTML = '<span>⚡</span> <span>45개 전수 가중치(2:1) 확률 연산 및 소환 중...</span>';
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span>⚡</span> <span>45개 전수 가중치(2:1) 확률 연산 및 소환 중...</span>';
+      }
 
       const orbs = document.querySelectorAll('#dragon-ball-track .dragon-orb');
       orbs.forEach(orb => {
         orb.classList.remove('revealed');
         orb.classList.add('generating');
-        orb.querySelector('.orb-number').textContent = '?';
+        const numEl = orb.querySelector('.orb-number');
+        if (numEl) numEl.textContent = '?';
       });
 
-      // 1. 추천 번호 후보군 확보 (AI 12 + 통계 12 + 명당 15)
       const aiPool = STATE.engineCandidates.AI && STATE.engineCandidates.AI.length === 12
         ? STATE.engineCandidates.AI
         : derive12CandidatesByIntegratedAI(STATE.targetRound);
@@ -2256,10 +2296,8 @@
         ? STATE.mdTop15Pool.map(i => i.num)
         : [2, 4, 10, 13, 17, 20, 23, 26, 30, 34, 36, 39, 41, 43, 45];
 
-      // 추천 번호 합집합 (Set)
       const recommendedSet = new Set([...aiPool, ...statPool, ...topSpotPool]);
 
-      // 2. 1~45번 전체 가중치 테이블 구성 (추천번호: 2, 일반번호: 1)
       const candidates = [];
       for (let num = 1; num <= 45; num++) {
         candidates.push({
@@ -2268,7 +2306,6 @@
         });
       }
 
-      // 3. 비복원 가중치 무작위 추출 (7개 번호 선별)
       const selected = [];
       while (selected.length < 7 && candidates.length > 0) {
         const totalWeight = candidates.reduce((sum, item) => sum + item.weight, 0);
@@ -2284,23 +2321,21 @@
         }
       }
 
-      // 1~6번째는 오름차순 정렬, 7번째는 럭키 보너스 번호로 배치
       const mainSix = selected.slice(0, 6).sort((a, b) => a - b);
       const luckySeventh = selected[6];
       const final7 = [...mainSix, luckySeventh];
 
-      // 4. 기존 패드 선택값 리셋
       STATE.fixedNumbers.clear();
       syncPadUI();
 
-      // 5. 0.22초 간격으로 구슬 팝업 애니메이션 및 패드에 즉시 주입
       for (let i = 0; i < orbs.length; i++) {
         await new Promise(r => setTimeout(r, 220));
         const num = final7[i];
 
         orbs[i].classList.remove('generating');
         orbs[i].classList.add('revealed');
-        orbs[i].querySelector('.orb-number').textContent = num;
+        const numEl = orbs[i].querySelector('.orb-number');
+        if (numEl) numEl.textContent = num;
 
         STATE.fixedNumbers.add(num);
         syncPadUI();
@@ -2309,8 +2344,10 @@
 
       renderEngineCandidates();
 
-      btn.disabled = false;
-      btn.innerHTML = '<span>✨</span> <span>신룡이여! 7성구를 소환하라</span>';
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<span>✨</span> <span>신룡이여! 7성구를 소환하라</span>';
+      }
       STATE.isDragonSummoning = false;
     }
 
@@ -2324,7 +2361,8 @@
       renderOMR();
 
       history.pushState({ modal: 'omr' }, '');
-      document.getElementById('omr-modal').classList.add('open');
+      const modal = document.getElementById('omr-modal');
+      if (modal) modal.classList.add('open');
     }
 
     function openOMRFromStorage(index = 0) {
@@ -2337,7 +2375,8 @@
       renderOMR();
 
       history.pushState({ modal: 'omr' }, '');
-      document.getElementById('omr-modal').classList.add('open');
+      const modal = document.getElementById('omr-modal');
+      if (modal) modal.classList.add('open');
     }
 
     function closeOMR(event) {
@@ -2369,12 +2408,18 @@
       const game = STATE.omrActiveSource[STATE.omrCurrentIndex];
       if (!game) return;
       const gameCode = String.fromCharCode(65 + (STATE.omrCurrentIndex % 5));
-      document.getElementById('omr-game-title').innerText = `[로또용지] 제 ${gameCode} 게임 (${STATE.omrCurrentIndex + 1}/${STATE.omrActiveSource.length})`;
+      const titleEl = document.getElementById('omr-game-title');
+      if (titleEl) {
+        titleEl.innerText = `[로또용지] 제 ${gameCode} 게임 (${STATE.omrCurrentIndex + 1}/${STATE.omrActiveSource.length})`;
+      }
 
       const preview = document.getElementById('omr-ball-preview');
-      preview.innerHTML = game.map(n => getBallHtml(n)).join(' ');
+      if (preview) {
+        preview.innerHTML = game.map(n => getBallHtml(n)).join(' ');
+      }
 
       const grid = document.getElementById('omr-grid');
+      if (!grid) return;
       grid.innerHTML = '';
       const set = new Set(game);
       for (let i = 1; i <= 45; i++) {
@@ -2425,7 +2470,8 @@
       renderQRSheet();
 
       history.pushState({ modal: 'qr' }, '');
-      document.getElementById('qr-modal').classList.add('open');
+      const modal = document.getElementById('qr-modal');
+      if (modal) modal.classList.add('open');
     }
 
     function closeQRModal(event) {
@@ -2466,35 +2512,47 @@
       const totalEstimatedPrice = (source.length * 1000).toLocaleString();
       const currentSheetPrice = (sheetGames.length * 1000).toLocaleString();
 
-      document.getElementById('qr-timestamp-label').innerText = `생성일시 ${QR_STATE.timestamp || getNowFormattedString()}`;
-      document.getElementById('qr-page-indicator').innerText = `${currentSheet + 1}/${totalSheets}`;
-      document.getElementById('qr-total-price').innerText = `(QR 총액 ${totalEstimatedPrice}원)`;
-      
-      document.getElementById('qr-current-sheet-price').innerHTML = `${currentSheetPrice}원 <span style="font-size:0.9rem; font-weight:400; color:#94a3b8; border:1px solid #cbd5e1; border-radius:50%; width:18px; height:18px; display:inline-flex; align-items:center; justify-content:center; padding-bottom:1px;">i</span>`;
-      
-      document.getElementById('qr-games-info-title').innerText = `${sheetGames.length}게임 (총 ${currentSheetPrice}원)`;
+      const timeLabel = document.getElementById('qr-timestamp-label');
+      const pageIndicator = document.getElementById('qr-page-indicator');
+      const totalPriceEl = document.getElementById('qr-total-price');
+      const sheetPriceEl = document.getElementById('qr-current-sheet-price');
+      const gamesTitle = document.getElementById('qr-games-info-title');
 
-      const gamesPayload = sheetGames.map(game => {
-        const nums = normalizeNumbers(game)
-          .map(n => String(n).padStart(2, '0'))
-          .join('');
-        return `M:${nums}`;
-      }).join(',');
-
-      const rawPayload = `MSG_ESLIP{10645}{(${sheetGames.length},${gamesPayload})}{}`;
-      const crc = calculateCRC8(rawPayload);
-      const qrPayload = `${rawPayload}${crc}|`;
+      if (timeLabel) timeLabel.innerText = `생성일시 ${QR_STATE.timestamp || getNowFormattedString()}`;
+      if (pageIndicator) pageIndicator.innerText = `${currentSheet + 1}/${totalSheets}`;
+      if (totalPriceEl) totalPriceEl.innerText = `(QR 총액 ${totalEstimatedPrice}원)`;
+      if (sheetPriceEl) sheetPriceEl.innerHTML = `${currentSheetPrice}원 <span style="font-size:0.9rem; font-weight:400; color:#94a3b8; border:1px solid #cbd5e1; border-radius:50%; width:18px; height:18px; display:inline-flex; align-items:center; justify-content:center; padding-bottom:1px;">i</span>`;
+      if (gamesTitle) gamesTitle.innerText = `${sheetGames.length}게임 (총 ${currentSheetPrice}원)`;
 
       const qrBox = document.getElementById('qr-canvas-box');
+      if (!qrBox) return;
       qrBox.innerHTML = '';
-      new QRCode(qrBox, {
-        text: qrPayload,
-        width: 180,
-        height: 180,
-        colorDark: "#000000",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.Level.M
-      });
+
+      if (typeof QRCode === 'undefined') {
+        qrBox.innerHTML = '<span style="color:#ef4444; font-size:0.75rem; text-align:center;">QR 라이브러리를 불러오지 못했습니다.<br/>인터넷 연결을 확인하세요.</span>';
+        return;
+      }
+
+      // 스마트폰 기본 카메라 및 동행복권 표준 URL 포맷 연동
+      let gamesParam = sheetGames.map(game => {
+        return 'm' + normalizeNumbers(game).map(n => String(n).padStart(2, '0')).join('');
+      }).join('');
+      const targetRound = STATE.targetRound || 1246;
+      const qrPayload = `http://m.dhlottery.co.kr/?v=${targetRound}${gamesParam}`;
+
+      try {
+        new QRCode(qrBox, {
+          text: qrPayload,
+          width: 180,
+          height: 180,
+          colorDark: "#000000",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.Level.L
+        });
+      } catch (err) {
+        console.error('QR 렌더링 실패:', err);
+        qrBox.innerHTML = '<span style="color:#ef4444; font-size:0.8rem;">QR 생성 중 오류 발생</span>';
+      }
     }
 
     function getBallClass(n) {
