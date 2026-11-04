@@ -798,7 +798,7 @@
           </div>
           <div class="range-control">
             <span style="font-size:0.8rem; color:var(--text-sub);">추출 수량:</span>
-            <input type="range" class="range-slider" id="extract-range" min="1" max="100" value="10" oninput="updateRangeFromSlider(this.value)" />
+            <input type="range" class="range-slider" id="extract-range" min="1" max="100" value="10" oninput="updateRangeFromSlider(this.value, this)" />
             <span id="range-val-badge" style="font-size:0.85rem; font-weight:700; color:var(--primary-accent); width:45px; text-align:right;">10G</span>
           </div>
           <button class="btn-extract" onclick="runDualEngineExtraction()">조합</button>
@@ -981,7 +981,7 @@
           </div>
         </div>
 
-        <div class="qr-bottom-notice">※ 본 QR은 동행복권 표준 확인 및 단말기 전송 보조용입니다.</div>
+        <div class="qr-bottom-notice">※ 본 QR은 단말기 전송용 보조 수단입니다.</div>
         <div class="qr-color-bar">
           <span style="background:#10b981;"></span>
           <span style="background:#84cc16;"></span>
@@ -1301,25 +1301,6 @@
       }
       renderMyeongdangTop15Grid();
       syncMyeongdangPadUI();
-    }
-
-    function setQuickQty(qty, btnEl) {
-      const slider = document.getElementById('extract-range');
-      if (slider) slider.value = qty;
-      updateRangeFromSlider(qty, btnEl);
-    }
-
-    function updateRangeFromSlider(val, btnEl) {
-      const intVal = parseInt(val, 10);
-      const badge = document.getElementById('range-val-badge');
-      if (badge) badge.innerText = `${intVal}G`;
-      
-      const parent = btnEl ? btnEl.parentElement : document.querySelector('#view-standard-panel .quick-qty-group');
-      if (parent) {
-        parent.querySelectorAll('.btn-qty').forEach(btn => {
-          btn.classList.toggle('active', parseInt(btn.innerText, 10) === intVal);
-        });
-      }
     }
 
     function setMyeongdangQty(qty, btnEl) {
@@ -1859,6 +1840,27 @@
       } else {
         const total = combinationsCount(count, 6);
         displayEl.innerText = `최대 조합: ${total.toLocaleString()}개`;
+      }
+    }
+
+    function setQuickQty(qty, btnEl) {
+      const rangeEl = document.getElementById('extract-range');
+      if (rangeEl) {
+        rangeEl.value = qty;
+        updateRangeFromSlider(qty, btnEl);
+      }
+    }
+
+    function updateRangeFromSlider(val, targetEl) {
+      const intVal = parseInt(val, 10);
+      const badge = document.getElementById('range-val-badge');
+      if (badge) badge.innerText = `${intVal}G`;
+
+      const parentGroup = targetEl ? (targetEl.classList.contains('btn-qty') ? targetEl.parentElement : targetEl.closest('.range-control').previousElementSibling) : document.querySelector('#view-standard-panel .quick-qty-group');
+      if (parentGroup) {
+        parentGroup.querySelectorAll('.btn-qty').forEach(btn => {
+          btn.classList.toggle('active', parseInt(btn.innerText, 10) === intVal);
+        });
       }
     }
 
@@ -2529,16 +2531,20 @@
       qrBox.innerHTML = '';
 
       if (typeof QRCode === 'undefined') {
-        qrBox.innerHTML = '<span style="color:#ef4444; font-size:0.75rem; text-align:center;">QR 라이브러리를 불러오지 못했습니다.<br/>인터넷 연결을 확인하세요.</span>';
+        qrBox.innerHTML = '<span style="color:#ef4444; font-size:0.75rem; text-align:center;">QR 라이브러리를 불러오지 못했습니다.</span>';
         return;
       }
 
-      // 스마트폰 기본 카메라 및 동행복권 표준 URL 포맷 연동
-      let gamesParam = sheetGames.map(game => {
-        return 'm' + normalizeNumbers(game).map(n => String(n).padStart(2, '0')).join('');
-      }).join('');
-      const targetRound = STATE.targetRound || 1246;
-      const qrPayload = `http://m.dhlottery.co.kr/?v=${targetRound}${gamesParam}`;
+      const gamesPayload = sheetGames.map(game => {
+        const nums = normalizeNumbers(game)
+          .map(n => String(n).padStart(2, '0'))
+          .join('');
+        return `M:${nums}`;
+      }).join(',');
+
+      const rawPayload = `MSG_ESLIP{10645}{(${sheetGames.length},${gamesPayload})}{}`;
+      const crc = calculateCRC8(rawPayload);
+      const qrPayload = `${rawPayload}${crc}|`;
 
       try {
         new QRCode(qrBox, {
@@ -2550,8 +2556,21 @@
           correctLevel: QRCode.Level.L
         });
       } catch (err) {
-        console.error('QR 렌더링 실패:', err);
-        qrBox.innerHTML = '<span style="color:#ef4444; font-size:0.8rem;">QR 생성 중 오류 발생</span>';
+        console.warn('E-Slip 오버플로우 대체 모드 가동:', err);
+        try {
+          const urlPayload = `http://m.dhlottery.co.kr/?v=${STATE.targetRound || 1246}` + 
+            sheetGames.map(g => 'm' + normalizeNumbers(g).map(n => String(n).padStart(2, '0')).join('')).join('');
+          new QRCode(qrBox, {
+            text: urlPayload,
+            width: 180,
+            height: 180,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.Level.L
+          });
+        } catch (e2) {
+          qrBox.innerHTML = '<span style="color:#ef4444; font-size:0.8rem;">QR 생성 실패 (데이터 초과)</span>';
+        }
       }
     }
 
