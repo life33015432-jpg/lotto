@@ -38,7 +38,7 @@
     
     .app-container { width: 100%; max-width: 530px; display: flex; flex-direction: column; gap: 14px; margin: 0 auto; }
     .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px; position: relative; }
-    .title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 6px; }
     .title-row h3 { font-size: 0.95rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 6px; }
 
     .header-top-row {
@@ -60,38 +60,6 @@
       font-size: 0.76rem;
       font-weight: 700;
       cursor: pointer;
-    }
-
-    .main-nav-tabs {
-      display: flex;
-      gap: 6px;
-      background: #0e1726;
-      padding: 5px;
-      border-radius: 12px;
-      border: 1px solid var(--border-color);
-      margin-top: 10px;
-    }
-    .main-nav-btn {
-      flex: 1;
-      padding: 10px 0;
-      background: transparent;
-      border: none;
-      border-radius: 8px;
-      color: var(--text-sub);
-      font-size: 0.88rem;
-      font-weight: 800;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-    .main-nav-btn.active {
-      background: var(--card-inner);
-      color: var(--primary-accent);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-      border: 1px solid rgba(245,158,11,0.3);
     }
 
     .ball {
@@ -145,6 +113,116 @@
     .stat-item { background: var(--card-inner); border-radius: 10px; padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; }
     .stat-header { display: flex; justify-content: space-between; color: var(--text-sub); font-size: 0.75rem; }
     .stat-ball-list { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; min-height: 32px; }
+
+    /* 다빈도 상위 번호 풀 (15·20·25·30수) 스타일 */
+    .freq-pool-card {
+      border: 1px solid rgba(245, 158, 11, 0.38);
+      background: linear-gradient(160deg, #162032 0%, #121b2b 100%);
+    }
+    .freq-controls-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .freq-select {
+      flex: 1;
+      background: #0f172a;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-main);
+      padding: 8px 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      outline: none;
+    }
+    .freq-size-tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .btn-pool-size {
+      padding: 8px 0;
+      background: #0e1726;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-sub);
+      font-size: 0.82rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .btn-pool-size.active {
+      background: var(--primary-accent);
+      color: #1e1100;
+      border-color: var(--primary-accent);
+      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35);
+    }
+    .freq-meta-banner {
+      background: #0e1726;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 8px 10px;
+      margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 0.74rem;
+      color: var(--text-sub);
+    }
+    .freq-meta-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    .freq-pool-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 9px 4px;
+      justify-items: center;
+      background: var(--card-inner);
+      padding: 12px 6px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 10px;
+      min-height: 120px;
+    }
+    .ball-choice-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      cursor: pointer;
+    }
+    .ball-rank-tag { font-size: 0.65rem; color: var(--text-sub); }
+    .ball-rank-tag b { color: var(--primary-accent); }
+    .freq-action-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .btn-apply-pool {
+      padding: 10px;
+      background: var(--secondary-accent);
+      color: #fff;
+      border: none;
+      border-radius: 9px;
+      font-size: 0.84rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .btn-instant-pool {
+      padding: 10px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      border: none;
+      border-radius: 9px;
+      font-size: 0.84rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
 
     .engine-toggle-group { display: flex; gap: 6px; background: #0e1726; padding: 4px; border-radius: 10px; margin-bottom: 10px; }
     .engine-tab-btn { flex: 1; padding: 8px 0; background: transparent; border: none; border-radius: 7px; color: var(--text-sub); font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
@@ -284,115 +362,6 @@
     .range-slider { flex: 1; accent-color: var(--primary-accent); }
     .btn-extract { width: 100%; padding: 13px; background: linear-gradient(135deg, #10b981, #059669); border: none; border-radius: 10px; color: #fff; font-size: 1rem; font-weight: 800; cursor: pointer; box-shadow: 0 3px 10px rgba(16,185,129,0.3); }
 
-    .chamber-wrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 10px 0 16px;
-    }
-    .lotto-chamber {
-      width: 230px;
-      height: 230px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 50% 25%, rgba(35, 55, 85, 0.45), rgba(8, 12, 22, 0.95)), #080c16;
-      border: 4px solid #334155;
-      box-shadow: inset 0 -20px 35px rgba(0,0,0,0.85), 0 0 20px rgba(59, 130, 246, 0.25);
-      position: relative;
-      overflow: hidden;
-    }
-    .chamber-glass-glare {
-      position: absolute;
-      top: 10px;
-      left: 24px;
-      width: 80px;
-      height: 38px;
-      border-radius: 50%;
-      background: linear-gradient(to bottom, rgba(255,255,255,0.32), rgba(255,255,255,0));
-      transform: rotate(-35deg);
-      pointer-events: none;
-      z-index: 10;
-    }
-    .chamber-bottom-grill {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 38px;
-      background: linear-gradient(to top, rgba(20, 28, 44, 0.95), transparent);
-      border-top: 1px dashed rgba(255,255,255,0.1);
-      z-index: 2;
-    }
-    .chamber-balls-container {
-      position: absolute;
-      inset: 0;
-      z-index: 4;
-    }
-    .physics-ball {
-      position: absolute;
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.72rem;
-      font-weight: 800;
-      color: #fff;
-      box-shadow: inset -1px -1px 3px rgba(0,0,0,0.5), 1px 1px 2px rgba(0,0,0,0.4);
-      transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-    }
-
-    @keyframes blowBounce1 {
-      0%   { transform: translate(0, 0) rotate(0deg); }
-      20%  { transform: translate(35px, -150px) rotate(140deg); }
-      45%  { transform: translate(-45px, -80px) rotate(260deg); }
-      70%  { transform: translate(50px, -165px) rotate(390deg); }
-      90%  { transform: translate(-15px, -50px) rotate(480deg); }
-      100% { transform: translate(0, 0) rotate(540deg); }
-    }
-    @keyframes blowBounce2 {
-      0%   { transform: translate(0, 0) rotate(0deg); }
-      25%  { transform: translate(-50px, -160px) rotate(-160deg); }
-      50%  { transform: translate(40px, -70px) rotate(-290deg); }
-      75%  { transform: translate(-30px, -155px) rotate(-420deg); }
-      90%  { transform: translate(20px, -40px) rotate(-500deg); }
-      100% { transform: translate(0, 0) rotate(-540deg); }
-    }
-    @keyframes blowBounce3 {
-      0%   { transform: translate(0, 0) rotate(0deg); }
-      30%  { transform: translate(5px, -175px) rotate(180deg); }
-      55%  { transform: translate(55px, -100px) rotate(320deg); }
-      80%  { transform: translate(-55px, -125px) rotate(450deg); }
-      100% { transform: translate(0, 0) rotate(540deg); }
-    }
-
-    .anim-blow-1 { animation: blowBounce1 0.44s infinite ease-in-out; }
-    .anim-blow-2 { animation: blowBounce2 0.40s infinite ease-in-out; }
-    .anim-blow-3 { animation: blowBounce3 0.48s infinite ease-in-out; }
-
-    .top15-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 10px 4px;
-      justify-items: center;
-      background: var(--card-inner);
-      padding: 12px 6px;
-      border-radius: 12px;
-      border: 1px solid var(--border-color);
-      margin-bottom: 12px;
-      min-height: 140px;
-    }
-    .ball-choice-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
-      cursor: pointer;
-    }
-    .ball-rank-tag { font-size: 0.65rem; color: var(--text-sub); }
-    .ball-rank-tag b { color: var(--primary-accent); }
-
     .list-scroll-5items {
       max-height: 250px;
       overflow-y: auto;
@@ -421,7 +390,7 @@
     .result-history-summary { font-size: 0.74rem; color: var(--text-sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: right; }
     .result-history-summary b { color: var(--primary-accent); }
 
-    .action-btn-group { display: flex; gap: 6px; align-items: center; }
+    .action-btn-group { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
     .btn-sm { padding: 5px 9px; border-radius: 6px; font-size: 0.74rem; font-weight: 600; border: none; cursor: pointer; flex-shrink: 0; }
     .btn-del { background: rgba(239,68,68,0.2); color: var(--danger-accent); }
     .btn-omr { background: rgba(59,130,246,0.2); color: var(--secondary-accent); }
@@ -685,19 +654,11 @@
         <span class="stat-badge">당일 접속 <b id="daily-visitor-count">-</b>명</span>
         <span class="stat-badge">누적 접속 <b id="total-visitor-count">-</b>명</span>
       </div>
-
-      <nav class="main-nav-tabs">
-        <button class="main-nav-btn active" id="menu-btn-standard" onclick="switchMainMenu('standard')">
-          <span>🔮</span> 종합 번호 추천
-        </button>
-        <button class="main-nav-btn" id="menu-btn-myeongdang" onclick="switchMainMenu('myeongdang')">
-          <span>🏆</span> 전국 2대 명당 추출
-        </button>
-      </nav>
     </header>
 
-    <!-- [메뉴 1] 종합 추천기 영역 -->
+    <!-- [메인 영역] 종합 번호 추천기 -->
     <main id="view-standard-panel" style="display:flex; flex-direction:column; gap:14px;">
+      <!-- 1. 최근 당첨 번호 통계 -->
       <section class="card">
         <div class="title-row">
           <h3>최근 당첨 번호 통계</h3>
@@ -719,6 +680,53 @@
         </div>
       </section>
 
+      <!-- 2. 다빈도 상위 번호 풀 (15 · 20 · 25 · 30수 압축 추출) -->
+      <section class="card freq-pool-card">
+        <div class="title-row">
+          <h3 style="color:var(--primary-accent);">📊 다빈도 상위 번호 풀 (15~30수)</h3>
+          <span style="font-size:0.73rem; color:var(--success-accent); font-weight:700;" id="freq-pool-scope-badge">직전 100회 기준</span>
+        </div>
+
+        <div class="freq-controls-row">
+          <select class="freq-select" id="sel-freq-window" onchange="updateFreqPool()">
+            <option value="100" selected>직전 100회 이동집계 (추천)</option>
+            <option value="50">직전 50회 이동집계</option>
+            <option value="150">직전 150회 이동집계</option>
+            <option value="200">직전 200회 이동집계</option>
+            <option value="all">전체 회차 누적집계</option>
+          </select>
+          <select class="freq-select" id="sel-freq-bonus" style="max-width:132px;" onchange="updateFreqPool()">
+            <option value="false" selected>본번호 6개만</option>
+            <option value="true">보너스 포함</option>
+          </select>
+        </div>
+
+        <div class="freq-size-tabs">
+          <button type="button" class="btn-pool-size" data-size="15" onclick="setFreqPoolSize(15, this)">15개</button>
+          <button type="button" class="btn-pool-size" data-size="20" onclick="setFreqPoolSize(20, this)">20개</button>
+          <button type="button" class="btn-pool-size active" data-size="25" onclick="setFreqPoolSize(25, this)">25개</button>
+          <button type="button" class="btn-pool-size" data-size="30" onclick="setFreqPoolSize(30, this)">30개</button>
+        </div>
+
+        <div class="freq-meta-banner">
+          <div class="freq-meta-line">
+            <span>1등 6개 포함 확률: <b style="color:var(--primary-accent);" id="freq-prob-text">-</b></span>
+            <span>45개 대비 압축률: <b style="color:#38bdf8;" id="freq-compress-text">-</b></span>
+          </div>
+          <div class="freq-meta-line">
+            <span>보유 데이터 백테스트: <b style="color:var(--success-accent);" id="freq-backtest-text">계산 중...</b></span>
+          </div>
+        </div>
+
+        <div class="freq-pool-grid" id="freq-pool-balls-grid"></div>
+
+        <div class="freq-action-row">
+          <button type="button" class="btn-apply-pool" onclick="applyFreqPoolToPad(false)">패드에 <span id="lbl-apply-k">25</span>개 적용</button>
+          <button type="button" class="btn-instant-pool" onclick="applyFreqPoolToPad(true)">⚡ 바로 조합 추출</button>
+        </div>
+      </section>
+
+      <!-- 3. 2대 번호 추천 엔진 -->
       <section class="card">
         <div class="title-row">
           <h3>2대 번호 추천 엔진</h3>
@@ -738,11 +746,11 @@
         </div>
       </section>
 
-      <!-- 7성구를 모아라! 섹션 -->
+      <!-- 4. 7성구를 모아라! 섹션 -->
       <section class="card dragon-card">
         <div class="title-row">
           <h3 style="color:#fbbf24;">🐉 7성구를 모아라!</h3>
-          <span style="font-size:0.75rem; color:var(--primary-accent); font-weight:700;">AI·통계·명당 융합</span>
+          <span style="font-size:0.75rem; color:var(--primary-accent); font-weight:700;">AI·통계·다빈도 융합</span>
         </div>
         
         <div class="dragon-pool-chips">
@@ -755,8 +763,8 @@
             <div class="dragon-chip-val">12개 후보 풀</div>
           </div>
           <div class="dragon-chip chip-c-spot">
-            <div class="dragon-chip-title">전국 2대 명당</div>
-            <div class="dragon-chip-val">15개 후보 풀</div>
+            <div class="dragon-chip-title">다빈도 상위</div>
+            <div class="dragon-chip-val" id="dragon-freq-chip-val">25개 후보 풀</div>
           </div>
         </div>
 
@@ -776,7 +784,8 @@
         </button>
       </section>
 
-      <section class="card pad-container">
+      <!-- 5. 번호 선택 패드 -->
+      <section class="card pad-container" id="main-pad-section">
         <div>
           <div class="title-row">
             <h3>번호 선택 패드</h3>
@@ -784,7 +793,7 @@
           </div>
           <div class="number-pad" id="main-number-pad"></div>
           <div class="pad-info-bar">
-            <span>선택된 고정수: <b id="fixed-count" style="color:var(--primary-accent);">0</b>개</span>
+            <span>선택된 고정수/후보수: <b id="fixed-count" style="color:var(--primary-accent);">0</b>개</span>
             <button class="btn-sm" style="background:var(--card-inner); color:var(--text-sub);" onclick="clearFixedNumbers()">초기화</button>
           </div>
         </div>
@@ -806,6 +815,7 @@
         </div>
       </section>
 
+      <!-- 6. 추출 결과 -->
       <section class="card" id="result-section" style="display:none;">
         <div class="title-row">
           <h3>추출 결과 <span id="result-limit-badge" style="font-size:0.75rem; color:#10b981;"></span></h3>
@@ -817,99 +827,6 @@
           </div>
         </div>
         <div id="extracted-games-list" class="list-scroll-5items"></div>
-      </section>
-    </main>
-
-    <!-- [메뉴 2] 전국 2대 명당 추출기 영역 -->
-    <main id="view-myeongdang-panel" style="display:none; flex-direction:column; gap:14px;">
-      <section class="card chamber-wrapper">
-        <div class="lotto-chamber" id="lotto-chamber">
-          <div class="chamber-glass-glare"></div>
-          <div class="chamber-bottom-grill"></div>
-          <div class="chamber-balls-container" id="chamber-balls-container"></div>
-        </div>
-        <div style="margin-top:10px; font-size:0.8rem; color:var(--text-sub); text-align:center;" id="chamber-status-label">
-          🎯 하단 대기 중 (버튼을 누르면 2초간 공들이 튀어 오르며 추첨합니다)
-        </div>
-      </section>
-
-      <section class="card">
-        <div class="title-row">
-          <h3>명당 빈도 1위~15위 번호</h3>
-          <span style="font-size:0.75rem; color:var(--primary-accent);" id="myeongdang-scope-tag">서울 노원 1등 최다 배출점 (역대 2등)</span>
-        </div>
-
-        <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:10px;">
-          <div style="display:flex; gap:6px;">
-            <select class="select-input" id="sel-md-location" style="flex:1; background:#0f172a; border:1px solid var(--border-color); border-radius:6px; color:#fff; padding:8px 6px; font-size:0.78rem;">
-              <option value="seoul">서울 노원 1등 최다 배출점</option>
-              <option value="busan">부산 동구 1등 최다 배출점</option>
-              <option value="all">전국 2대 명당 전체 (서울+부산)</option>
-            </select>
-            <select class="select-input" id="sel-md-rank" style="flex:1; background:#0f172a; border:1px solid var(--border-color); border-radius:6px; color:#fff; padding:8px 6px; font-size:0.78rem;">
-              <option value="rank2" selected>역대 2등 당첨 회차만</option>
-              <option value="rank1">역대 1등 당첨 회차만</option>
-              <option value="all">1등 + 2등 배출 회차 전체</option>
-            </select>
-          </div>
-          <button class="btn-sm" style="width:100%; background:var(--primary-accent); color:#1e1100; font-weight:800; padding:9px; font-size:0.85rem; border-radius:8px;" onclick="applyMyeongdangPrecomputed()">적용</button>
-        </div>
-
-        <p style="font-size:0.75rem; color:var(--text-sub); margin-bottom:8px;">
-          * 조건을 변경하고 <b>[적용]</b> 버튼을 누르면 15개 공과 아래 순위표가 동적으로 바뀝니다.
-        </p>
-
-        <div class="top15-grid" id="top15-balls-grid"></div>
-
-        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.78rem; color:var(--text-sub); margin-bottom:10px;">
-          <span>선택된 번호: <b id="selected-md-count" style="color:var(--primary-accent);">15</b>개</span>
-          <div>
-            <button class="btn-sm" style="background:var(--card-inner); color:var(--text-sub); margin-right:4px;" onclick="selectAllMyeongdang(true)">전체선택</button>
-            <button class="btn-sm" style="background:var(--card-inner); color:var(--text-sub);" onclick="selectAllMyeongdang(false)">기본 6개만</button>
-          </div>
-        </div>
-      </section>
-
-      <section class="card pad-container">
-        <div>
-          <div class="title-row">
-            <h3>번호 선택 패드</h3>
-            <span class="max-combo-badge" id="md-max-combo-display">최대 조합: 0개</span>
-          </div>
-          <p style="font-size:0.75rem; color:var(--text-sub); margin-bottom:8px;">
-            * 상위 15수 또는 번호 패드를 터치하여 원하는 번호를 조합하세요. (최소 6개 이상)
-          </p>
-          <div class="number-pad" id="md-number-pad"></div>
-          <div class="pad-info-bar">
-            <span>선택된 조합수: <b id="md-pad-count" style="color:var(--primary-accent);">15</b>개</span>
-            <button class="btn-sm" style="background:var(--card-inner); color:var(--text-sub);" onclick="clearMyeongdangPad()">초기화</button>
-          </div>
-        </div>
-
-        <div style="border-top:1px solid var(--border-color); padding-top:10px; margin-top:10px;">
-          <span style="font-size:0.8rem; color:var(--text-sub);">추출할 게임 수량 선택:</span>
-          <div class="quick-qty-group">
-            <button class="btn-qty" onclick="setMyeongdangQty(5, this)">5개</button>
-            <button class="btn-qty active" onclick="setMyeongdangQty(10, this)">10개</button>
-            <button class="btn-qty" onclick="setMyeongdangQty(20, this)">20개</button>
-            <button class="btn-qty" onclick="setMyeongdangQty(50, this)">50개</button>
-            <button class="btn-qty" onclick="setMyeongdangQty(100, this)">100개</button>
-          </div>
-          <button class="btn-extract" id="btn-extract-myeongdang" style="margin-top:10px;" onclick="generateMyeongdangGames()">선택 번호로 조합 추출</button>
-        </div>
-      </section>
-
-      <section class="card" id="md-result-section" style="display:none;">
-        <div class="title-row">
-          <h3>추출 결과 <span id="md-result-limit-badge" style="font-size:0.75rem; color:#10b981;"></span></h3>
-          <div class="action-btn-group">
-            <button class="btn-sm btn-omr" onclick="openOMRFromMD(0)">[로또용지]</button>
-            <button class="btn-sm btn-qr" onclick="openQRModal('md')">[QR]</button>
-            <button class="btn-sm btn-save-all" onclick="saveAllMDResults()">[전체 보관]</button>
-            <button class="btn-sm btn-reset" onclick="resetMDExtractedResults()">[초기화]</button>
-          </div>
-        </div>
-        <div id="md-extracted-games-list" class="list-scroll-5items"></div>
       </section>
     </main>
 
@@ -1015,24 +932,19 @@
     ];
 
     const STATE = {
-      activeMenu: 'standard',
       fixedNumbers: new Set(),
       activeEngineTab: 'AI',
       engineCandidates: { AI: [], SCORE: [] },
       commonCandidates: [],
       historyDB: FALLBACK_HISTORY,
-      myeongdangData: null,
-      mdTop15Pool: [],
-      mdSelected: new Set(),
-      mdTargetQty: 10,
-      mdGeneratedGames: [],
+      freqPoolSize: 25,
+      freqPoolList: [],
       targetRound: 1246,
       prevRound: 1245,
       generatedGames: [],
       omrCurrentIndex: 0,
       omrActiveSource: [],
       savedGames: [],
-      isExtractingMD: false,
       isDragonSummoning: false
     };
 
@@ -1041,18 +953,6 @@
       sheetIndex: 0,
       timestamp: ''
     };
-
-    const BOTTOM_SLOTS_15 = [
-      { x: 102, y: 194 }, 
-      { x: 74,  y: 190 }, { x: 130, y: 190 },
-      { x: 46,  y: 178 }, { x: 158, y: 178 },
-      { x: 88,  y: 166 }, { x: 116, y: 166 }, 
-      { x: 60,  y: 158 }, { x: 144, y: 158 },
-      { x: 34,  y: 146 }, { x: 170, y: 146 },
-      { x: 102, y: 138 }, 
-      { x: 74,  y: 134 }, { x: 130, y: 134 },
-      { x: 48,  y: 122 }
-    ];
 
     function openNoticeModal() {
       const modal = document.getElementById('legal-notice-modal');
@@ -1064,7 +964,7 @@
       if (modal) modal.classList.remove('open');
     }
 
-    window.addEventListener('popstate', (e) => {
+    window.addEventListener('popstate', () => {
       const qrModal = document.getElementById('qr-modal');
       const omrModal = document.getElementById('omr-modal');
       const noticeModal = document.getElementById('legal-notice-modal');
@@ -1085,404 +985,173 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       initNumberPad();
-      initMyeongdangPad();
       initSavedGames();
 
       calculateTargetRounds();
       generateWeeklyCandidates();
       analyzeRecentStatistics();
+      updateFreqPool();
       updateMaxComboDisplay();
-      applyMyeongdangPrecomputed();
 
       initDailyVisitors().catch(e => console.warn('Visitor init error:', e));
       loadHistoryDB().then(() => {
         calculateTargetRounds();
         generateWeeklyCandidates();
         analyzeRecentStatistics();
-        applyMyeongdangPrecomputed();
+        updateFreqPool();
       }).catch(e => console.warn('DB load error:', e));
     });
 
-    function switchMainMenu(menuKey) {
-      STATE.activeMenu = menuKey;
-      const isStd = (menuKey === 'standard');
-
-      const stdPanel = document.getElementById('view-standard-panel');
-      const mdPanel = document.getElementById('view-myeongdang-panel');
-      if (stdPanel) stdPanel.style.display = isStd ? 'flex' : 'none';
-      if (mdPanel) mdPanel.style.display = isStd ? 'none' : 'flex';
-
-      const btnStd = document.getElementById('menu-btn-standard');
-      const btnMd = document.getElementById('menu-btn-myeongdang');
-      if (btnStd) btnStd.classList.toggle('active', isStd);
-      if (btnMd) btnMd.classList.toggle('active', !isStd);
-
-      if (!isStd) {
-        applyMyeongdangPrecomputed();
-      }
+    /* =========================================================
+       다빈도 상위 번호 풀 (15 · 20 · 25 · 30수) 계산 및 백테스트
+       ========================================================= */
+    function setFreqPoolSize(size, btnEl) {
+      STATE.freqPoolSize = size;
+      document.querySelectorAll('.btn-pool-size').forEach(btn => {
+        btn.classList.toggle('active', Number(btn.dataset.size) === size);
+      });
+      const lbl = document.getElementById('lbl-apply-k');
+      if (lbl) lbl.innerText = size;
+      const chipVal = document.getElementById('dragon-freq-chip-val');
+      if (chipVal) chipVal.innerText = `${size}개 후보 풀`;
+      updateFreqPool();
     }
 
-    function initMyeongdangPad() {
-      const pad = document.getElementById('md-number-pad');
-      if (!pad) return;
-      pad.innerHTML = '';
-      for (let i = 1; i <= 45; i++) {
-        const ball = createBall(i, () => toggleMyeongdangNumber(i));
-        ball.id = `md-pad-ball-${i}`;
-        ball.className = `ball ball-unselected`;
-        pad.appendChild(ball);
-      }
-    }
-
-    function syncMyeongdangPadUI() {
-      for (let i = 1; i <= 45; i++) {
-        const ball = document.getElementById(`md-pad-ball-${i}`);
-        if (!ball) continue;
-        if (STATE.mdSelected.has(i)) {
-          ball.className = `ball ${getBallClass(i)} selected-ring`;
-        } else {
-          ball.className = `ball ball-unselected`;
-        }
-      }
-      const countEl = document.getElementById('md-pad-count');
-      if (countEl) countEl.innerText = STATE.mdSelected.size;
-      updateMyeongdangMaxComboDisplay();
-    }
-
-    function updateMyeongdangMaxComboDisplay() {
-      const count = STATE.mdSelected.size;
-      const displayEl = document.getElementById('md-max-combo-display');
-      if (!displayEl) return;
-      if (count < 6) {
-        displayEl.innerText = `최대 조합: 0개`;
-      } else {
-        const total = combinationsCount(count, 6);
-        displayEl.innerText = `최대 조합: ${total.toLocaleString()}개`;
-      }
-    }
-
-    function toggleMyeongdangNumber(num) {
-      if (STATE.mdSelected.has(num)) {
-        if (STATE.mdSelected.size <= 6) {
-          alert('조합을 위해 최소 6개 이상의 번호가 선택되어 있어야 합니다.');
-          return;
-        }
-        STATE.mdSelected.delete(num);
-      } else {
-        STATE.mdSelected.add(num);
-      }
-      renderMyeongdangTop15Grid();
-      syncMyeongdangPadUI();
-    }
-
-    function clearMyeongdangPad() {
-      STATE.mdSelected.clear();
-      renderMyeongdangTop15Grid();
-      syncMyeongdangPadUI();
-    }
-
-    function applyMyeongdangPrecomputed() {
-      const locEl = document.getElementById('sel-md-location');
-      const rankEl = document.getElementById('sel-md-rank');
-      const loc = locEl ? locEl.value : 'seoul';
-      const rank = rankEl ? rankEl.value : 'rank2';
-
-      const locName = (loc === 'seoul') ? '서울 노원 1등 최다 배출점' : ((loc === 'busan') ? '부산 동구 1등 최다 배출점' : '전국 2대 명당 전체');
-      const rankName = (rank === 'rank1') ? '역대 1등' : ((rank === 'rank2') ? '역대 2등' : '1등+2등 전체');
-      const scopeTag = document.getElementById('myeongdang-scope-tag');
-      if (scopeTag) scopeTag.innerText = `${locName} (${rankName})`;
-
-      if (STATE.myeongdangData && STATE.historyDB.length > 0) {
-        let targetRounds = [];
-        if (loc === 'all') {
-          ['seoul', 'busan'].forEach(l => {
-            if (STATE.myeongdangData[l]) {
-              if (rank === 'all') {
-                targetRounds = targetRounds.concat(STATE.myeongdangData[l].rank1_rounds || [], STATE.myeongdangData[l].rank2_rounds || []);
-              } else {
-                targetRounds = targetRounds.concat(STATE.myeongdangData[l][`${rank}_rounds`] || []);
-              }
-            }
-          });
-        } else if (STATE.myeongdangData[loc]) {
-          if (rank === 'all') {
-            targetRounds = (STATE.myeongdangData[loc].rank1_rounds || []).concat(STATE.myeongdangData[loc].rank2_rounds || []);
-          } else {
-            targetRounds = STATE.myeongdangData[loc][`${rank}_rounds`] || [];
-          }
-        }
-
-        const counts = Array(46).fill(0);
-        targetRounds.forEach(r => {
-          const draw = STATE.historyDB.find(d => Number(d.round || d.drwNo) === Number(r));
-          if (draw && draw.numbers) {
-            draw.numbers.forEach(n => {
-              if (n >= 1 && n <= 45) counts[n]++;
-            });
-          }
+    function getRankedFrequencyPool(historySlice, includeBonus) {
+      const counts = Array(46).fill(0);
+      historySlice.forEach(draw => {
+        const nums = draw.numbers || [];
+        nums.forEach(n => {
+          if (n >= 1 && n <= 45) counts[n]++;
         });
-
-        const pool = [];
-        for (let i = 1; i <= 45; i++) {
-          if (counts[i] > 0) pool.push({ num: i, count: counts[i] });
+        if (includeBonus && draw.bonus >= 1 && draw.bonus <= 45) {
+          counts[draw.bonus]++;
         }
-        pool.sort((a, b) => b.count - a.count || a.num - b.num);
-        STATE.mdTop15Pool = pool.slice(0, 15);
-      } else {
-        const defaultPool = [1, 2, 3, 10, 12, 13, 17, 20, 26, 31, 34, 38, 40, 43, 45];
-        STATE.mdTop15Pool = defaultPool.map((n, i) => ({ num: n, count: 20 - i }));
-      }
+      });
 
-      STATE.mdSelected = new Set(STATE.mdTop15Pool.map(item => item.num));
-      renderMyeongdangTop15Grid();
-      setupChamberBottomBalls();
-      syncMyeongdangPadUI();
+      const list = [];
+      for (let n = 1; n <= 45; n++) {
+        list.push({ num: n, count: counts[n] });
+      }
+      // 출현 많은 순 정렬, 동점 시 번호 오름차순
+      list.sort((a, b) => b.count - a.count || a.num - b.num);
+      return list;
     }
 
-    function renderMyeongdangTop15Grid() {
-      const grid = document.getElementById('top15-balls-grid');
+    function updateFreqPool() {
+      const winEl = document.getElementById('sel-freq-window');
+      const bonusEl = document.getElementById('sel-freq-bonus');
+      const winVal = winEl ? winEl.value : '100';
+      const includeBonus = bonusEl ? (bonusEl.value === 'true') : false;
+      const topK = STATE.freqPoolSize;
+
+      const scopeBadge = document.getElementById('freq-pool-scope-badge');
+      if (scopeBadge) {
+        scopeBadge.innerText = winVal === 'all' ? '전체 누적 기준' : `직전 ${winVal}회 기준`;
+      }
+
+      // STATE.historyDB는 최신 회차 내림차순 정렬 상태
+      const slice = (winVal === 'all')
+        ? STATE.historyDB
+        : STATE.historyDB.slice(0, Number(winVal));
+
+      const ranked = getRankedFrequencyPool(slice, includeBonus);
+      STATE.freqPoolList = ranked.slice(0, topK);
+
+      // 확률 및 압축률 계산
+      const prob = combinationsCount(topK, 6) / combinationsCount(45, 6);
+      const probText = document.getElementById('freq-prob-text');
+      const compText = document.getElementById('freq-compress-text');
+      if (probText) probText.innerText = `${(prob * 100).toFixed(2)}% (약 ${(1 / prob).toFixed(1)}회당 1회)`;
+      if (compText) compText.innerText = `45개 → ${topK}개 (${Math.round((topK / 45) * 100)}%)`;
+
+      // 보유 데이터 실시간 백테스트
+      const btText = document.getElementById('freq-backtest-text');
+      if (btText) {
+        if (STATE.historyDB.length <= 20) {
+          btText.innerText = '데이터 로딩 중...';
+        } else {
+          // 시간순(오름차순) 배열 생성
+          const ascHistory = [...STATE.historyDB].reverse();
+          const initWindow = (winVal === 'all') ? Math.min(100, Math.floor(ascHistory.length / 2)) : Number(winVal);
+
+          if (ascHistory.length <= initWindow) {
+            btText.innerText = `데이터 부족 (현재 ${ascHistory.length}회 보유)`;
+          } else {
+            let hit1 = 0, hit2 = 0, hit3 = 0;
+            const totalTest = ascHistory.length - initWindow;
+
+            for (let i = initWindow; i < ascHistory.length; i++) {
+              const trainSlice = (winVal === 'all')
+                ? ascHistory.slice(0, i)
+                : ascHistory.slice(i - initWindow, i);
+
+              const topSet = new Set(
+                getRankedFrequencyPool(trainSlice, includeBonus).slice(0, topK).map(x => x.num)
+              );
+
+              const targetDraw = ascHistory[i];
+              let match = 0;
+              targetDraw.numbers.forEach(n => { if (topSet.has(n)) match++; });
+
+              if (match === 6) hit1++;
+              else if (match === 5 && topSet.has(targetDraw.bonus)) hit2++;
+              else if (match === 5) hit3++;
+            }
+
+            btText.innerText = `최근 ${totalTest}회 검증 → 1등 ${hit1}회 · 2등 ${hit2}회 · 3등 ${hit3}회`;
+          }
+        }
+      }
+
+      renderFreqPoolGrid();
+    }
+
+    function renderFreqPoolGrid() {
+      const grid = document.getElementById('freq-pool-balls-grid');
       if (!grid) return;
       grid.innerHTML = '';
 
-      if (STATE.mdTop15Pool.length === 0) {
-        grid.innerHTML = '<div style="grid-column:1/-1; color:#94a3b8; font-size:0.8rem; text-align:center;">명당 데이터를 불러오는 중이거나 데이터가 없습니다.</div>';
-        return;
-      }
-
-      STATE.mdTop15Pool.forEach((item, index) => {
+      STATE.freqPoolList.forEach((item, idx) => {
         const wrap = document.createElement('div');
         wrap.className = 'ball-choice-item';
-        wrap.onclick = () => toggleMyeongdangNumber(item.num);
+        wrap.onclick = () => {
+          toggleFixedNumber(item.num);
+          renderFreqPoolGrid();
+        };
 
-        const isSelected = STATE.mdSelected.has(item.num);
+        const isSelected = STATE.fixedNumbers.has(item.num);
         const ball = document.createElement('span');
-        ball.className = `ball ${isSelected ? getBallClass(item.num) : 'ball-unselected'}`;
+        ball.className = `ball ${getBallClass(item.num)}`;
         if (isSelected) ball.classList.add('selected-ring');
         ball.innerText = item.num;
 
         const rankTag = document.createElement('span');
         rankTag.className = 'ball-rank-tag';
-        rankTag.innerHTML = `<b>${index + 1}위</b> (${item.count}회)`;
+        rankTag.innerHTML = `<b>${idx + 1}위</b> (${item.count}회)`;
 
         wrap.appendChild(ball);
         wrap.appendChild(rankTag);
         grid.appendChild(wrap);
       });
-
-      const countEl = document.getElementById('selected-md-count');
-      if (countEl) countEl.innerText = STATE.mdSelected.size;
     }
 
-    function setupChamberBottomBalls() {
-      const container = document.getElementById('chamber-balls-container');
-      if (!container) return;
-      container.innerHTML = '';
+    function applyFreqPoolToPad(runImmediately = false) {
+      if (!STATE.freqPoolList.length) return;
+      STATE.fixedNumbers.clear();
+      STATE.freqPoolList.forEach(item => STATE.fixedNumbers.add(item.num));
 
-      const pool = STATE.mdTop15Pool;
-      pool.forEach((item, idx) => {
-        if (idx >= BOTTOM_SLOTS_15.length) return;
-        const slot = BOTTOM_SLOTS_15[idx];
+      syncPadUI();
+      renderFreqPoolGrid();
+      renderEngineCandidates();
+      updateMaxComboDisplay();
 
-        const ball = document.createElement('div');
-        ball.className = `physics-ball ${getBallClass(item.num)}`;
-        ball.id = `chamber-ball-${idx}`;
-        ball.innerText = item.num;
-        ball.style.left = `${slot.x}px`;
-        ball.style.top = `${slot.y}px`;
-
-        container.appendChild(ball);
-      });
-    }
-
-    function selectAllMyeongdang(bool) {
-      if (bool) {
-        STATE.mdSelected = new Set(STATE.mdTop15Pool.map(i => i.num));
+      if (runImmediately) {
+        runDualEngineExtraction();
       } else {
-        STATE.mdSelected = new Set(STATE.mdTop15Pool.slice(0, 6).map(i => i.num));
+        const padSec = document.getElementById('main-pad-section');
+        if (padSec) padSec.scrollIntoView({ behavior: 'smooth' });
       }
-      renderMyeongdangTop15Grid();
-      syncMyeongdangPadUI();
-    }
-
-    function setQuickQty(qty, btnEl) {
-      const slider = document.getElementById('extract-range');
-      if (slider) slider.value = qty;
-      updateRangeFromSlider(qty, btnEl);
-    }
-
-    function updateRangeFromSlider(val, btnEl) {
-      const intVal = parseInt(val, 10);
-      const badge = document.getElementById('range-val-badge');
-      if (badge) badge.innerText = `${intVal}G`;
-      
-      const parent = btnEl ? (btnEl.classList.contains('btn-qty') ? btnEl.parentElement : btnEl.closest('.range-control').previousElementSibling) : document.querySelector('#view-standard-panel .quick-qty-group');
-      if (parent) {
-        parent.querySelectorAll('.btn-qty').forEach(btn => {
-          btn.classList.toggle('active', parseInt(btn.innerText, 10) === intVal);
-        });
-      }
-    }
-
-    function setMyeongdangQty(qty, btnEl) {
-      STATE.mdTargetQty = qty;
-      const parent = btnEl ? btnEl.parentElement : document.querySelector('#view-myeongdang-panel .quick-qty-group');
-      if (parent) {
-        parent.querySelectorAll('.btn-qty').forEach(btn => {
-          btn.classList.toggle('active', parseInt(btn.innerText, 10) === qty);
-        });
-      }
-    }
-
-    function generateMyeongdangGames() {
-      if (STATE.isExtractingMD) return;
-
-      const pool = Array.from(STATE.mdSelected).sort((a,b) => a - b);
-      if (pool.length < 6) {
-        alert('조합을 위해 최소 6개 이상의 번호를 선택해주세요.');
-        return;
-      }
-
-      const btn = document.getElementById('btn-extract-myeongdang');
-      const statusLabel = document.getElementById('chamber-status-label');
-
-      STATE.isExtractingMD = true;
-      if (btn) {
-        btn.disabled = true;
-        btn.style.opacity = '0.7';
-      }
-
-      if (statusLabel) {
-        statusLabel.innerHTML = '🔥 <b style="color:var(--primary-accent);">로또 기계 가동 중! 공들이 튀어 오릅니다... (2초)</b>';
-      }
-      
-      const animClasses = ['anim-blow-1', 'anim-blow-2', 'anim-blow-3'];
-      const balls = document.querySelectorAll('.physics-ball');
-      balls.forEach((ball, i) => {
-        ball.classList.add(animClasses[i % animClasses.length]);
-      });
-
-      setTimeout(() => {
-        balls.forEach((ball, i) => {
-          ball.classList.remove('anim-blow-1', 'anim-blow-2', 'anim-blow-3');
-          const slot = BOTTOM_SLOTS_15[i];
-          if (slot) {
-            ball.style.left = `${slot.x}px`;
-            ball.style.top = `${slot.y}px`;
-          }
-        });
-
-        if (statusLabel) {
-          statusLabel.innerHTML = '✅ <b style="color:#10b981;">추첨 완료</b>';
-        }
-
-        const generated = [];
-        const seen = new Set();
-        let attempts = 0;
-
-        while (generated.length < STATE.mdTargetQty && attempts < 2500) {
-          attempts++;
-          const shuffled = [...pool].sort(() => Math.random() - 0.5);
-          const combo = shuffled.slice(0, 6).sort((a,b) => a - b);
-          const key = combo.join(',');
-          if (!seen.has(key)) {
-            seen.add(key);
-            generated.push(combo);
-          }
-        }
-
-        STATE.mdGeneratedGames = generated;
-        renderMDExtractedResults();
-
-        if (btn) {
-          btn.disabled = false;
-          btn.style.opacity = '1';
-        }
-        STATE.isExtractingMD = false;
-      }, 2000);
-    }
-
-    function renderMDExtractedResults() {
-      const section = document.getElementById('md-result-section');
-      const badge = document.getElementById('md-result-limit-badge');
-      const list = document.getElementById('md-extracted-games-list');
-      
-      if (!section || !list) return;
-      section.style.display = 'block';
-      list.innerHTML = '';
-      if (badge) badge.innerText = `(${STATE.mdGeneratedGames.length}게임)`;
-
-      STATE.mdGeneratedGames.forEach((game, idx) => {
-        const row = document.createElement('div');
-        row.className = 'single-line-result';
-
-        const ballsHtml = game.map(n => getBallHtmlSm(n)).join('');
-        const histText = verifyHistoryFormatted(game);
-
-        row.innerHTML = `
-          <div class="result-left-group">
-            <div class="result-game-label">${idx + 1}</div>
-            <div class="result-balls-group">${ballsHtml}</div>
-          </div>
-          <div class="result-right-group">
-            <div class="result-history-summary" title="${histText}">${histText}</div>
-            <button class="btn-sm" style="background:var(--card-bg); color:var(--secondary-accent); border:1px solid var(--secondary-accent);" onclick="saveSingleGame([${game.join(',')}])">저장</button>
-          </div>
-        `;
-        list.appendChild(row);
-      });
-
-      section.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function resetMDExtractedResults() {
-      STATE.mdGeneratedGames = [];
-      const list = document.getElementById('md-extracted-games-list');
-      const section = document.getElementById('md-result-section');
-      if (list) list.innerHTML = '';
-      if (section) section.style.display = 'none';
-    }
-
-    function saveAllMDResults() {
-      if (!STATE.mdGeneratedGames.length) return;
-
-      const existingKeys = new Set(STATE.savedGames.map(g => normalizeNumbers(g).join(',')));
-      let addedCount = 0;
-      let duplicateCount = 0;
-
-      STATE.mdGeneratedGames.forEach(g => {
-        const norm = normalizeNumbers(g);
-        const key = norm.join(',');
-        if (!existingKeys.has(key)) {
-          STATE.savedGames.push(norm);
-          existingKeys.add(key);
-          addedCount++;
-        } else {
-          duplicateCount++;
-        }
-      });
-
-      if (addedCount === 0) {
-        alert('추출된 모든 번호가 이미 보관함에 저장되어 있습니다.');
-        return;
-      }
-
-      localStorage.setItem('saved_lotto_slots', JSON.stringify(STATE.savedGames));
-      renderStorageList();
-      alert(`${addedCount}개 게임이 보관함에 저장되었습니다.` + (duplicateCount > 0 ? ` (중복 ${duplicateCount}개 제외)` : ''));
-    }
-
-    function openOMRFromMD(index = 0) {
-      if (!STATE.mdGeneratedGames.length) {
-        alert('추출된 게임 결과가 없습니다.');
-        return;
-      }
-      STATE.omrActiveSource = STATE.mdGeneratedGames;
-      STATE.omrCurrentIndex = index;
-      renderOMR();
-
-      history.pushState({ modal: 'omr' }, '');
-      const modal = document.getElementById('omr-modal');
-      if (modal) modal.classList.add('open');
     }
 
     async function initDailyVisitors() {
@@ -1586,18 +1255,6 @@
         if (cached) {
           try { STATE.historyDB = JSON.parse(cached).sort((a, b) => Number(b.round || 0) - Number(a.round || 0)); } catch (e) {}
         }
-      }
-
-      try {
-        const resM = await fetch(`/data/myeongdang.json?t=${Date.now()}`, { 
-          cache: 'no-store',
-          headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' }
-        });
-        if (resM.ok) {
-          STATE.myeongdangData = await resM.json();
-        }
-      } catch (err) {
-        console.warn('명당 데이터 로드 실패:', err);
       }
     }
     
@@ -1803,6 +1460,7 @@
       const list = STATE.engineCandidates[STATE.activeEngineTab] || [];
       list.forEach(n => STATE.fixedNumbers.add(n));
       syncPadUI();
+      renderFreqPoolGrid();
       renderEngineCandidates();
       updateMaxComboDisplay();
     }
@@ -1826,6 +1484,7 @@
         STATE.fixedNumbers.add(num);
       }
       syncPadUI();
+      renderFreqPoolGrid();
       renderEngineCandidates();
       updateMaxComboDisplay();
     }
@@ -1833,6 +1492,7 @@
     function clearFixedNumbers() {
       STATE.fixedNumbers.clear();
       syncPadUI();
+      renderFreqPoolGrid();
       renderEngineCandidates();
       updateMaxComboDisplay();
     }
@@ -1938,7 +1598,7 @@
     function runDualEngineExtraction() {
       const fixedNums = Array.from(STATE.fixedNumbers);
       if (fixedNums.length === 0) {
-        alert('번호 선택 패드에서 번호를 1개 이상 선택해주세요.');
+        alert('번호 선택 패드 또는 다빈도 번호 풀에서 번호를 1개 이상 선택해주세요.');
         return;
       }
 
@@ -1952,9 +1612,9 @@
         
         if (fixedNums.length > 12) {
           let attempts = 0;
-          const maxTries = Math.min(requested * 20, 10000);
+          const maxTries = Math.min(requested * 40, 20000);
           const seen = new Set();
-          while (allPossibleCombos.length < requested * 3 && attempts < maxTries) {
+          while (allPossibleCombos.length < requested * 4 && attempts < maxTries) {
             attempts++;
             const shuffled = [...fixedNums].sort(() => Math.random() - 0.5);
             const combo = shuffled.slice(0, 6).sort((a, b) => a - b);
@@ -2283,7 +1943,7 @@
     }
 
     /* =========================================================
-       드래곤볼 7성구 융합 소환 로직 (AI 12 + 통계 12 + 명당 15)
+       드래곤볼 7성구 융합 소환 로직 (AI 12 + 통계 12 + 다빈도 풀)
        ========================================================= */
     async function summonDragonBalls() {
       if (STATE.isDragonSummoning) return;
@@ -2308,22 +1968,22 @@
         ? STATE.engineCandidates.SCORE
         : [1, 6, 11, 14, 18, 22, 27, 31, 35, 38, 41, 44];
 
-      const topSpotPool = (STATE.mdTop15Pool && STATE.mdTop15Pool.length > 0)
-        ? STATE.mdTop15Pool.map(i => i.num)
-        : [2, 4, 10, 13, 17, 20, 23, 26, 30, 34, 36, 39, 41, 43, 45];
+      const freqTopPool = (STATE.freqPoolList && STATE.freqPoolList.length > 0)
+        ? STATE.freqPoolList.map(i => i.num)
+        : [1, 2, 3, 7, 8, 9, 13, 15, 16, 18, 20, 23, 24, 25, 27, 28, 29, 31, 32, 35, 36, 37, 38, 39, 42];
 
       const selected = new Set();
       const shuffle = arr => [...arr].sort(() => 0.5 - Math.random());
 
       const sAi = shuffle(aiPool);
       const sStat = shuffle(statPool);
-      const sSpot = shuffle(topSpotPool);
+      const sFreq = shuffle(freqTopPool);
 
       selected.add(sAi[0]); selected.add(sAi[1]);
       selected.add(sStat[0]); selected.add(sStat[1]);
-      selected.add(sSpot[0]); selected.add(sSpot[1]);
+      selected.add(sFreq[0]); selected.add(sFreq[1]);
 
-      const unifiedUnion = shuffle(Array.from(new Set([...aiPool, ...statPool, ...topSpotPool])));
+      const unifiedUnion = shuffle(Array.from(new Set([...aiPool, ...statPool, ...freqTopPool])));
       for (const num of unifiedUnion) {
         if (selected.size >= 7) break;
         selected.add(num);
@@ -2350,6 +2010,7 @@
         updateMaxComboDisplay();
       }
 
+      renderFreqPoolGrid();
       renderEngineCandidates();
 
       btn.disabled = false;
@@ -2462,9 +2123,6 @@
       if (sourceType === 'extract') {
         list = STATE.generatedGames;
         if (!list.length) { alert('추출된 게임 결과가 없습니다.'); return; }
-      } else if (sourceType === 'md') {
-        list = STATE.mdGeneratedGames;
-        if (!list.length) { alert('추출된 명당 게임이 없습니다.'); return; }
       } else if (sourceType === 'storage') {
         list = STATE.savedGames;
         if (!list.length) { alert('보관함에 저장된 게임이 없습니다.'); return; }
@@ -2508,7 +2166,6 @@
 
     /* =========================================================
        QR 코드 렌더링 (동행복권 단말기 모바일 슬립지 E-Slip 규격)
-       40버전 자동 확장 지원 엔진을 통해 5게임 전체 데이터도 오류 없이 선명하게 생성
        ========================================================= */
     function renderQRSheet() {
       const source = QR_STATE.source;
@@ -2543,7 +2200,6 @@
         return;
       }
 
-      // 동행복권 모바일 슬립지 단말기 표준 전문 페이로드 조립
       const gamesPayload = sheetGames.map(game => {
         const nums = normalizeNumbers(game)
           .map(n => String(n).padStart(2, '0'))
@@ -2556,7 +2212,6 @@
       const qrPayload = `${rawPayload}${crc}|`;
 
       try {
-        // easyqrcodejs 규격: text 및 기본 옵션
         new QRCode(qrBox, {
           text: qrPayload,
           width: 180,
@@ -2568,7 +2223,6 @@
       } catch (err) {
         console.warn('QR 1차 생성 재시도:', err);
         try {
-          // 백업 옵션
           new QRCode(qrBox, qrPayload);
         } catch (e2) {
           qrBox.innerHTML = '<span style="color:#ef4444; font-size:0.8rem;">QR 생성 실패</span>';
