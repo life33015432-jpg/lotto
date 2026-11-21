@@ -2,19 +2,15 @@ name: Auto Lotto Update
 
 on:
   schedule:
-    # 한국시간(KST) 매주 토요일 20:50 ~ 22:50 사이 10분 간격 실행
-    # KST = UTC + 9
-    # 11:50 UTC = 20:50 KST
-    # 12:00 ~ 12:50 UTC = 21:00 ~ 21:50 KST (10분 간격)
-    # 13:00 ~ 13:50 UTC = 22:00 ~ 22:50 KST (10분 간격)
-    - cron: '57 11 * * 6'
-    - cron: '*/12,42 12,13 * * 6'
+    # KST 20:40, 20:50 (UTC 11:40, 11:50)
+    - cron: '40,50 11 * * 6'
+    # KST 21:00 ~ 22:50 (UTC 12:00 ~ 13:50, 10분 간격)
+    - cron: '*/10 12,13 * * 6'
   workflow_dispatch:
 
 permissions:
   contents: write
 
-# 중복 실행 방지 (이전 작업이 지연 중일 때 새 작업 큐 대기)
 concurrency:
   group: lotto-update-group
   cancel-in-progress: false
@@ -33,9 +29,6 @@ jobs:
         with:
           node-version: 22
 
-      - name: 의존성 설치 (선택 사항)
-        run: echo "환경 준비 완료"
-
       - name: 최신 당첨 번호 스크래핑 및 JSON 갱신
         run: node scripts/update-lotto.js
 
@@ -44,8 +37,7 @@ jobs:
           git config --global user.name 'Aipluslotto-Bot'
           git config --global user.email 'bot@aipluslotto.com'
           git add data/lotto-history.json
-          
-          # 변경사항이 존재할 때만 커밋 및 푸시
+
           if git diff --staged --quiet; then
             echo "갱신할 새 회차 데이터가 없습니다. (이미 최신이거나 미발표)"
           else
