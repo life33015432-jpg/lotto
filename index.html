@@ -114,7 +114,6 @@
     .stat-header { display: flex; justify-content: space-between; color: var(--text-sub); font-size: 0.75rem; }
     .stat-ball-list { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; min-height: 32px; }
 
-    /* 다빈도 상위 번호 풀 (15·20·25·30수) 스타일 */
     .freq-pool-card {
       border: 1px solid rgba(245, 158, 11, 0.38);
       background: linear-gradient(160deg, #162032 0%, #121b2b 100%);
@@ -231,7 +230,6 @@
     
     .ai-ball-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; justify-items: center; margin: 4px 0 10px; min-height: 72px; }
 
-    /* 드래곤볼 7성구 전용 스타일 */
     .dragon-card {
       background: linear-gradient(145deg, #131d2e 0%, #0d131f 100%);
       border: 1px solid rgba(245, 158, 11, 0.4);
@@ -398,7 +396,6 @@
     .btn-save-all { background: var(--secondary-accent); color: #fff; }
     .btn-reset { background: rgba(148,163,184,0.15); color: var(--text-sub); border: 1px solid var(--border-color); }
 
-    /* 별도 창 공지사항 모달 */
     .notice-modal-backdrop {
       position: fixed;
       inset: 0;
@@ -462,7 +459,6 @@
       font-size: 0.88rem;
     }
 
-    /* OMR 모달 */
     .omr-modal-backdrop { 
       position: fixed; 
       inset: 0; 
@@ -496,7 +492,6 @@
     .omr-nav-btn-row { display: flex; justify-content: space-between; margin-top: 12px; gap: 8px; }
     .omr-nav-btn { flex: 1; padding: 10px; background: #e2e8f0; border: none; border-radius: 8px; font-weight: 700; color: #334155; cursor: pointer; font-size: 0.85rem; }
 
-    /* 다크 그레이 QR 모달 */
     .qr-custom-modal-backdrop {
       position: fixed;
       inset: 0;
@@ -768,7 +763,6 @@
           </div>
         </div>
 
-        <!-- 7성구 트랙 (1성구 ~ 7성구) -->
         <div class="dragon-track" id="dragon-ball-track">
           <div class="dragon-orb" data-idx="0"><span class="orb-stars">★</span><span class="orb-number">?</span></div>
           <div class="dragon-orb" data-idx="1"><span class="orb-stars">★★</span><span class="orb-number">?</span></div>
@@ -994,17 +988,67 @@
       updateMaxComboDisplay();
 
       initDailyVisitors().catch(e => console.warn('Visitor init error:', e));
-      loadHistoryDB().then(() => {
+      refreshLottoDataIfUpdated(true);
+      startAutoRoundSync();
+    });
+
+    async function refreshLottoDataIfUpdated(forceRender = false) {
+      const beforeRound = Number(STATE.prevRound || 0);
+      await loadHistoryDB().catch(e => console.warn('DB load error:', e));
+
+      const latestRound = (STATE.historyDB && STATE.historyDB.length > 0)
+        ? Number(STATE.historyDB[0].round || 0)
+        : beforeRound;
+
+      if (forceRender || latestRound > beforeRound) {
         calculateTargetRounds();
         generateWeeklyCandidates();
         analyzeRecentStatistics();
         updateFreqPool();
-      }).catch(e => console.warn('DB load error:', e));
-    });
+        renderStorageList();
 
-    /* =========================================================
-       다빈도 상위 번호 풀 (15 · 20 · 25 · 30수) 계산 및 백테스트
-       ========================================================= */
+        if (!forceRender && latestRound > beforeRound) {
+          console.info(`[자동 업데이트] 제 ${latestRound}회 최신 당첨 데이터가 반영되었습니다.`);
+        }
+      }
+    }
+
+    function startAutoRoundSync() {
+      let timerId = null;
+
+      const getNextIntervalMs = () => {
+        const now = new Date();
+        const day = now.getDay();   // 6 = 토요일
+        const hour = now.getHours();
+        const min = now.getMinutes();
+
+        // 토요일 20:30 ~ 23:59 사이 1분마다 재조회, 그 외 시간대 10분마다 재조회
+        if (day === 6 && ((hour === 20 && min >= 30) || hour >= 21)) {
+          return 60 * 1000;
+        }
+        return 10 * 60 * 1000;
+      };
+
+      const scheduleNext = () => {
+        clearTimeout(timerId);
+        timerId = setTimeout(async () => {
+          if (!document.hidden) {
+            await refreshLottoDataIfUpdated(false);
+          }
+          scheduleNext();
+        }, getNextIntervalMs());
+      };
+
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+          refreshLottoDataIfUpdated(false);
+          scheduleNext();
+        }
+      });
+
+      scheduleNext();
+    }
+
     function setFreqPoolSize(size, btnEl) {
       STATE.freqPoolSize = size;
       document.querySelectorAll('.btn-pool-size').forEach(btn => {
@@ -1033,7 +1077,6 @@
       for (let n = 1; n <= 45; n++) {
         list.push({ num: n, count: counts[n] });
       }
-      // 출현 많은 순 정렬, 동점 시 번호 오름차순
       list.sort((a, b) => b.count - a.count || a.num - b.num);
       return list;
     }
@@ -1050,7 +1093,6 @@
         scopeBadge.innerText = winVal === 'all' ? '전체 누적 기준' : `직전 ${winVal}회 기준`;
       }
 
-      // STATE.historyDB는 최신 회차 내림차순 정렬 상태
       const slice = (winVal === 'all')
         ? STATE.historyDB
         : STATE.historyDB.slice(0, Number(winVal));
@@ -1058,20 +1100,17 @@
       const ranked = getRankedFrequencyPool(slice, includeBonus);
       STATE.freqPoolList = ranked.slice(0, topK);
 
-      // 확률 및 압축률 계산
       const prob = combinationsCount(topK, 6) / combinationsCount(45, 6);
       const probText = document.getElementById('freq-prob-text');
       const compText = document.getElementById('freq-compress-text');
       if (probText) probText.innerText = `${(prob * 100).toFixed(2)}% (약 ${(1 / prob).toFixed(1)}회당 1회)`;
       if (compText) compText.innerText = `45개 → ${topK}개 (${Math.round((topK / 45) * 100)}%)`;
 
-      // 보유 데이터 실시간 백테스트
       const btText = document.getElementById('freq-backtest-text');
       if (btText) {
         if (STATE.historyDB.length <= 20) {
           btText.innerText = '데이터 로딩 중...';
         } else {
-          // 시간순(오름차순) 배열 생성
           const ascHistory = [...STATE.historyDB].reverse();
           const initWindow = (winVal === 'all') ? Math.min(100, Math.floor(ascHistory.length / 2)) : Number(winVal);
 
@@ -1942,9 +1981,6 @@
       }
     }
 
-    /* =========================================================
-       드래곤볼 7성구 융합 소환 로직 (AI 12 + 통계 12 + 다빈도 풀)
-       ========================================================= */
     async function summonDragonBalls() {
       if (STATE.isDragonSummoning) return;
       STATE.isDragonSummoning = true;
@@ -2164,9 +2200,6 @@
       }
     }
 
-    /* =========================================================
-       QR 코드 렌더링 (동행복권 단말기 모바일 슬립지 E-Slip 규격)
-       ========================================================= */
     function renderQRSheet() {
       const source = QR_STATE.source;
       if (!source || !source.length) return;
